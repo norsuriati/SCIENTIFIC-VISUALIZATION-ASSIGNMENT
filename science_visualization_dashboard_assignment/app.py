@@ -24,6 +24,21 @@ pop, inc, cpi = get_data()
 ALL = sorted(inc.state.unique())
 
 
+def metrics(inc, cpi, pop, y0, y1):
+    med = inc.pivot(index="state", columns="year", values="income_median")
+    ca = A.cpi_annual(cpi).reindex(med.index)
+    pt = A.pop_total(pop).pivot(index="state", columns="year", values="pop_k").reindex(med.index)
+    m = pd.DataFrame(index=med.index)
+    m["inc_med_growth"] = (med[y1] / med[y0] - 1) * 100
+    m["cpi_growth"] = (ca[y1] / ca[y0] - 1) * 100
+    m["real_med_idx"] = (med[y1] / med[y0]) / (ca[y1] / ca[y0]) * 100
+    m["inc_med_end"] = med[y1]
+    m["pop_end"] = pt[y1]
+    m["pop_growth"] = (pt[y1] / pt[y0] - 1) * 100
+    m["label"] = [A.short(x) for x in m.index]
+    return m
+
+
 def card(label, value, sub=""):
     st.caption(label)
     st.markdown(f"#### {value}")
@@ -46,17 +61,16 @@ page = st.sidebar.radio("Objective", ["Objective 1", "Objective 2", "Objective 3
 st.sidebar.markdown("---")
 st.sidebar.subheader("Filters")
 sel = st.sidebar.multiselect("State", ALL, default=ALL, format_func=A.short)
-y0, y1 = st.sidebar.select_slider("Year (compare from → to)", options=A.SURVEY_YEARS, value=(A.BASE_YEAR, A.END_YEAR))
-st.sidebar.caption("Filters apply to all three objectives. Growth is measured from the first year to the second year. "
-                   "CPI shows how fast prices *rose*, not which state is more expensive.")
+years = st.sidebar.multiselect("Year", A.SURVEY_YEARS, default=A.SURVEY_YEARS)
 if not sel:
     st.warning("No state selected: showing all states.")
     sel = ALL
-if y0 >= y1:
-    st.warning("Choose two different years (the first must be earlier than the second).")
+if len(years) < 2:
+    st.warning("Select at least 2 years.")
     st.stop()
+y0, y1 = min(years), max(years)
 
-M = A.metrics(inc, cpi, pop, y0, y1).loc[sel]
+M = metrics(inc, cpi, pop, y0, y1).loc[sel]
 n = len(M)
 period = f"{y0} → {y1}"
 subtitle = f"{n} state{'s' if n > 1 else ''} · {period}"
