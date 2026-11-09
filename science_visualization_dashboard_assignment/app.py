@@ -1,6 +1,6 @@
-"""Malaysia: Income, Prices & Population - Cost-of-Living Pressure by State
+"""Malaysia: Income, Prices & Population - Cost of Living by State
 JIE42403 Scientific Visualisation.  Run:  streamlit run streamlit_app.py
-Libraries: streamlit, plotly, pandas, numpy, scipy (+ analysis.py for all calculations)."""
+One objective = one page = one chart."""
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
@@ -9,27 +9,21 @@ from scipy import stats
 
 import analysis as A
 
-st.set_page_config(page_title="Malaysia Cost-of-Living Pressure", page_icon="📊", layout="wide")
+st.set_page_config(page_title="Malaysia Cost of Living", page_icon="📊", layout="wide")
 
-BLUE, ORANGE, AQUA, YELLOW = "#2a78d6", "#eb6834", "#1baf7a", "#eda100"
+BLUE, ORANGE, AQUA = "#2a78d6", "#eb6834", "#1baf7a"
 SEQ = [[0, "#cde2fb"], [0.25, "#6da7ec"], [0.5, "#2a78d6"], [0.75, "#184f95"], [1, "#0d366b"]]
-DIV = [[0, "#2a78d6"], [0.5, "#e9e8e4"], [1, "#eb6834"]]          # blue - grey - orange
 
 
 @st.cache_data
 def get_data():
     pop, inc, cpi = A.load()
     m = A.state_metrics(inc, cpi, pop)
-    return pop, inc, cpi, m, A.income_panel(inc, cpi)
+    return cpi, m
 
 
-pop, inc, cpi, M, P = get_data()
+cpi, M = get_data()
 M["label"] = [A.short(s) for s in M.index]
-
-
-def style(fig, h=400, **kw):
-    fig.update_layout(height=h, margin=dict(l=10, r=10, t=30, b=10), legend=dict(orientation="h", y=-0.2), **kw)
-    return fig
 
 
 def card(label, value, sub=""):
@@ -39,204 +33,120 @@ def card(label, value, sub=""):
         st.caption(sub)
 
 
-def bubble_map(color, title, size=None):
-    """Geospatial bubble map: one bubble per state."""
-    sz = np.sqrt(size) * 1.1 + 4 if size is not None else 22
-    f = go.Figure(go.Scattergeo(
-        lat=[A.COORDS[s][0] for s in M.index], lon=[A.COORDS[s][1] for s in M.index], text=M.label,
-        marker=dict(size=sz, color=color, colorscale=SEQ, showscale=True, colorbar=dict(title=title),
-                    line=dict(width=1, color="white"), opacity=0.9),
-        customdata=np.c_[M.pop_end, M.inc_med_end, M.cpi_growth, M.real_med_idx],
-        hovertemplate="<b>%{text}</b><br>Population %{customdata[0]:,.0f}k<br>Median income RM%{customdata[1]:,.0f}"
-                      "<br>Price growth %{customdata[2]:.1f}%<br>Real income index %{customdata[3]:.0f}<extra></extra>"))
-    f.update_geos(fitbounds="locations", showcountries=True, showland=True, landcolor="#e9e8e4",
-                  countrycolor="#9a9992", showocean=True, oceancolor="#dbe9f9", resolution=50)
-    return f
-
-
-# ------------------------------------------------------------------ sidebar
 st.sidebar.title("📊 Cost of Living in Malaysia")
-page = st.sidebar.radio("Objective", ["1 · Income vs Prices", "2 · Population & Cost of Living", "3 · Pressure Drivers & Index"])
-measure = st.sidebar.radio("Income measure", ["Median", "Mean"], help="Median is less distorted by high earners.")
-st.sidebar.caption(f"**Data:** merged DOSM dataset (household income, state CPI 2010=100, state population). Income and CPI are compared over "
-                   f"{A.BASE_YEAR}–{A.END_YEAR} ({', '.join(map(str, A.SURVEY_YEARS))}); CPI = annual average of the survey year.")
-st.sidebar.caption("⚠️ CPI is an index (2010 = 100 in every state): it shows how fast prices *rose*, not which state is *more expensive* in RM.")
+page = st.sidebar.radio("Objective", ["Objective 1", "Objective 2", "Objective 3"])
+st.sidebar.caption("Data: DOSM household income, CPI (2010 = 100) and population by state, 2012–2024. "
+                   "CPI shows how fast prices *rose*, not which state is more expensive.")
 
-col = "median" if measure == "Median" else "mean"
-inc_growth = M["inc_med_growth"] if col == "median" else M["inc_mean_growth"]
-real_idx = P.pivot(index="state", columns="year", values=f"real_{col}_idx")
-real_end = real_idx[A.END_YEAR]
-gap = inc_growth - M["cpi_growth"]
-
-# ================================================================== PAGE 1
-if page.startswith("1"):
-    st.title("Objective 1 · Income vs Prices")
+# ================================================================== OBJECTIVE 1
+if page == "Objective 1":
+    gap = M.inc_med_growth - M.cpi_growth
+    real = M.real_med_idx
+    st.title("Objective 1")
     st.markdown("**To compare income growth and price growth in each state** "
                 "*(to identify which states became more affordable and which are falling behind).*")
     with st.container(border=True):
         st.subheader("Summary box")
         c = st.columns(5)
-        with c[0]: card("States where income beat prices", f"{(gap > 0).sum()} / {len(gap)}")
-        with c[1]: card(f"Avg {col} income growth", f"{inc_growth.mean():.0f}%", f"vs prices +{M.cpi_growth.mean():.0f}%")
-        with c[2]: card("Best real gain", A.short(real_end.idxmax()), f"real income ×{real_end.max()/100:.2f}")
-        with c[3]: card("Weakest real gain", A.short(real_end.idxmin()), f"real income ×{real_end.min()/100:.2f}")
+        with c[0]: card("Income beat prices", f"{(gap > 0).sum()} of {len(gap)} states")
+        with c[1]: card("Average growth", f"+{M.inc_med_growth.mean():.0f}% income", f"vs +{M.cpi_growth.mean():.0f}% prices")
+        with c[2]: card("Biggest gain", A.short(real.idxmax()), f"real income ×{real.max()/100:.2f}")
+        with c[3]: card("Smallest gain", A.short(real.idxmin()), f"real income ×{real.min()/100:.2f}")
         with c[4]: card("Highest price growth", A.short(M.cpi_growth.idxmax()), f"+{M.cpi_growth.max():.0f}%")
 
-    v1, v2 = st.columns(2)
-    with v1:
-        st.markdown("##### ① Line chart: income vs prices over time (2012 = 100)")
-        s = st.selectbox("State", list(M.index), index=list(M.index).index("Selangor"), format_func=A.short)
-        g = P[P.state == s]
-        f = go.Figure()
-        f.add_trace(go.Scatter(x=g.year, y=g[f"{col}_idx"], name=f"{measure} income", mode="lines+markers",
-                               line=dict(color=BLUE, width=2), marker=dict(size=8)))
-        f.add_trace(go.Scatter(x=g.year, y=g.cpi, name="Consumer prices (CPI)", mode="lines+markers",
-                               line=dict(color=ORANGE, width=2), marker=dict(size=8)))
-        f.add_hline(y=100, line_dash="dot", line_color="grey")
-        f.update_yaxes(title="Index (2012 = 100)")
-        f.update_xaxes(title="Survey year", dtick=2)
-        st.plotly_chart(style(f, 420, hovermode="x unified"))
-    with v2:
-        st.markdown("##### ② Bar chart: growth 2012→2024 by state")
-        d = pd.DataFrame({"inc": inc_growth, "cpi": M.cpi_growth, "gap": gap}).sort_values("gap")
-        names = [A.short(i) for i in d.index]
-        f = go.Figure()
-        f.add_trace(go.Bar(y=names, x=d.cpi, name="Prices (CPI)", orientation="h", marker_color=ORANGE))
-        f.add_trace(go.Bar(y=names, x=d.inc, name=f"{measure} income", orientation="h", marker_color=BLUE))
-        f.update_layout(barmode="group", bargap=0.25)
-        f.update_xaxes(title="% change 2012→2024")
-        st.plotly_chart(style(f, 520))
-    st.markdown("##### ③ Map: real-income index 2024 (income growth after removing price rises; 100 = no change)")
-    st.plotly_chart(style(bubble_map(real_end.reindex(M.index), "Real income<br>index"), 460))
-    with st.expander("Interpretation / Discussion", expanded=True):
-        hi, lo = real_end.idxmax(), real_end.idxmin()
-        st.markdown(f"""
-* **Incomes outran prices everywhere (②).** Every state's {col} income grew faster than its prices, so real purchasing power rose by
-  {real_end.min()-100:.0f}% to {real_end.max()-100:.0f}%. Strongest: **{A.short(hi)}** (×{real_end.max()/100:.2f}); weakest: **{A.short(lo)}** (×{real_end.min()/100:.2f}).
-* **Fast inflation does not automatically mean poor affordability (①, ②).** Selangor and Putrajaya had the highest price growth (+{M.cpi_growth['Selangor']:.0f}%, +{M.cpi_growth['W.P. Putrajaya']:.0f}%),
-  yet Selangor's real income still rose ×{real_end['Selangor']/100:.2f}; Putrajaya is the exception (×{real_end['W.P. Putrajaya']/100:.2f}) because its income grew modestly.
-* **Who is falling behind (③).** The palest bubbles (Putrajaya, Negeri Sembilan, Labuan, Pahang) gained least; Terengganu and Perlis gained most. The 2020 dip (COVID-19) is visible in ① — real income fell about 10% in most states before recovering by 2022–2024.
-* **Caveat.** Low-base states (Terengganu, Perlis) show big percentage gains partly because their 2012 income was low, and growth says nothing about the *level* of affordability. Rankings are sensitive to the base year (rank correlation 0.58 between 2012 and 2014 bases), though the extremes hold.""")
+    st.markdown("##### Bar chart: income growth vs price growth, 2012 → 2024")
+    d = pd.DataFrame({"inc": M.inc_med_growth, "cpi": M.cpi_growth, "gap": gap}).sort_values("gap")
+    names = [A.short(i) for i in d.index]
+    f = go.Figure()
+    f.add_trace(go.Bar(y=names, x=d.cpi, name="Prices (CPI)", orientation="h", marker_color=ORANGE))
+    f.add_trace(go.Bar(y=names, x=d.inc, name="Median household income", orientation="h", marker_color=BLUE))
+    f.update_layout(barmode="group", bargap=0.25, height=620, margin=dict(l=10, r=10, t=10, b=10), legend=dict(orientation="h", y=1.05))
+    f.update_xaxes(title="% increase 2012 → 2024")
+    st.plotly_chart(f)
+    st.caption("States are sorted by the gap (income growth minus price growth): smallest gap at the bottom, largest at the top.")
 
-# ================================================================== PAGE 2
-elif page.startswith("2"):
-    st.title("Objective 2 · Population and Cost of Living")
+    with st.expander("Interpretation", expanded=True):
+        top = gap.sort_values(ascending=False).head(3); low = gap.sort_values().head(3)
+        st.markdown(f"""
+* **Incomes grew faster than prices in every state.** Median income rose {M.inc_med_growth.min():.0f}–{M.inc_med_growth.max():.0f}%, while prices rose only {M.cpi_growth.min():.0f}–{M.cpi_growth.max():.0f}%. People can afford more than in 2012 everywhere.
+* **Biggest winners:** {', '.join(A.short(i) for i in top.index)} (income grew {top.iloc[0]:.0f}, {top.iloc[1]:.0f} and {top.iloc[2]:.0f} points faster than prices).
+* **Falling behind:** {', '.join(A.short(i) for i in low.index)}, where income growth beat price growth by only {low.iloc[0]:.0f}–{low.iloc[2]:.0f} points. Putrajaya has the weakest real gain overall: prices rose {M.cpi_growth['W.P. Putrajaya']:.0f}% (highest of all) but income only {M.inc_med_growth['W.P. Putrajaya']:.0f}%.
+* **Fast price growth does not always mean less affordable.** Selangor had very high price growth (+{M.cpi_growth['Selangor']:.0f}%) but income doubled (+{M.inc_med_growth['Selangor']:.0f}%).
+* **Caution:** low-income states such as Terengganu and Perlis show big gains partly because they started from a low income in 2012.""")
+
+# ================================================================== OBJECTIVE 2
+elif page == "Objective 2":
+    r1 = stats.spearmanr(M.pop_end, M.inc_med_end); r2 = stats.spearmanr(M.pop_end, M.cpi_growth)
+    r3 = stats.spearmanr(M.pop_growth, M.cpi_growth)
+    top3 = M.pop_end.nlargest(3)
+    st.title("Objective 2")
     st.markdown("**To examine whether states with more people also have higher income and prices** "
                 "*(to find where cost-of-living pressure is greatest).*")
-    ymap = {"Median household income 2024 (RM)": "inc_med_end", "Price growth 2012→2024 (%)": "cpi_growth",
-            "Real median income index 2024": "real_med_idx", "Population growth 2012→2024 (%)": "pop_growth"}
-    ylab = st.selectbox("Compare population size (2024) with…", list(ymap))
-    yv = ymap[ylab]
-    rho, prho = stats.spearmanr(M.pop_end, M[yv])
-    top3 = M.pop_end.nlargest(3)
     with st.container(border=True):
         st.subheader("Summary box")
         c = st.columns(5)
-        with c[0]: card("Population 2024", f"{M.pop_end.sum()/1000:.1f} M", f"+{(M.pop_end.sum()/M.pop_base.sum()-1)*100:.0f}% since 2012")
-        with c[1]: card("Top-3 share", f"{top3.sum()/M.pop_end.sum()*100:.0f}%", ", ".join(A.short(i) for i in top3.index))
-        with c[2]: card("Correlation ρ (selected)", f"{rho:+.2f}", f"p = {prho:.2f}")
-        with c[3]: card("Fastest-growing", A.short(M.pop_growth.idxmax()), f"+{M.pop_growth.max():.0f}%")
-        with c[4]: card("Largest population", A.short(M.pop_end.idxmax()), f"{M.pop_end.max()/1000:.1f} M people")
+        with c[0]: card("Malaysia population 2024", f"{M.pop_end.sum()/1000:.1f} M")
+        with c[1]: card("Top 3 states", f"{top3.sum()/M.pop_end.sum()*100:.0f}% of people", ", ".join(A.short(i) for i in top3.index))
+        with c[2]: card("Population vs income", f"ρ = {r1[0]:+.2f}", "no clear link" if abs(r1[0]) < 0.3 else "linked")
+        with c[3]: card("Population vs price growth", f"ρ = {r2[0]:+.2f}", "weak link" if abs(r2[0]) < 0.4 else "linked")
+        with c[4]: card("Highest price growth", A.short(M.cpi_growth.idxmax()), f"+{M.cpi_growth.max():.0f}%")
 
-    v1, v2 = st.columns(2)
-    with v1:
-        st.markdown("##### ① Scatter plot: population size vs selected indicator")
-        x = np.log10(M.pop_end)
-        b = np.polyfit(x, M[yv], 1)
-        xs = np.linspace(x.min(), x.max(), 50)
-        f = go.Figure()
-        f.add_trace(go.Scatter(x=M.pop_end, y=M[yv], mode="markers+text", text=M.label, textposition="top center", name="State",
-                               marker=dict(size=13, color=M.cpi_growth, colorscale=SEQ, showscale=True,
-                                           colorbar=dict(title="Price<br>growth %"), line=dict(width=1.5, color="white")),
-                               hovertemplate="%{text}<br>Pop %{x:,.0f}k<br>" + ylab + " %{y:,.1f}<extra></extra>"))
-        f.add_trace(go.Scatter(x=10 ** xs, y=np.polyval(b, xs), mode="lines", line=dict(color=ORANGE, dash="dash"), name="Trend"))
-        f.update_xaxes(type="log", title="Population 2024 ('000, log scale)")
-        f.update_yaxes(title=ylab)
-        st.plotly_chart(style(f, 460))
-    with v2:
-        st.markdown("##### ② Bar chart: population growth vs price growth 2012→2024")
-        d = M.sort_values("pop_growth")
-        names = list(d.label)
-        f = go.Figure()
-        f.add_trace(go.Bar(y=names, x=d.cpi_growth, name="Price growth %", orientation="h", marker_color=ORANGE))
-        f.add_trace(go.Bar(y=names, x=d.pop_growth, name="Population growth %", orientation="h", marker_color=BLUE))
-        f.update_layout(barmode="group", bargap=0.25)
-        f.update_xaxes(title="% change 2012→2024")
-        st.plotly_chart(style(f, 560))
-    st.markdown("##### ③ Map: bubble = population 2024, colour = price growth 2012→2024")
-    st.plotly_chart(style(bubble_map(M.cpi_growth, "Price<br>growth %", size=M.pop_end), 480))
-    with st.expander("Interpretation / Discussion", expanded=True):
-        r1 = stats.spearmanr(M.pop_end, M.inc_med_end); r2 = stats.spearmanr(M.pop_end, M.cpi_growth)
-        r3 = stats.spearmanr(M.pop_growth, M.cpi_growth); r4 = stats.spearmanr(M.inc_med_end, M.cpi_growth)
+    st.markdown("##### Scatter plot: population vs household income, 2024 (colour = price growth since 2012)")
+    f = go.Figure(go.Scatter(
+        x=M.pop_end, y=M.inc_med_end, mode="markers+text", text=M.label, textposition="top center",
+        marker=dict(size=16, color=M.cpi_growth, colorscale=SEQ, showscale=True, colorbar=dict(title="Price<br>growth %"),
+                    line=dict(width=1.5, color="white")),
+        hovertemplate="<b>%{text}</b><br>Population %{x:,.0f}k<br>Median income RM%{y:,.0f}<extra></extra>"))
+    f.update_xaxes(type="log", title="Population 2024 ('000, log scale)")
+    f.update_yaxes(title="Median household income 2024 (RM)")
+    f.update_layout(height=600, margin=dict(l=10, r=10, t=10, b=10))
+    st.plotly_chart(f)
+    st.caption("Each dot is one state. Darker dot = prices rose more between 2012 and 2024.")
+
+    with st.expander("Interpretation", expanded=True):
         st.markdown(f"""
-* **More people does not mean higher income or prices (①, ③).** Population size is essentially unrelated to median income
-  (ρ = {r1[0]:+.2f}, p = {r1[1]:.2f}) and only weakly to price growth (ρ = {r2[0]:+.2f}, p = {r2[1]:.2f}). Sabah and Perak are populous but have low incomes, whereas
-  KL, Putrajaya and Labuan are small yet among the richest.
-* **What does move together (①, ②).** Richer states saw faster price rises (income level vs price growth ρ = {r4[0]:+.2f}, p = {r4[1]:.3f}), and states whose population grew faster also saw faster price growth
-  (ρ = {r3[0]:+.2f}, p = {r3[1]:.2f}). This points to urban demand and wage levels, rather than head-count, as the source of price pressure.
-* **Where pressure is greatest (③).** The Klang Valley (Selangor holds ≈{M.pop_share['Selangor']:.0f}% of Malaysians) combines large or fast-growing populations with high price growth: Putrajaya +{M.cpi_growth['W.P. Putrajaya']:.0f}%, Selangor +{M.cpi_growth['Selangor']:.0f}%,
-  then Johor +{M.cpi_growth['Johor']:.0f}%, Penang +{M.cpi_growth['Pulau Pinang']:.0f}% and KL +{M.cpi_growth['W.P. Kuala Lumpur']:.0f}%.
-* **Caveat.** n = 16 states, so only the income–price link is clearly significant; Putrajaya (population recorded from 2010) is an outlier; correlation is not causation.""")
+* **More people does not mean higher income.** The correlation between population and income is ρ = {r1[0]:+.2f} (p = {r1[1]:.2f}), which is no real link. Selangor is the largest state and one of the richest, but Sabah and Perak have many people and low income.
+* **Small states can be rich.** KL, Putrajaya and Labuan have few people but high income.
+* **Dark dots (fast price growth) sit at the top.** The richest states (Putrajaya, Selangor, KL, Johor, Penang) also had the biggest price rises, so pressure comes more from wealth and urban demand than from head-count. Population size and price growth are only weakly related (ρ = {r2[0]:+.2f}), but states whose population grew faster also saw faster price rises (ρ = {r3[0]:+.2f}).
+* **Where pressure is greatest:** Putrajaya (+{M.cpi_growth['W.P. Putrajaya']:.0f}%), Selangor (+{M.cpi_growth['Selangor']:.0f}%) and Johor (+{M.cpi_growth['Johor']:.0f}%). Low-income, low-price-growth states such as Kelantan and Perak face a different problem: low income, not rising prices.
+* **Caution:** only 16 states, so these patterns are indications, not proof.""")
 
-# ================================================================== PAGE 3
+# ================================================================== OBJECTIVE 3
 else:
-    st.title("Objective 3 · Pressure Drivers & Index")
+    DG = A.division_growth(cpi)
+    nat = DG.mean().sort_values(ascending=False)
+    ess = DG[A.ESSENTIALS]
+    tot = ess.sum(axis=1).sort_values()
+    st.title("Objective 3")
     st.markdown("**To identify which spending categories, such as food, housing and transport, push prices up the most** "
                 "*(to rank states by overall cost-of-living pressure).*")
-    y0, y1 = st.select_slider("Period for category price change (survey years)", options=A.SURVEY_YEARS, value=(A.BASE_YEAR, A.END_YEAR))
-    DG = A.division_growth(cpi, y0, y1)
-    nat = DG.mean().sort_values()
-    st.sidebar.markdown("**Pressure-index weights**")
-    w = {k: st.sidebar.slider(k, 0, 5, 1) for k in ["Price growth", "Real-income shortfall", "Low income level", "Population growth"]}
-    if sum(w.values()) == 0:
-        st.sidebar.warning("All weights are 0 — using equal weights.")
-        w = {k: 1 for k in w}
-    comp, contrib, idx = A.pressure_index(M, w)
-    idx = idx.sort_values(ascending=False)
     with st.container(border=True):
         st.subheader("Summary box")
         c = st.columns(5)
-        with c[0]: card("Highest pressure", A.short(idx.index[0]), f"index {idx.iloc[0]:.0f}/100")
-        with c[1]: card("Lowest pressure", A.short(idx.index[-1]), f"index {idx.iloc[-1]:.0f}/100")
-        with c[2]: card("Fastest-rising category", nat.index[-1].split(" &")[0], f"avg +{nat.iloc[-1]:.0f}% ({y0}→{y1})")
-        with c[3]: card("Food & Beverages", f"+{nat['Food & Beverages']:.0f}%", f"Housing +{nat['Housing & Utilities']:.0f}%")
-        with c[4]: card("Categories with falling prices", f"{(nat < 0).sum()} of {len(nat)}", f"{y0}→{y1}, average of 16 states")
+        with c[0]: card("Fastest-rising category", nat.index[0].split(" &")[0], f"+{nat.iloc[0]:.0f}% on average")
+        with c[1]: card("Food & Beverages", f"+{nat['Food & Beverages']:.0f}%", "average of 16 states")
+        with c[2]: card("Housing & Utilities", f"+{nat['Housing & Utilities']:.0f}%", "average of 16 states")
+        with c[3]: card("Highest pressure", A.short(tot.index[-1]), f"food +{ess.loc[tot.index[-1], 'Food & Beverages']:.0f}%")
+        with c[4]: card("Lowest pressure", A.short(tot.index[0]), f"food +{ess.loc[tot.index[0], 'Food & Beverages']:.0f}%")
 
-    v1, v2 = st.columns(2)
-    with v1:
-        st.markdown(f"##### ① Bar chart: average price change by category, {y0}→{y1}")
-        f = go.Figure(go.Bar(y=list(nat.index), x=nat.values, orientation="h",
-                             marker_color=[ORANGE if v >= 0 else BLUE for v in nat.values],
-                             hovertemplate="%{y}<br>%{x:.1f}%<extra></extra>"))
-        f.update_xaxes(title="% change (average of 16 states)")
-        st.plotly_chart(style(f, 500))
-    with v2:
-        st.markdown("##### ② Stacked bar: Cost-of-Living Pressure Index (0–100)")
-        f = go.Figure()
-        for k, colr in zip(contrib.columns, [BLUE, ORANGE, AQUA, YELLOW]):
-            f.add_trace(go.Bar(y=[A.short(s) for s in idx.index], x=contrib.loc[idx.index, k], name=k, orientation="h",
-                               marker_color=colr, hovertemplate=k + ": %{x:.1f}<extra></extra>"))
-        f.update_layout(barmode="stack", bargap=0.25)
-        f.update_yaxes(autorange="reversed")
-        f.update_xaxes(title="Index (higher = more pressure)")
-        st.plotly_chart(style(f, 500))
-    st.markdown(f"##### ③ Heatmap: price change by category and state, {y0}→{y1} (%)")
-    order = DG.loc[:, DG.mean().sort_values(ascending=False).index]
-    f = go.Figure(go.Heatmap(z=order.values, x=list(order.columns), y=[A.short(s) for s in order.index], colorscale=DIV, zmid=0,
-                             text=np.round(order.values, 0), texttemplate="%{text:.0f}", colorbar=dict(title="% chg"),
-                             hovertemplate="%{y} · %{x}<br>%{z:.1f}%<extra></extra>"))
-    f.update_xaxes(tickangle=-35)
-    f.update_yaxes(autorange="reversed")
-    st.plotly_chart(style(f, 520))
-    with st.expander("Interpretation / Discussion", expanded=True):
-        fo = DG["Food & Beverages"].sort_values()
-        top = nat.index[::-1]
+    st.markdown("##### Stacked bar: price rise in food, housing and transport by state, 2012 → 2024")
+    names = [A.short(s) for s in tot.index]
+    f = go.Figure()
+    for k, colr in zip(A.ESSENTIALS, [BLUE, ORANGE, AQUA]):
+        f.add_trace(go.Bar(y=names, x=ess.loc[tot.index, k], name=k, orientation="h", marker_color=colr,
+                           hovertemplate=k + ": +%{x:.1f}%<extra></extra>"))
+    f.update_layout(barmode="stack", bargap=0.25, height=620, margin=dict(l=10, r=10, t=10, b=10), legend=dict(orientation="h", y=1.05))
+    f.update_xaxes(title="Price rise (%), the three categories added together")
+    st.plotly_chart(f)
+    st.caption("States are ranked by the total of the three bars: longest bar = highest cost-of-living pressure from essentials.")
+
+    with st.expander("Interpretation", expanded=True):
+        t3 = list(tot.index[::-1][:3]); b3 = list(tot.index[:3])
         st.markdown(f"""
-* **A few categories drive most of the rise (①).** On average the biggest increases were **{top[0]}** (+{nat[top[0]]:.0f}%), **{top[1]}** (+{nat[top[1]]:.0f}%) and **{top[2]}** (+{nat[top[2]]:.0f}%) ({y0}→{y1}),
-  while categories such as Information & Communication and Clothing & Footwear fell (default 2012→2024 window) — consumers gained there.
-* **Food pressure differs by state (③).** Food & Beverages rose from +{fo.iloc[0]:.0f}% in {A.short(fo.index[0])} to +{fo.iloc[-1]:.0f}% in {A.short(fo.index[-1])}; essentials rose most in the Klang Valley (Putrajaya, Selangor) and in Penang and Johor.
-* **The index ranks states (②).** At current weights **{A.short(idx.index[0])}**, **{A.short(idx.index[1])}** and **{A.short(idx.index[2])}** face the highest pressure and **{A.short(idx.index[-1])}** the lowest. The coloured stacks show *why*: Putrajaya is driven by population growth and a weak real-income gain, Kelantan by low income level.
-  Move the sidebar sliders to test sensitivity — Terengganu stays at or near the bottom and Putrajaya / Negeri Sembilan near the top under most weightings, but the middle ranks reshuffle.
-* **Caveat.** The index is relative (rank-based) across 16 states, not an absolute poverty measure, and it uses price *growth*, not price levels.""")
+* **Categories that push prices up the most.** Across all states the biggest rises were {nat.index[0]} (+{nat.iloc[0]:.0f}%), {nat.index[1]} (+{nat.iloc[1]:.0f}%) and {nat.index[2]} (+{nat.iloc[2]:.0f}%). Information & Communication and Clothing fell, so not every price went up.
+* **Food is the biggest everyday pressure.** Food & Beverages rose +{nat['Food & Beverages']:.0f}% on average, compared with +{nat['Housing & Utilities']:.0f}% for housing and +{nat['Transport'].round(0):.0f}% for transport.
+* **Highest pressure:** {', '.join(A.short(i) for i in t3)}. In these states food, housing and transport all rose strongly (food +{ess.loc[t3[0], 'Food & Beverages']:.0f}% in {A.short(t3[0])}).
+* **Lowest pressure:** {', '.join(A.short(i) for i in b3)}, where the three essentials rose the least.
+* **Caution:** the three bars are simply added together, not weighted by how much households spend on each. The chart shows how fast prices rose, not how expensive each state is.""")
 
-st.caption("Sources: Department of Statistics Malaysia (DOSM) – household income, CPI by state, population by state. JIE42403 Scientific Visualisation assignment.")
+st.caption("Source: Department of Statistics Malaysia (DOSM). JIE42403 Scientific Visualisation.")
