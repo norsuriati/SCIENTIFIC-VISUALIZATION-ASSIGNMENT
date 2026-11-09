@@ -1,6 +1,6 @@
 """Malaysia: Income, Prices & Population - Cost of Living by State
-JIE42403 Scientific Visualisation.  Run:  streamlit run streamlit_app.py
-One objective = one page = one chart.  Sidebar filters (State, Year) apply to every page."""
+JIE42403 Scientific Visualisation.   Run:  streamlit run app.py
+One objective = one page = one chart.  Sidebar filters (State, Year range) apply to every page."""
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
@@ -11,10 +11,34 @@ import analysis as A
 
 st.set_page_config(page_title="Malaysia Cost of Living", page_icon="📊", layout="wide")
 
-BLUE, ORANGE, AQUA = "#2a78d6", "#eb6834", "#1baf7a"
-SEQ = [[0, "#cde2fb"], [0.25, "#6da7ec"], [0.5, "#2a78d6"], [0.75, "#184f95"], [1, "#0d366b"]]
+# ------------------------------------------------------------------ design tokens
+INK, MUTED, GRID = "#1f2937", "#6b7280", "#e5e7eb"
+BLUE, ORANGE, TEAL = "#2563eb", "#ea580c", "#0d9488"
+GOOD, BAD = "#047857", "#b91c1c"
+SEQ = [[0, "#dbeafe"], [0.5, "#3b82f6"], [1, "#1e3a8a"]]
+FONT = "Inter, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+
+st.markdown(f"""
+<style>
+.block-container {{padding-top: 2rem; padding-bottom: 3rem; max-width: 1280px;}}
+h1 {{font-size: 1.9rem !important; font-weight: 700 !important; letter-spacing: -0.02em; margin-bottom: .1rem;}}
+.tag {{display:inline-block; font-size:.72rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+       color:{BLUE}; background:#eff6ff; padding:.2rem .6rem; border-radius:999px; margin-bottom:.5rem;}}
+.goal {{color:{MUTED}; font-size:1rem; margin:.2rem 0 .3rem 0; line-height:1.5;}}
+.scope {{color:{MUTED}; font-size:.85rem; margin-bottom:1.1rem;}}
+.kpi {{background:#fff; border:1px solid {GRID}; border-radius:12px; padding:.9rem 1rem; height:100%;
+       box-shadow:0 1px 2px rgba(16,24,40,.04);}}
+.kpi .l {{font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:{MUTED};}}
+.kpi .v {{font-size:1.5rem; font-weight:700; color:{INK}; line-height:1.25; margin:.15rem 0;}}
+.kpi .s {{font-size:.8rem; color:{MUTED};}}
+.sec {{font-size:1.05rem; font-weight:650; color:{INK}; margin:1.4rem 0 .1rem 0;}}
+.note {{font-size:.82rem; color:{MUTED}; margin-top:-.3rem;}}
+section[data-testid="stSidebar"] {{border-right:1px solid {GRID};}}
+</style>
+""", unsafe_allow_html=True)
 
 
+# ------------------------------------------------------------------ data
 @st.cache_data
 def get_data():
     return A.load()
@@ -22,16 +46,18 @@ def get_data():
 
 pop, inc, cpi = get_data()
 ALL = sorted(inc.state.unique())
+YEARS = [y for y in A.SURVEY_YEARS if y in set(inc.year)]
 
 
-def metrics(inc, cpi, pop, y0, y1):
+def metrics(y0, y1):
     med = inc.pivot(index="state", columns="year", values="income_median")
     ca = A.cpi_annual(cpi).reindex(med.index)
     pt = A.pop_total(pop).pivot(index="state", columns="year", values="pop_k").reindex(med.index)
     m = pd.DataFrame(index=med.index)
     m["inc_med_growth"] = (med[y1] / med[y0] - 1) * 100
     m["cpi_growth"] = (ca[y1] / ca[y0] - 1) * 100
-    m["real_med_idx"] = (med[y1] / med[y0]) / (ca[y1] / ca[y0]) * 100
+    m["gap"] = m.inc_med_growth - m.cpi_growth
+    m["real_chg"] = ((med[y1] / med[y0]) / (ca[y1] / ca[y0]) - 1) * 100   # % change in purchasing power
     m["inc_med_end"] = med[y1]
     m["pop_end"] = pt[y1]
     m["pop_growth"] = (pt[y1] / pt[y0] - 1) * 100
@@ -39,167 +65,211 @@ def metrics(inc, cpi, pop, y0, y1):
     return m
 
 
-def card(label, value, sub=""):
-    st.caption(label)
-    st.markdown(f"#### {value}")
-    if sub:
-        st.caption(sub)
+# ------------------------------------------------------------------ helpers
+def kpi(col, label, value, sub=""):
+    col.markdown(f'<div class="kpi"><div class="l">{label}</div><div class="v">{value}</div>'
+                 f'<div class="s">{sub}&nbsp;</div></div>', unsafe_allow_html=True)
 
 
-def height(n, per=34, base=150):
-    return int(max(380, per * n + base))
+def show(fig):
+    try:
+        st.plotly_chart(fig, width="stretch")
+    except TypeError:                                  # older Streamlit
+        st.plotly_chart(fig, use_container_width=True)
 
 
-def level(r, strong=0.5, weak=0.25):
+def style(fig, h, **kw):
+    fig.update_layout(height=h, template="plotly_white", font=dict(family=FONT, size=13, color=INK),
+                      margin=dict(l=10, r=20, t=40, b=10), paper_bgcolor="white", plot_bgcolor="white",
+                      hoverlabel=dict(font_size=13), **kw)
+    fig.update_xaxes(gridcolor=GRID, zeroline=False, linecolor=GRID)
+    fig.update_yaxes(gridcolor=GRID, zeroline=False, linecolor=GRID)
+    return fig
+
+
+def row_h(n, per=34, base=140):
+    return int(max(360, per * n + base))
+
+
+def header(tag, goal, purpose, scope):
+    st.markdown(f'<span class="tag">{tag}</span>', unsafe_allow_html=True)
+    st.markdown(f"# {goal}")
+    st.markdown(f'<div class="goal">{purpose}</div><div class="scope">{scope}</div>', unsafe_allow_html=True)
+
+
+def strength(r):
     a = abs(r)
-    return "a strong" if a >= strong else ("a moderate" if a >= weak else "almost no")
+    return "strong" if a >= 0.5 else ("moderate" if a >= 0.25 else "weak")
+
+
+def names(idx):
+    return ", ".join(A.short(i) for i in idx)
 
 
 # ------------------------------------------------------------------ sidebar
-st.sidebar.title("📊 Cost of Living in Malaysia")
-page = st.sidebar.radio("Objective", ["Objective 1", "Objective 2", "Objective 3"])
+st.sidebar.markdown("## 📊 Cost of Living")
+st.sidebar.caption("Malaysia · by state")
+page = st.sidebar.radio("Objective", ["1 · Income vs prices", "2 · Population & pressure", "3 · Spending categories"])
 st.sidebar.markdown("---")
-st.sidebar.subheader("Filters")
-sel = st.sidebar.multiselect("State", ALL, default=ALL, format_func=A.short)
-years = st.sidebar.multiselect("Year", A.SURVEY_YEARS, default=A.SURVEY_YEARS)
-if not sel:
-    st.warning("No state selected: showing all states.")
-    sel = ALL
-if len(years) < 2:
-    st.warning("Select at least 2 years.")
-    st.stop()
-y0, y1 = min(years), max(years)
+st.sidebar.markdown("**Filters**")
+sel = st.sidebar.multiselect("States", ALL, default=ALL, format_func=A.short)
+y0, y1 = st.sidebar.select_slider("Year range", options=YEARS, value=(YEARS[0], YEARS[-1]))
+st.sidebar.caption("Years are DOSM household-income survey years. Prices use the annual-average CPI.")
 
-M = metrics(inc, cpi, pop, y0, y1).loc[sel]
+if not sel:
+    st.sidebar.info("No state selected, so all states are shown.")
+    sel = ALL
+if y0 == y1:
+    st.info("Start and end year are the same. Move the **Year range** slider so the two ends differ.")
+    st.stop()
+
+M = metrics(y0, y1).loc[sel]
 n = len(M)
 period = f"{y0} → {y1}"
-subtitle = f"{n} state{'s' if n > 1 else ''} · {period}"
+scope = f"{n} state{'s' if n > 1 else ''} · {period}"
 
 # ================================================================== OBJECTIVE 1
-if page == "Objective 1":
-    gap = M.inc_med_growth - M.cpi_growth
-    real = M.real_med_idx
-    st.title("Objective 1")
-    st.markdown("**To compare income growth and price growth in each state** "
-                "*(to identify which states became more affordable and which are falling behind).*")
-    st.caption(subtitle)
-    with st.container(border=True):
-        st.subheader("Summary box")
-        c = st.columns(5)
-        with c[0]: card("Income beat prices", f"{(gap > 0).sum()} of {n} states")
-        with c[1]: card("Average growth", f"+{M.inc_med_growth.mean():.0f}% income", f"vs +{M.cpi_growth.mean():.0f}% prices")
-        with c[2]: card("Biggest real gain", A.short(real.idxmax()), f"real income ×{real.max()/100:.2f}")
-        with c[3]: card("Smallest real gain", A.short(real.idxmin()), f"real income ×{real.min()/100:.2f}")
-        with c[4]: card("Highest price growth", A.short(M.cpi_growth.idxmax()), f"+{M.cpi_growth.max():.0f}%")
+if page.startswith("1"):
+    header("Objective 1", "Income growth vs price growth",
+           "To compare income growth and price growth in each state, and identify which states became "
+           "more affordable and which are falling behind.", scope)
 
-    st.markdown(f"##### Bar chart: income growth vs price growth, {period}")
-    d = pd.DataFrame({"inc": M.inc_med_growth, "cpi": M.cpi_growth, "gap": gap}).sort_values("gap")
-    names = [A.short(i) for i in d.index]
+    gap, real = M.gap, M.real_chg
+    c = st.columns(4)
+    kpi(c[0], "Income beat prices", f"{(gap > 0).sum()} of {n}", "states with real income gain")
+    kpi(c[1], "Average growth", f"+{M.inc_med_growth.mean():.0f}%", f"income, vs +{M.cpi_growth.mean():.0f}% prices")
+    kpi(c[2], "Biggest real gain", A.short(real.idxmax()), f"purchasing power {real.max():+.0f}%")
+    kpi(c[3], "Smallest real gain", A.short(real.idxmin()), f"purchasing power {real.min():+.0f}%")
+
+    st.markdown(f'<div class="sec">Median household income growth vs price growth, {period}</div>'
+                '<div class="note">States sorted by the gap (income growth minus price growth). '
+                'Top = most affordable gain, bottom = falling behind.</div>', unsafe_allow_html=True)
+    d = M.assign(gap=gap).sort_values("gap")
     f = go.Figure()
-    f.add_trace(go.Bar(y=names, x=d.cpi, name="Prices (CPI)", orientation="h", marker_color=ORANGE))
-    f.add_trace(go.Bar(y=names, x=d.inc, name="Median household income", orientation="h", marker_color=BLUE))
-    f.update_layout(barmode="group", bargap=0.25, height=height(n, 38), margin=dict(l=10, r=10, t=10, b=10), legend=dict(orientation="h", y=1.04))
-    f.update_xaxes(title=f"% increase {period}")
-    st.plotly_chart(f)
-    st.caption("Sorted by the gap (income growth minus price growth): largest gap at the top.")
+    f.add_trace(go.Bar(y=d.label, x=d.cpi_growth, name="Prices (CPI)", orientation="h", marker_color=ORANGE,
+                       text=[f"{v:.0f}%" for v in d.cpi_growth], textposition="outside", cliponaxis=False,
+                       hovertemplate="%{y}<br>Prices +%{x:.1f}%<extra></extra>"))
+    f.add_trace(go.Bar(y=d.label, x=d.inc_med_growth, name="Median household income", orientation="h", marker_color=BLUE,
+                       text=[f"{v:.0f}%" for v in d.inc_med_growth], textposition="outside", cliponaxis=False,
+                       hovertemplate="%{y}<br>Income +%{x:.1f}%<extra></extra>"))
+    style(f, row_h(n, 40), barmode="group", bargap=0.3, bargroupgap=0.05,
+          legend=dict(orientation="h", y=1.06, x=0))
+    f.update_xaxes(title=f"% increase, {period}", ticksuffix="%")
+    show(f)
 
-    with st.expander("Interpretation", expanded=True):
+    with st.container(border=True):
+        st.markdown("**Key insights**")
         k = min(3, n)
-        top = gap.sort_values(ascending=False).head(k); low = gap.sort_values().head(k)
+        top, low = gap.sort_values(ascending=False).head(k), gap.sort_values().head(k)
         w = real.idxmin()
         beat = "every selected state" if (gap > 0).all() else f"{(gap > 0).sum()} of {n} states"
         st.markdown(f"""
-* **Income vs prices.** Between {y0} and {y1}, median income grew faster than prices in {beat}. Income rose {M.inc_med_growth.min():.0f}–{M.inc_med_growth.max():.0f}% while prices rose {M.cpi_growth.min():.0f}–{M.cpi_growth.max():.0f}%.
-* **Biggest winners:** {', '.join(f"{A.short(i)} (+{v:.0f} pts)" for i, v in top.items())}, where income growth beat price growth by the widest margin.
-* **Falling behind:** {', '.join(f"{A.short(i)} ({v:+.0f} pts)" for i, v in low.items())}, where the gap between income and price growth is smallest.
-* **Weakest real gain:** {A.short(w)}. Prices rose {M.cpi_growth[w]:.0f}% but median income rose {M.inc_med_growth[w]:.0f}%, so real purchasing power changed by only {real[w]-100:+.0f}%.
-* **Caution:** a state that starts with low income can show a big percentage gain; growth does not show how affordable a state is today.""")
+- **Overall.** From {y0} to {y1}, median income grew faster than prices in {beat}. Income rose {M.inc_med_growth.min():.0f}–{M.inc_med_growth.max():.0f}% while prices rose {M.cpi_growth.min():.0f}–{M.cpi_growth.max():.0f}%.
+- **Became more affordable:** {', '.join(f"{A.short(i)} ({v:+.0f} pts)" for i, v in top.items())}. Income growth beat price growth by the widest margin.
+- **Falling behind (relatively):** {', '.join(f"{A.short(i)} ({v:+.0f} pts)" for i, v in low.items())}. The gap between income and price growth is smallest{", though still positive" if (low > 0).all() else ""}.
+- **Weakest real gain:** {A.short(w)}. Prices rose {M.cpi_growth[w]:.0f}% and median income rose {M.inc_med_growth[w]:.0f}%, so purchasing power changed by only {real[w]:+.0f}%.
+- **Caution:** a state that starts with a low income can show a large percentage gain. Growth does not show how affordable a state is today.""")
 
 # ================================================================== OBJECTIVE 2
-elif page == "Objective 2":
-    st.title("Objective 2")
-    st.markdown("**To examine whether states with more people also have higher income and prices** "
-                "*(to find where cost-of-living pressure is greatest).*")
-    st.caption(subtitle)
+elif page.startswith("2"):
+    header("Objective 2", "Population, income and prices",
+           "To examine whether states with more people also have higher income and prices, "
+           "and find where cost-of-living pressure is greatest.", scope)
+
     enough = n >= 5
     if enough:
-        r1 = stats.spearmanr(M.pop_end, M.inc_med_end); r2 = stats.spearmanr(M.pop_end, M.cpi_growth)
-        r4 = stats.spearmanr(M.inc_med_end, M.cpi_growth)
+        r1 = stats.spearmanr(M.pop_end, M.inc_med_end)
+        r2 = stats.spearmanr(M.pop_end, M.cpi_growth)
+        r3 = stats.spearmanr(M.inc_med_end, M.cpi_growth)
     top3 = M.pop_end.nlargest(min(3, n))
-    with st.container(border=True):
-        st.subheader("Summary box")
-        c = st.columns(5)
-        with c[0]: card(f"Population {y1}", f"{M.pop_end.sum()/1000:.1f} M", "selected states")
-        with c[1]: card("Largest states", f"{top3.sum()/M.pop_end.sum()*100:.0f}% of people", ", ".join(A.short(i) for i in top3.index))
-        with c[2]: card("Population vs income", f"ρ = {r1[0]:+.2f}" if enough else "n/a", "needs 5+ states" if not enough else "")
-        with c[3]: card("Population vs price growth", f"ρ = {r2[0]:+.2f}" if enough else "n/a", "needs 5+ states" if not enough else "")
-        with c[4]: card("Highest price growth", A.short(M.cpi_growth.idxmax()), f"+{M.cpi_growth.max():.0f}%")
+    c = st.columns(4)
+    kpi(c[0], f"Population {y1}", f"{M.pop_end.sum() / 1000:.1f} M", "selected states")
+    kpi(c[1], "Largest states", f"{top3.sum() / M.pop_end.sum() * 100:.0f}% of people", names(top3.index))
+    kpi(c[2], "Population vs income", f"ρ = {r1[0]:+.2f}" if enough else "n/a",
+        f"{strength(r1[0])} link" if enough else "needs 5+ states")
+    kpi(c[3], "Population vs price growth", f"ρ = {r2[0]:+.2f}" if enough else "n/a",
+        f"{strength(r2[0])} link" if enough else "needs 5+ states")
 
-    st.markdown(f"##### Scatter plot: population vs household income in {y1} (colour = price growth {period})")
+    st.markdown(f'<div class="sec">Population vs median household income, {y1}</div>'
+                f'<div class="note">One dot per state. Darker dot = prices rose more over {period}. '
+                'Population is on a log scale because a few states are far larger than the rest.</div>',
+                unsafe_allow_html=True)
     f = go.Figure(go.Scatter(
         x=M.pop_end, y=M.inc_med_end, mode="markers+text", text=M.label, textposition="top center",
-        marker=dict(size=16, color=M.cpi_growth, colorscale=SEQ, showscale=True, colorbar=dict(title="Price<br>growth %"),
+        textfont=dict(size=12, color=INK),
+        marker=dict(size=18, color=M.cpi_growth, colorscale=SEQ, showscale=True,
+                    colorbar=dict(title="Price<br>growth %", thickness=14, len=0.8),
                     line=dict(width=1.5, color="white")),
-        hovertemplate="<b>%{text}</b><br>Population %{x:,.0f}k<br>Median income RM%{y:,.0f}<extra></extra>"))
+        customdata=M.cpi_growth,
+        hovertemplate="<b>%{text}</b><br>Population %{x:,.0f}k<br>Median income RM%{y:,.0f}"
+                      "<br>Price growth +%{customdata:.1f}%<extra></extra>"))
+    style(f, 600, showlegend=False)
     f.update_xaxes(type="log", title=f"Population {y1} ('000, log scale)")
-    f.update_yaxes(title=f"Median household income {y1} (RM)")
-    f.update_layout(height=600, margin=dict(l=10, r=10, t=10, b=10))
-    st.plotly_chart(f)
-    st.caption("Each dot is one state. Darker dot = prices rose more over the selected period.")
+    f.update_yaxes(title=f"Median household income {y1} (RM)", tickprefix="RM")
+    show(f)
 
-    with st.expander("Interpretation", expanded=True):
-        rich = M.inc_med_end.idxmax(); big = M.pop_end.idxmax(); topp = M.cpi_growth.sort_values(ascending=False).head(min(3, n))
-        lines = []
+    with st.container(border=True):
+        st.markdown("**Key insights**")
+        rich, big = M.inc_med_end.idxmax(), M.pop_end.idxmax()
+        topp = M.cpi_growth.sort_values(ascending=False).head(min(3, n))
         if enough:
-            lines.append(f"* **Population and income.** There is {level(r1[0])} link between population size and median income (ρ = {r1[0]:+.2f}, p = {r1[1]:.2f}). {A.short(big)} has the most people ({M.pop_end[big]/1000:.1f} M), while {A.short(rich)} has the highest income (RM{M.inc_med_end[rich]:,.0f}).")
-            lines.append(f"* **Population and prices.** There is {level(r2[0])} link between population size and price growth (ρ = {r2[0]:+.2f}). Income level and price growth show {level(r4[0])} link (ρ = {r4[0]:+.2f}, p = {r4[1]:.3f}): " +
-                         ("richer states saw faster price rises, so pressure follows wealth and urban demand more than head-count." if r4[0] >= 0.25 else "price rises did not follow income level in this selection."))
+            tail = ("richer states saw faster price rises, so pressure follows wealth and urban demand more than head-count."
+                    if r3[0] >= 0.25 else "price rises did not follow income level in this selection.")
+            st.markdown(f"""
+- **Population and income.** There is a {strength(r1[0])} link (ρ = {r1[0]:+.2f}, p = {r1[1]:.2f}). {A.short(big)} has the most people ({M.pop_end[big] / 1000:.1f} M) and {A.short(rich)} has the highest income (RM{M.inc_med_end[rich]:,.0f}).
+- **Population and prices.** There is a {strength(r2[0])} link with price growth (ρ = {r2[0]:+.2f}). Income level and price growth show a {strength(r3[0])} link (ρ = {r3[0]:+.2f}, p = {r3[1]:.2f}): {tail}
+- **Where pressure is greatest:** {', '.join(f"{A.short(i)} (+{v:.0f}%)" for i, v in topp.items())} had the fastest price growth over {period}.
+- **Caution:** at most 16 states, so these patterns are indications, not proof. Correlation is not causation.""")
         else:
-            lines.append(f"* Select at least 5 states to see correlations. {A.short(big)} has the most people ({M.pop_end[big]/1000:.1f} M); {A.short(rich)} has the highest income (RM{M.inc_med_end[rich]:,.0f}).")
-        lines.append(f"* **Where pressure is greatest:** {', '.join(f'{A.short(i)} (+{v:.0f}%)' for i, v in topp.items())} had the fastest price growth over {period}.")
-        lines.append("* **Caution:** only 16 states at most, so these patterns are indications, not proof; correlation is not causation.")
-        st.markdown("\n".join(lines))
+            st.markdown(f"""
+- Select at least 5 states to see correlations.
+- {A.short(big)} has the most people ({M.pop_end[big] / 1000:.1f} M) and {A.short(rich)} has the highest income (RM{M.inc_med_end[rich]:,.0f}).
+- **Where pressure is greatest:** {', '.join(f"{A.short(i)} (+{v:.0f}%)" for i, v in topp.items())} had the fastest price growth over {period}.""")
 
 # ================================================================== OBJECTIVE 3
 else:
+    header("Objective 3", "Which spending categories push prices up",
+           "To identify which spending categories, such as food, housing and transport, push prices up "
+           "the most, and rank states by overall cost-of-living pressure.", scope)
+
     DG = A.division_growth(cpi, y0, y1).loc[sel]
     nat = DG.mean().sort_values(ascending=False)
     ess = DG[A.ESSENTIALS]
     tot = ess.sum(axis=1).sort_values()
-    st.title("Objective 3")
-    st.markdown("**To identify which spending categories, such as food, housing and transport, push prices up the most** "
-                "*(to rank states by overall cost-of-living pressure).*")
-    st.caption(subtitle)
-    with st.container(border=True):
-        st.subheader("Summary box")
-        c = st.columns(5)
-        with c[0]: card("Fastest-rising category", nat.index[0].split(" &")[0], f"+{nat.iloc[0]:.0f}% on average")
-        with c[1]: card("Food & Beverages", f"{nat['Food & Beverages']:+.0f}%", "average of selected states")
-        with c[2]: card("Housing & Utilities", f"{nat['Housing & Utilities']:+.0f}%", "average of selected states")
-        with c[3]: card("Highest pressure", A.short(tot.index[-1]), f"food {ess.loc[tot.index[-1], 'Food & Beverages']:+.0f}%")
-        with c[4]: card("Lowest pressure", A.short(tot.index[0]), f"food {ess.loc[tot.index[0], 'Food & Beverages']:+.0f}%")
 
-    st.markdown(f"##### Stacked bar: price rise in food, housing and transport by state, {period}")
-    names = [A.short(s) for s in tot.index]
+    c = st.columns(4)
+    kpi(c[0], "Fastest-rising category", nat.index[0].split(" &")[0], f"+{nat.iloc[0]:.0f}% on average")
+    kpi(c[1], "Food & Beverages", f"{nat['Food & Beverages']:+.0f}%", "average of selected states")
+    kpi(c[2], "Highest pressure", A.short(tot.index[-1]), f"essentials +{tot.iloc[-1]:.0f}% combined")
+    kpi(c[3], "Lowest pressure", A.short(tot.index[0]), f"essentials +{tot.iloc[0]:.0f}% combined")
+
+    st.markdown(f'<div class="sec">Price rise in food, housing and transport by state, {period}</div>'
+                '<div class="note">States ranked by the three bars added together: '
+                'longest bar = highest cost-of-living pressure from essentials.</div>', unsafe_allow_html=True)
+    lab = [A.short(s) for s in tot.index]
     f = go.Figure()
-    for k, colr in zip(A.ESSENTIALS, [BLUE, ORANGE, AQUA]):
-        f.add_trace(go.Bar(y=names, x=ess.loc[tot.index, k], name=k, orientation="h", marker_color=colr,
-                           hovertemplate=k + ": %{x:+.1f}%<extra></extra>"))
-    f.update_layout(barmode="stack", bargap=0.25, height=height(n, 38), margin=dict(l=10, r=10, t=10, b=10), legend=dict(orientation="h", y=1.04))
-    f.update_xaxes(title="Price rise (%), the three categories added together")
-    st.plotly_chart(f)
-    st.caption("Ranked by the total of the three bars: longest bar = highest cost-of-living pressure from essentials.")
+    for k_, colr in zip(A.ESSENTIALS, [BLUE, ORANGE, TEAL]):
+        f.add_trace(go.Bar(y=lab, x=ess.loc[tot.index, k_], name=k_, orientation="h", marker_color=colr,
+                           hovertemplate=k_ + ": %{x:+.1f}%<extra>%{y}</extra>"))
+    f.add_trace(go.Scatter(y=lab, x=tot.values, mode="text", text=[f"{v:.0f}%" for v in tot.values],
+                           textposition="middle right", showlegend=False, hoverinfo="skip",
+                           textfont=dict(size=12, color=INK)))
+    style(f, row_h(n, 38), barmode="stack", bargap=0.3, legend=dict(orientation="h", y=1.06, x=0))
+    f.update_xaxes(title="Price rise (%), the three categories added together", ticksuffix="%",
+                   range=[min(0, tot.min() * 1.1), tot.max() * 1.12])
+    show(f)
 
-    with st.expander("Interpretation", expanded=True):
+    with st.container(border=True):
+        st.markdown("**Key insights**")
         k = min(3, n)
-        t3 = list(tot.index[::-1][:k]); b3 = list(tot.index[:k])
+        t3, b3 = list(tot.index[::-1][:k]), list(tot.index[:k])
         fell = [c_ for c_, v in nat.items() if v < 0]
+        fell_txt = f" {', '.join(fell)} fell, so not every price went up." if fell else ""
         st.markdown(f"""
-* **Categories that push prices up the most.** Over {period}, the biggest average rises were {nat.index[0]} ({nat.iloc[0]:+.0f}%), {nat.index[1]} ({nat.iloc[1]:+.0f}%) and {nat.index[2]} ({nat.iloc[2]:+.0f}%)."""
-                    + (f" {', '.join(fell)} fell, so not every price went up." if fell else "") + f"""
-* **Everyday essentials.** Food & Beverages changed {nat['Food & Beverages']:+.0f}% on average, Housing & Utilities {nat['Housing & Utilities']:+.0f}% and Transport {nat['Transport']:+.0f}%.
-* **Highest pressure:** {', '.join(A.short(i) for i in t3)}, where the three essentials rose the most (for example food {ess.loc[t3[0], 'Food & Beverages']:+.0f}% in {A.short(t3[0])}).
-* **Lowest pressure:** {', '.join(A.short(i) for i in b3)}, where the three essentials rose the least.
-* **Caution:** the three bars are simply added together, not weighted by how much households spend on each. The chart shows how fast prices rose, not how expensive each state is.""")
+- **Categories that push prices up the most.** Over {period}, the biggest average rises were {nat.index[0]} ({nat.iloc[0]:+.0f}%), {nat.index[1]} ({nat.iloc[1]:+.0f}%) and {nat.index[2]} ({nat.iloc[2]:+.0f}%).{fell_txt}
+- **Everyday essentials.** Food & Beverages {nat['Food & Beverages']:+.0f}%, Housing & Utilities {nat['Housing & Utilities']:+.0f}% and Transport {nat['Transport']:+.0f}% on average.
+- **Highest pressure:** {names(t3)}, where the three essentials rose the most (for example food {ess.loc[t3[0], 'Food & Beverages']:+.0f}% in {A.short(t3[0])}).
+- **Lowest pressure:** {names(b3)}, where the three essentials rose the least.
+- **Caution:** the three bars are added together, not weighted by household spending. The chart shows how fast prices rose, not how expensive each state is.""")
 
-st.caption("Source: Department of Statistics Malaysia (DOSM). JIE42403 Scientific Visualisation.")
+st.caption("Source: Department of Statistics Malaysia (DOSM) · JIE42403 Scientific Visualisation")
