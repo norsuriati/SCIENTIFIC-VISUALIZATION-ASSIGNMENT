@@ -177,22 +177,29 @@ elif page.startswith("2"):
     kpi(c[3], "Population vs price growth", f"ρ = {r2[0]:+.2f}" if enough else "n/a",
         f"{strength(r2[0])} link" if enough else "needs 5+ states")
 
-    st.markdown(f'<div class="sec">Population vs median household income, {y1}</div>'
-                f'<div class="note">One dot per state. Darker dot = prices rose more over {period}. '
-                'Population is on a log scale because a few states are far larger than the rest.</div>',
+    st.markdown(f'<div class="sec">Income vs price growth, bubble size = population {y1}</div>'
+                f'<div class="note">One bubble per state. Further right = higher median income in {y1}; '
+                f'higher up = prices rose more over {period}; bigger bubble = more people. Colour = region.</div>',
                 unsafe_allow_html=True)
-    f = go.Figure(go.Scatter(
-        x=M.pop_end, y=M.inc_med_end, mode="markers+text", text=M.label, textposition="top center",
-        textfont=dict(size=12, color=INK),
-        marker=dict(size=18, color=M.cpi_growth, colorscale=SEQ, showscale=True,
-                    colorbar=dict(title="Price<br>growth %", thickness=14, len=0.8),
-                    line=dict(width=1.5, color="white")),
-        customdata=M.cpi_growth,
-        hovertemplate="<b>%{text}</b><br>Population %{x:,.0f}k<br>Median income RM%{y:,.0f}"
-                      "<br>Price growth +%{customdata:.1f}%<extra></extra>"))
-    style(f, 600, showlegend=False)
-    f.update_xaxes(type="log", title=f"Population {y1} ('000, log scale)")
-    f.update_yaxes(title=f"Median household income {y1} (RM)", tickprefix="RM")
+    REG_COL = {"Klang Valley": BLUE, "South": ORANGE, "North": TEAL, "East Coast": "#7c3aed", "East Malaysia": "#64748b"}
+    sizeref = 2.0 * M.pop_end.max() / (62 ** 2)
+    f = go.Figure()
+    for reg, colr in REG_COL.items():
+        g = M[[A.REGION[i] == reg for i in M.index]].sort_values("inc_med_end")
+        if g.empty:
+            continue
+        f.add_trace(go.Scatter(
+            x=g.inc_med_end, y=g.cpi_growth, mode="markers+text", name=reg, text=g.label,
+            textposition=["top center" if i % 2 == 0 else "bottom center" for i in range(len(g))],
+            textfont=dict(size=12, color=INK),
+            marker=dict(size=g.pop_end, sizemode="area", sizeref=sizeref, sizemin=7, color=colr, opacity=0.78,
+                        line=dict(width=1.5, color="white")),
+            customdata=np.stack([g.pop_end, g.inc_med_growth], axis=-1),
+            hovertemplate="<b>%{text}</b><br>Median income RM%{x:,.0f}<br>Price growth +%{y:.1f}%"
+                          "<br>Population %{customdata[0]:,.0f}k<extra></extra>"))
+    style(f, 620, legend=dict(orientation="h", y=1.07, x=0, title_text=""))
+    f.update_xaxes(title=f"Median household income {y1} (RM)", tickprefix="RM", tickformat=",", automargin=True)
+    f.update_yaxes(title=f"Price growth {period} (%)", ticksuffix="%", automargin=True)
     show(f)
 
 
@@ -213,21 +220,29 @@ else:
     kpi(c[2], "Highest pressure", A.short(tot.index[-1]), f"essentials +{tot.iloc[-1]:.0f}% combined")
     kpi(c[3], "Lowest pressure", A.short(tot.index[0]), f"essentials +{tot.iloc[0]:.0f}% combined")
 
-    st.markdown(f'<div class="sec">Price rise in food, housing and transport by state, {period}</div>'
-                '<div class="note">States ranked by the three bars added together: '
-                'longest bar = highest cost-of-living pressure from essentials.</div>', unsafe_allow_html=True)
-    lab = [A.short(s) for s in tot.index]
-    f = go.Figure()
-    for k_, colr in zip(A.ESSENTIALS, [BLUE, ORANGE, TEAL]):
-        f.add_trace(go.Bar(y=lab, x=ess.loc[tot.index, k_], name=k_, orientation="h", marker_color=colr,
-                           hovertemplate=k_ + ": %{x:+.1f}%<extra>%{y}</extra>"))
-    f.add_trace(go.Scatter(y=lab, x=tot.values, mode="text", text=[f"{v:.0f}%" for v in tot.values],
-                           textposition="middle right", showlegend=False, hoverinfo="skip",
-                           textfont=dict(size=12, color=INK)))
-    style(f, row_h(n, 38), barmode="stack", bargap=0.3, legend=dict(orientation="h", y=1.06, x=0))
-    f.update_xaxes(title="Price rise (%), the three categories added together", ticksuffix="%",
-                   range=[min(0, tot.min() * 1.1), tot.max() * 1.12])
+    st.markdown(f'<div class="sec">Price rise in food, housing and transport, by state, {period}</div>'
+                '<div class="note">Each block is one state inside one category. Bigger block = bigger price rise. '
+                'A category with more area pushes prices up more overall.</div>', unsafe_allow_html=True)
+    ids, labels, parents, values, texts, colors = [], [], [], [], [], []
+    for cat, colr in zip(A.ESSENTIALS, [BLUE, ORANGE, TEAL]):
+        v = ess[cat].clip(lower=0.01)
+        ids.append(cat); labels.append(f"<b>{cat}</b>"); parents.append(""); values.append(float(v.sum()))
+        texts.append(f"avg {ess[cat].mean():+.0f}%"); colors.append(colr)
+        for st_, val in ess[cat].sort_values(ascending=False).items():
+            ids.append(f"{cat}/{st_}"); labels.append(A.short(st_)); parents.append(cat)
+            values.append(float(max(val, 0.01))); texts.append(f"{val:+.0f}%"); colors.append(colr)
+    f = go.Figure(go.Treemap(
+        ids=ids, labels=labels, parents=parents, values=values, text=texts, branchvalues="total",
+        textinfo="label+text", textfont=dict(size=14, color="white"),
+        marker=dict(colors=colors, line=dict(width=2, color="white")),
+        tiling=dict(pad=4), sort=False, root_color="white",
+        hovertemplate="<b>%{label}</b><br>Price rise %{text}<extra></extra>"))
+    style(f, 640, showlegend=False)
+    f.update_layout(margin=dict(l=0, r=0, t=10, b=0))
     show(f)
+    if (ess < 0).any().any():
+        st.caption("Some prices fell in this period. A fall cannot be drawn as area, so it shows as a tiny block "
+                   "with its real % in the label. Choose a longer year range for a clearer picture.")
 
 
 st.caption("Source: Department of Statistics Malaysia (DOSM) · JIE42403 Scientific Visualisation")
