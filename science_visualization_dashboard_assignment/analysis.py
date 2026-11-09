@@ -29,13 +29,37 @@ COORDS = {
 
 def short(s): return SHORT.get(s, s)
 
+def _find(*names):
+    """Return the first existing data file among `names` (looks in data/ then next to this file)."""
+    for folder in (DATA, DATA.parent):
+        for n in names:
+            if (folder / n).exists():
+                return folder / n
+    have = sorted(p.name for p in DATA.glob("*")) if DATA.exists() else "data/ folder not found"
+    raise FileNotFoundError(f"None of {names} found. Files in data/: {have}")
+
+
+def load_merged(path):
+    """Build the three working tables from the single merged file
+    (columns: state, year, population, income_mean, income_median, division, index)."""
+    d = pd.read_csv(path)
+    pop = d.drop_duplicates(["state", "year"])[["state", "year", "population"]].copy()
+    pop["age"] = "overall"                      # merged file has no age breakdown
+    inc = d.drop_duplicates(["state", "year"])[["state", "year", "income_mean", "income_median"]].copy()
+    cpi = d[["state", "year", "division", "index"]].copy()
+    return pop, inc, cpi
+
+
 def load():
-    pop = pd.read_csv(DATA / "population_state_slim.csv", parse_dates=["date"])
+    merged = DATA / "merged_dataset.csv"
+    if merged.exists():
+        return load_merged(merged)
+    pop = pd.read_csv(_find("population_state_slim.csv", "population_state.csv"), parse_dates=["date"])
     pop = pop[(pop.sex == "both") & (pop.ethnicity == "overall")].copy()
     pop["year"] = pop.date.dt.year
-    inc = pd.read_csv(DATA / "hh_income_state.csv", parse_dates=["date"])
+    inc = pd.read_csv(_find("hh_income_state.csv"), parse_dates=["date"])
     inc["year"] = inc.date.dt.year
-    cpi = pd.read_csv(DATA / "cpi_2d_state_mapped.csv", parse_dates=["date"])
+    cpi = pd.read_csv(_find("cpi_2d_state_mapped.csv"), parse_dates=["date"])
     cpi["year"] = cpi.date.dt.year
     return pop, inc, cpi
 
@@ -99,8 +123,10 @@ def state_metrics(inc, cpi, pop):
     m["pop_end"], m["pop_base"] = pt[END_YEAR], pt[BASE_YEAR]
     m["pop_growth"] = (m.pop_end / m.pop_base - 1) * 100
     m["pop_share"] = m.pop_end / m.pop_end.sum() * 100
-    ag = age_groups(pop, END_YEAR)
-    m["dep_ratio"] = ag["dep_ratio"]
+    if pop.age.nunique() > 1:
+        m["dep_ratio"] = age_groups(pop, END_YEAR)["dep_ratio"]
+    else:
+        m["dep_ratio"] = np.nan                  # merged file has no age structure
     # essentials & per-division growth (annual avg 2012 -> 2024)
     for d in ESSENTIALS:
         ca = cpi_annual(cpi, d)
