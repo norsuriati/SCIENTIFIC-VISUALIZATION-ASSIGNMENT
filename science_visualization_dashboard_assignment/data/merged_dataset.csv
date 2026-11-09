@@ -1,0 +1,1569 @@
+state,year,population,income_mean,income_median,division,index
+Johor,2012,3450.4,4658,3650,Alcoholic Beverages & Tobacco,105.4
+Johor,2012,3450.4,4658,3650,Clothing & Footwear,97.9
+Johor,2012,3450.4,4658,3650,Education Services,104.4
+Johor,2012,3450.4,4658,3650,Food & Beverages,108.6
+Johor,2012,3450.4,4658,3650,Furnishings & Household Maintenance,104.2
+Johor,2012,3450.4,4658,3650,Health,104.2
+Johor,2012,3450.4,4658,3650,Housing & Utilities,103
+Johor,2012,3450.4,4658,3650,Information & Communication,99.3
+Johor,2012,3450.4,4658,3650,Insurance & Financial Services,106.9
+Johor,2012,3450.4,4658,3650,Overall,105.2
+Johor,2012,3450.4,4658,3650,Personal Care & Miscellaneous,105.4
+Johor,2012,3450.4,4658,3650,"Recreation, Sport & Culture",106.2
+Johor,2012,3450.4,4658,3650,Restaurants & Accommodation,107.5
+Johor,2012,3450.4,4658,3650,Transport,105.4
+Johor,2014,3559.8,6207,5197,Alcoholic Beverages & Tobacco,125.3
+Johor,2014,3559.8,6207,5197,Clothing & Footwear,97.7
+Johor,2014,3559.8,6207,5197,Education Services,110
+Johor,2014,3559.8,6207,5197,Food & Beverages,116.9
+Johor,2014,3559.8,6207,5197,Furnishings & Household Maintenance,107.3
+Johor,2014,3559.8,6207,5197,Health,111
+Johor,2014,3559.8,6207,5197,Housing & Utilities,108.1
+Johor,2014,3559.8,6207,5197,Information & Communication,98.2
+Johor,2014,3559.8,6207,5197,Insurance & Financial Services,115.5
+Johor,2014,3559.8,6207,5197,Overall,111.6
+Johor,2014,3559.8,6207,5197,Personal Care & Miscellaneous,110.8
+Johor,2014,3559.8,6207,5197,"Recreation, Sport & Culture",108.4
+Johor,2014,3559.8,6207,5197,Restaurants & Accommodation,114.3
+Johor,2014,3559.8,6207,5197,Transport,114
+Johor,2016,3651.8,6928,5652,Alcoholic Beverages & Tobacco,167.7
+Johor,2016,3651.8,6928,5652,Clothing & Footwear,98.8
+Johor,2016,3651.8,6928,5652,Education Services,118.9
+Johor,2016,3651.8,6928,5652,Food & Beverages,128.3
+Johor,2016,3651.8,6928,5652,Furnishings & Household Maintenance,112.1
+Johor,2016,3651.8,6928,5652,Health,123.4
+Johor,2016,3651.8,6928,5652,Housing & Utilities,115.9
+Johor,2016,3651.8,6928,5652,Information & Communication,98.3
+Johor,2016,3651.8,6928,5652,Insurance & Financial Services,124.2
+Johor,2016,3651.8,6928,5652,Overall,118
+Johor,2016,3651.8,6928,5652,Personal Care & Miscellaneous,121.7
+Johor,2016,3651.8,6928,5652,"Recreation, Sport & Culture",112.1
+Johor,2016,3651.8,6928,5652,Restaurants & Accommodation,123.8
+Johor,2016,3651.8,6928,5652,Transport,102.9
+Johor,2019,3761.2,8013,6427,Alcoholic Beverages & Tobacco,171.2
+Johor,2019,3761.2,8013,6427,Clothing & Footwear,96.5
+Johor,2019,3761.2,8013,6427,Education Services,126.2
+Johor,2019,3761.2,8013,6427,Food & Beverages,139.1
+Johor,2019,3761.2,8013,6427,Furnishings & Household Maintenance,116
+Johor,2019,3761.2,8013,6427,Health,128.2
+Johor,2019,3761.2,8013,6427,Housing & Utilities,122.7
+Johor,2019,3761.2,8013,6427,Information & Communication,97
+Johor,2019,3761.2,8013,6427,Insurance & Financial Services,118.1
+Johor,2019,3761.2,8013,6427,Overall,125.1
+Johor,2019,3761.2,8013,6427,Personal Care & Miscellaneous,121.6
+Johor,2019,3761.2,8013,6427,"Recreation, Sport & Culture",114.9
+Johor,2019,3761.2,8013,6427,Restaurants & Accommodation,133
+Johor,2019,3761.2,8013,6427,Transport,115.4
+Johor,2020,4009.7,7264,5690,Alcoholic Beverages & Tobacco,171.9
+Johor,2020,4009.7,7264,5690,Clothing & Footwear,95.5
+Johor,2020,4009.7,7264,5690,Education Services,127.3
+Johor,2020,4009.7,7264,5690,Food & Beverages,141.2
+Johor,2020,4009.7,7264,5690,Furnishings & Household Maintenance,115.8
+Johor,2020,4009.7,7264,5690,Health,129.7
+Johor,2020,4009.7,7264,5690,Housing & Utilities,120.5
+Johor,2020,4009.7,7264,5690,Information & Communication,97.9
+Johor,2020,4009.7,7264,5690,Insurance & Financial Services,118.1
+Johor,2020,4009.7,7264,5690,Overall,123.3
+Johor,2020,4009.7,7264,5690,Personal Care & Miscellaneous,123.5
+Johor,2020,4009.7,7264,5690,"Recreation, Sport & Culture",116.4
+Johor,2020,4009.7,7264,5690,Restaurants & Accommodation,134.2
+Johor,2020,4009.7,7264,5690,Transport,102.4
+Johor,2022,4028.3,8517,6879,Alcoholic Beverages & Tobacco,173.6
+Johor,2022,4028.3,8517,6879,Clothing & Footwear,95.6
+Johor,2022,4028.3,8517,6879,Education Services,127.2
+Johor,2022,4028.3,8517,6879,Food & Beverages,152.6
+Johor,2022,4028.3,8517,6879,Furnishings & Household Maintenance,121.2
+Johor,2022,4028.3,8517,6879,Health,130.2
+Johor,2022,4028.3,8517,6879,Housing & Utilities,124
+Johor,2022,4028.3,8517,6879,Information & Communication,98
+Johor,2022,4028.3,8517,6879,Insurance & Financial Services,118.8
+Johor,2022,4028.3,8517,6879,Overall,130.6
+Johor,2022,4028.3,8517,6879,Personal Care & Miscellaneous,125.9
+Johor,2022,4028.3,8517,6879,"Recreation, Sport & Culture",119.5
+Johor,2022,4028.3,8517,6879,Restaurants & Accommodation,140.8
+Johor,2022,4028.3,8517,6879,Transport,120
+Johor,2024,4184.4,9484,7712,Alcoholic Beverages & Tobacco,175.7
+Johor,2024,4184.4,9484,7712,Clothing & Footwear,97.7
+Johor,2024,4184.4,9484,7712,Education Services,139.7
+Johor,2024,4184.4,9484,7712,Food & Beverages,161.9
+Johor,2024,4184.4,9484,7712,Furnishings & Household Maintenance,126.7
+Johor,2024,4184.4,9484,7712,Health,136.9
+Johor,2024,4184.4,9484,7712,Housing & Utilities,130
+Johor,2024,4184.4,9484,7712,Information & Communication,93.8
+Johor,2024,4184.4,9484,7712,Insurance & Financial Services,119.3
+Johor,2024,4184.4,9484,7712,Overall,136.1
+Johor,2024,4184.4,9484,7712,Personal Care & Miscellaneous,133
+Johor,2024,4184.4,9484,7712,"Recreation, Sport & Culture",122.3
+Johor,2024,4184.4,9484,7712,Restaurants & Accommodation,152.4
+Johor,2024,4184.4,9484,7712,Transport,122.6
+Kedah,2012,2001.1,3425,2633,Alcoholic Beverages & Tobacco,105.2
+Kedah,2012,2001.1,3425,2633,Clothing & Footwear,97.7
+Kedah,2012,2001.1,3425,2633,Education Services,101.1
+Kedah,2012,2001.1,3425,2633,Food & Beverages,106.9
+Kedah,2012,2001.1,3425,2633,Furnishings & Household Maintenance,103.1
+Kedah,2012,2001.1,3425,2633,Health,103.5
+Kedah,2012,2001.1,3425,2633,Housing & Utilities,104.9
+Kedah,2012,2001.1,3425,2633,Information & Communication,99.2
+Kedah,2012,2001.1,3425,2633,Insurance & Financial Services,101.9
+Kedah,2012,2001.1,3425,2633,Overall,105
+Kedah,2012,2001.1,3425,2633,Personal Care & Miscellaneous,105.4
+Kedah,2012,2001.1,3425,2633,"Recreation, Sport & Culture",103.4
+Kedah,2012,2001.1,3425,2633,Restaurants & Accommodation,110.2
+Kedah,2012,2001.1,3425,2633,Transport,104.3
+Kedah,2014,2062.7,4478,3451,Alcoholic Beverages & Tobacco,124.4
+Kedah,2014,2062.7,4478,3451,Clothing & Footwear,96.3
+Kedah,2014,2062.7,4478,3451,Education Services,103.6
+Kedah,2014,2062.7,4478,3451,Food & Beverages,115
+Kedah,2014,2062.7,4478,3451,Furnishings & Household Maintenance,106.6
+Kedah,2014,2062.7,4478,3451,Health,107.1
+Kedah,2014,2062.7,4478,3451,Housing & Utilities,109
+Kedah,2014,2062.7,4478,3451,Information & Communication,98
+Kedah,2014,2062.7,4478,3451,Insurance & Financial Services,107.3
+Kedah,2014,2062.7,4478,3451,Overall,110.5
+Kedah,2014,2062.7,4478,3451,Personal Care & Miscellaneous,107.4
+Kedah,2014,2062.7,4478,3451,"Recreation, Sport & Culture",106
+Kedah,2014,2062.7,4478,3451,Restaurants & Accommodation,116.5
+Kedah,2014,2062.7,4478,3451,Transport,111.1
+Kedah,2016,2119.7,4971,3811,Alcoholic Beverages & Tobacco,168.9
+Kedah,2016,2119.7,4971,3811,Clothing & Footwear,94.2
+Kedah,2016,2119.7,4971,3811,Education Services,105.1
+Kedah,2016,2119.7,4971,3811,Food & Beverages,121.8
+Kedah,2016,2119.7,4971,3811,Furnishings & Household Maintenance,112.2
+Kedah,2016,2119.7,4971,3811,Health,113.5
+Kedah,2016,2119.7,4971,3811,Housing & Utilities,116.8
+Kedah,2016,2119.7,4971,3811,Information & Communication,99.3
+Kedah,2016,2119.7,4971,3811,Insurance & Financial Services,118.1
+Kedah,2016,2119.7,4971,3811,Overall,114.4
+Kedah,2016,2119.7,4971,3811,Personal Care & Miscellaneous,116.2
+Kedah,2016,2119.7,4971,3811,"Recreation, Sport & Culture",109.5
+Kedah,2016,2119.7,4971,3811,Restaurants & Accommodation,122.2
+Kedah,2016,2119.7,4971,3811,Transport,101
+Kedah,2019,2173.7,5522,4325,Alcoholic Beverages & Tobacco,173.4
+Kedah,2019,2173.7,5522,4325,Clothing & Footwear,88
+Kedah,2019,2173.7,5522,4325,Education Services,107.5
+Kedah,2019,2173.7,5522,4325,Food & Beverages,128.8
+Kedah,2019,2173.7,5522,4325,Furnishings & Household Maintenance,114.1
+Kedah,2019,2173.7,5522,4325,Health,117.7
+Kedah,2019,2173.7,5522,4325,Housing & Utilities,123.8
+Kedah,2019,2173.7,5522,4325,Information & Communication,98.2
+Kedah,2019,2173.7,5522,4325,Insurance & Financial Services,117.8
+Kedah,2019,2173.7,5522,4325,Overall,119.5
+Kedah,2019,2173.7,5522,4325,Personal Care & Miscellaneous,116.8
+Kedah,2019,2173.7,5522,4325,"Recreation, Sport & Culture",112.8
+Kedah,2019,2173.7,5522,4325,Restaurants & Accommodation,128.2
+Kedah,2019,2173.7,5522,4325,Transport,109.8
+Kedah,2020,2131.4,5005,3829,Alcoholic Beverages & Tobacco,173.9
+Kedah,2020,2131.4,5005,3829,Clothing & Footwear,87.5
+Kedah,2020,2131.4,5005,3829,Education Services,108.4
+Kedah,2020,2131.4,5005,3829,Food & Beverages,129.6
+Kedah,2020,2131.4,5005,3829,Furnishings & Household Maintenance,114.2
+Kedah,2020,2131.4,5005,3829,Health,118.6
+Kedah,2020,2131.4,5005,3829,Housing & Utilities,119.7
+Kedah,2020,2131.4,5005,3829,Information & Communication,98.9
+Kedah,2020,2131.4,5005,3829,Insurance & Financial Services,117.8
+Kedah,2020,2131.4,5005,3829,Overall,117.4
+Kedah,2020,2131.4,5005,3829,Personal Care & Miscellaneous,119.5
+Kedah,2020,2131.4,5005,3829,"Recreation, Sport & Culture",113.6
+Kedah,2020,2131.4,5005,3829,Restaurants & Accommodation,128.2
+Kedah,2020,2131.4,5005,3829,Transport,99.6
+Kedah,2022,2163.1,5550,4402,Alcoholic Beverages & Tobacco,175.1
+Kedah,2022,2163.1,5550,4402,Clothing & Footwear,86.9
+Kedah,2022,2163.1,5550,4402,Education Services,109.4
+Kedah,2022,2163.1,5550,4402,Food & Beverages,136.1
+Kedah,2022,2163.1,5550,4402,Furnishings & Household Maintenance,118.4
+Kedah,2022,2163.1,5550,4402,Health,120.7
+Kedah,2022,2163.1,5550,4402,Housing & Utilities,125.1
+Kedah,2022,2163.1,5550,4402,Information & Communication,98.8
+Kedah,2022,2163.1,5550,4402,Insurance & Financial Services,118.5
+Kedah,2022,2163.1,5550,4402,Overall,123.5
+Kedah,2022,2163.1,5550,4402,Personal Care & Miscellaneous,121.3
+Kedah,2022,2163.1,5550,4402,"Recreation, Sport & Culture",115.5
+Kedah,2022,2163.1,5550,4402,Restaurants & Accommodation,133.8
+Kedah,2022,2163.1,5550,4402,Transport,113.1
+Kedah,2024,2217.1,5793,4895,Alcoholic Beverages & Tobacco,176.5
+Kedah,2024,2217.1,5793,4895,Clothing & Footwear,85.1
+Kedah,2024,2217.1,5793,4895,Education Services,112
+Kedah,2024,2217.1,5793,4895,Food & Beverages,141
+Kedah,2024,2217.1,5793,4895,Furnishings & Household Maintenance,120.8
+Kedah,2024,2217.1,5793,4895,Health,123.7
+Kedah,2024,2217.1,5793,4895,Housing & Utilities,131.8
+Kedah,2024,2217.1,5793,4895,Information & Communication,93.8
+Kedah,2024,2217.1,5793,4895,Insurance & Financial Services,119.2
+Kedah,2024,2217.1,5793,4895,Overall,127.2
+Kedah,2024,2217.1,5793,4895,Personal Care & Miscellaneous,126.5
+Kedah,2024,2217.1,5793,4895,"Recreation, Sport & Culture",118.1
+Kedah,2024,2217.1,5793,4895,Restaurants & Accommodation,144.7
+Kedah,2024,2217.1,5793,4895,Transport,115.8
+Kelantan,2012,1651,3168,2276,Alcoholic Beverages & Tobacco,105.8
+Kelantan,2012,1651,3168,2276,Clothing & Footwear,101
+Kelantan,2012,1651,3168,2276,Education Services,108.4
+Kelantan,2012,1651,3168,2276,Food & Beverages,108.6
+Kelantan,2012,1651,3168,2276,Furnishings & Household Maintenance,102.2
+Kelantan,2012,1651,3168,2276,Health,105.2
+Kelantan,2012,1651,3168,2276,Housing & Utilities,103.6
+Kelantan,2012,1651,3168,2276,Information & Communication,99.9
+Kelantan,2012,1651,3168,2276,Insurance & Financial Services,100.8
+Kelantan,2012,1651,3168,2276,Overall,105.7
+Kelantan,2012,1651,3168,2276,Personal Care & Miscellaneous,105.7
+Kelantan,2012,1651,3168,2276,"Recreation, Sport & Culture",101.3
+Kelantan,2012,1651,3168,2276,Restaurants & Accommodation,105.8
+Kelantan,2012,1651,3168,2276,Transport,105.3
+Kelantan,2014,1723.4,3715,2716,Alcoholic Beverages & Tobacco,129.5
+Kelantan,2014,1723.4,3715,2716,Clothing & Footwear,100.8
+Kelantan,2014,1723.4,3715,2716,Education Services,115.7
+Kelantan,2014,1723.4,3715,2716,Food & Beverages,116.6
+Kelantan,2014,1723.4,3715,2716,Furnishings & Household Maintenance,104
+Kelantan,2014,1723.4,3715,2716,Health,110.2
+Kelantan,2014,1723.4,3715,2716,Housing & Utilities,107.8
+Kelantan,2014,1723.4,3715,2716,Information & Communication,99.1
+Kelantan,2014,1723.4,3715,2716,Insurance & Financial Services,108.8
+Kelantan,2014,1723.4,3715,2716,Overall,111.6
+Kelantan,2014,1723.4,3715,2716,Personal Care & Miscellaneous,105
+Kelantan,2014,1723.4,3715,2716,"Recreation, Sport & Culture",102.6
+Kelantan,2014,1723.4,3715,2716,Restaurants & Accommodation,109
+Kelantan,2014,1723.4,3715,2716,Transport,113.4
+Kelantan,2016,1796.7,4214,3079,Alcoholic Beverages & Tobacco,179
+Kelantan,2016,1796.7,4214,3079,Clothing & Footwear,102
+Kelantan,2016,1796.7,4214,3079,Education Services,123.6
+Kelantan,2016,1796.7,4214,3079,Food & Beverages,123.8
+Kelantan,2016,1796.7,4214,3079,Furnishings & Household Maintenance,109
+Kelantan,2016,1796.7,4214,3079,Health,117.6
+Kelantan,2016,1796.7,4214,3079,Housing & Utilities,111.2
+Kelantan,2016,1796.7,4214,3079,Information & Communication,99
+Kelantan,2016,1796.7,4214,3079,Insurance & Financial Services,118.5
+Kelantan,2016,1796.7,4214,3079,Overall,115.4
+Kelantan,2016,1796.7,4214,3079,Personal Care & Miscellaneous,112.5
+Kelantan,2016,1796.7,4214,3079,"Recreation, Sport & Culture",104.7
+Kelantan,2016,1796.7,4214,3079,Restaurants & Accommodation,114.6
+Kelantan,2016,1796.7,4214,3079,Transport,101.6
+Kelantan,2019,1883.8,4874,3563,Alcoholic Beverages & Tobacco,183.3
+Kelantan,2019,1883.8,4874,3563,Clothing & Footwear,98.1
+Kelantan,2019,1883.8,4874,3563,Education Services,129.4
+Kelantan,2019,1883.8,4874,3563,Food & Beverages,130.6
+Kelantan,2019,1883.8,4874,3563,Furnishings & Household Maintenance,110.8
+Kelantan,2019,1883.8,4874,3563,Health,124.2
+Kelantan,2019,1883.8,4874,3563,Housing & Utilities,116.9
+Kelantan,2019,1883.8,4874,3563,Information & Communication,98.5
+Kelantan,2019,1883.8,4874,3563,Insurance & Financial Services,117
+Kelantan,2019,1883.8,4874,3563,Overall,120.6
+Kelantan,2019,1883.8,4874,3563,Personal Care & Miscellaneous,113.3
+Kelantan,2019,1883.8,4874,3563,"Recreation, Sport & Culture",106.9
+Kelantan,2019,1883.8,4874,3563,Restaurants & Accommodation,118.7
+Kelantan,2019,1883.8,4874,3563,Transport,111.8
+Kelantan,2020,1792.5,4411,3010,Alcoholic Beverages & Tobacco,183.5
+Kelantan,2020,1792.5,4411,3010,Clothing & Footwear,97.6
+Kelantan,2020,1792.5,4411,3010,Education Services,130.3
+Kelantan,2020,1792.5,4411,3010,Food & Beverages,131.8
+Kelantan,2020,1792.5,4411,3010,Furnishings & Household Maintenance,111
+Kelantan,2020,1792.5,4411,3010,Health,126.3
+Kelantan,2020,1792.5,4411,3010,Housing & Utilities,113
+Kelantan,2020,1792.5,4411,3010,Information & Communication,99.4
+Kelantan,2020,1792.5,4411,3010,Insurance & Financial Services,117
+Kelantan,2020,1792.5,4411,3010,Overall,118.8
+Kelantan,2020,1792.5,4411,3010,Personal Care & Miscellaneous,117.8
+Kelantan,2020,1792.5,4411,3010,"Recreation, Sport & Culture",107.8
+Kelantan,2020,1792.5,4411,3010,Restaurants & Accommodation,119.5
+Kelantan,2020,1792.5,4411,3010,Transport,99.5
+Kelantan,2022,1830.6,4885,3614,Alcoholic Beverages & Tobacco,184.1
+Kelantan,2022,1830.6,4885,3614,Clothing & Footwear,97.7
+Kelantan,2022,1830.6,4885,3614,Education Services,131.9
+Kelantan,2022,1830.6,4885,3614,Food & Beverages,140.6
+Kelantan,2022,1830.6,4885,3614,Furnishings & Household Maintenance,115.8
+Kelantan,2022,1830.6,4885,3614,Health,128.5
+Kelantan,2022,1830.6,4885,3614,Housing & Utilities,117.3
+Kelantan,2022,1830.6,4885,3614,Information & Communication,99.2
+Kelantan,2022,1830.6,4885,3614,Insurance & Financial Services,117
+Kelantan,2022,1830.6,4885,3614,Overall,125.9
+Kelantan,2022,1830.6,4885,3614,Personal Care & Miscellaneous,120.8
+Kelantan,2022,1830.6,4885,3614,"Recreation, Sport & Culture",109
+Kelantan,2022,1830.6,4885,3614,Restaurants & Accommodation,124.7
+Kelantan,2022,1830.6,4885,3614,Transport,116
+Kelantan,2024,1887.9,5265,4083,Alcoholic Beverages & Tobacco,184.6
+Kelantan,2024,1887.9,5265,4083,Clothing & Footwear,98.6
+Kelantan,2024,1887.9,5265,4083,Education Services,132.6
+Kelantan,2024,1887.9,5265,4083,Food & Beverages,146.3
+Kelantan,2024,1887.9,5265,4083,Furnishings & Household Maintenance,118.3
+Kelantan,2024,1887.9,5265,4083,Health,131.4
+Kelantan,2024,1887.9,5265,4083,Housing & Utilities,119.9
+Kelantan,2024,1887.9,5265,4083,Information & Communication,96.3
+Kelantan,2024,1887.9,5265,4083,Insurance & Financial Services,117
+Kelantan,2024,1887.9,5265,4083,Overall,129.3
+Kelantan,2024,1887.9,5265,4083,Personal Care & Miscellaneous,128.3
+Kelantan,2024,1887.9,5265,4083,"Recreation, Sport & Culture",109.8
+Kelantan,2024,1887.9,5265,4083,Restaurants & Accommodation,131.1
+Kelantan,2024,1887.9,5265,4083,Transport,117.5
+Melaka,2012,843.2,4759,3923,Alcoholic Beverages & Tobacco,105.4
+Melaka,2012,843.2,4759,3923,Clothing & Footwear,95.3
+Melaka,2012,843.2,4759,3923,Education Services,110
+Melaka,2012,843.2,4759,3923,Food & Beverages,108.3
+Melaka,2012,843.2,4759,3923,Furnishings & Household Maintenance,104.8
+Melaka,2012,843.2,4759,3923,Health,103.8
+Melaka,2012,843.2,4759,3923,Housing & Utilities,103
+Melaka,2012,843.2,4759,3923,Information & Communication,96.9
+Melaka,2012,843.2,4759,3923,Insurance & Financial Services,100.6
+Melaka,2012,843.2,4759,3923,Overall,104.8
+Melaka,2012,843.2,4759,3923,Personal Care & Miscellaneous,104.1
+Melaka,2012,843.2,4759,3923,"Recreation, Sport & Culture",106.4
+Melaka,2012,843.2,4759,3923,Restaurants & Accommodation,108.6
+Melaka,2012,843.2,4759,3923,Transport,104.6
+Melaka,2014,871.7,6046,5029,Alcoholic Beverages & Tobacco,125.3
+Melaka,2014,871.7,6046,5029,Clothing & Footwear,91
+Melaka,2014,871.7,6046,5029,Education Services,116.8
+Melaka,2014,871.7,6046,5029,Food & Beverages,116.4
+Melaka,2014,871.7,6046,5029,Furnishings & Household Maintenance,109.8
+Melaka,2014,871.7,6046,5029,Health,109.6
+Melaka,2014,871.7,6046,5029,Housing & Utilities,109.2
+Melaka,2014,871.7,6046,5029,Information & Communication,95.4
+Melaka,2014,871.7,6046,5029,Insurance & Financial Services,101.4
+Melaka,2014,871.7,6046,5029,Overall,110.2
+Melaka,2014,871.7,6046,5029,Personal Care & Miscellaneous,104.7
+Melaka,2014,871.7,6046,5029,"Recreation, Sport & Culture",106.3
+Melaka,2014,871.7,6046,5029,Restaurants & Accommodation,115.5
+Melaka,2014,871.7,6046,5029,Transport,110.6
+Melaka,2016,901.1,6849,5588,Alcoholic Beverages & Tobacco,167.1
+Melaka,2016,901.1,6849,5588,Clothing & Footwear,86.9
+Melaka,2016,901.1,6849,5588,Education Services,123.6
+Melaka,2016,901.1,6849,5588,Food & Beverages,126.2
+Melaka,2016,901.1,6849,5588,Furnishings & Household Maintenance,114.8
+Melaka,2016,901.1,6849,5588,Health,115
+Melaka,2016,901.1,6849,5588,Housing & Utilities,117.3
+Melaka,2016,901.1,6849,5588,Information & Communication,99.9
+Melaka,2016,901.1,6849,5588,Insurance & Financial Services,110.6
+Melaka,2016,901.1,6849,5588,Overall,114.6
+Melaka,2016,901.1,6849,5588,Personal Care & Miscellaneous,112.4
+Melaka,2016,901.1,6849,5588,"Recreation, Sport & Culture",109.6
+Melaka,2016,901.1,6849,5588,Restaurants & Accommodation,119
+Melaka,2016,901.1,6849,5588,Transport,100.2
+Melaka,2019,928.4,7741,6054,Alcoholic Beverages & Tobacco,169.6
+Melaka,2019,928.4,7741,6054,Clothing & Footwear,79.2
+Melaka,2019,928.4,7741,6054,Education Services,129.8
+Melaka,2019,928.4,7741,6054,Food & Beverages,135.7
+Melaka,2019,928.4,7741,6054,Furnishings & Household Maintenance,118.2
+Melaka,2019,928.4,7741,6054,Health,119.6
+Melaka,2019,928.4,7741,6054,Housing & Utilities,124.6
+Melaka,2019,928.4,7741,6054,Information & Communication,96
+Melaka,2019,928.4,7741,6054,Insurance & Financial Services,110
+Melaka,2019,928.4,7741,6054,Overall,120.4
+Melaka,2019,928.4,7741,6054,Personal Care & Miscellaneous,112.8
+Melaka,2019,928.4,7741,6054,"Recreation, Sport & Culture",112.9
+Melaka,2019,928.4,7741,6054,Restaurants & Accommodation,126.6
+Melaka,2019,928.4,7741,6054,Transport,108
+Melaka,2020,998.4,7186,5447,Alcoholic Beverages & Tobacco,169
+Melaka,2020,998.4,7186,5447,Clothing & Footwear,77.8
+Melaka,2020,998.4,7186,5447,Education Services,130.9
+Melaka,2020,998.4,7186,5447,Food & Beverages,136.7
+Melaka,2020,998.4,7186,5447,Furnishings & Household Maintenance,117.8
+Melaka,2020,998.4,7186,5447,Health,120.4
+Melaka,2020,998.4,7186,5447,Housing & Utilities,120.5
+Melaka,2020,998.4,7186,5447,Information & Communication,97.8
+Melaka,2020,998.4,7186,5447,Insurance & Financial Services,110
+Melaka,2020,998.4,7186,5447,Overall,118.1
+Melaka,2020,998.4,7186,5447,Personal Care & Miscellaneous,114.7
+Melaka,2020,998.4,7186,5447,"Recreation, Sport & Culture",113.2
+Melaka,2020,998.4,7186,5447,Restaurants & Accommodation,126.3
+Melaka,2020,998.4,7186,5447,Transport,97.5
+Melaka,2022,1008.6,8057,6210,Alcoholic Beverages & Tobacco,170.3
+Melaka,2022,1008.6,8057,6210,Clothing & Footwear,74.9
+Melaka,2022,1008.6,8057,6210,Education Services,131.2
+Melaka,2022,1008.6,8057,6210,Food & Beverages,145
+Melaka,2022,1008.6,8057,6210,Furnishings & Household Maintenance,123
+Melaka,2022,1008.6,8057,6210,Health,120.6
+Melaka,2022,1008.6,8057,6210,Housing & Utilities,125.9
+Melaka,2022,1008.6,8057,6210,Information & Communication,97.7
+Melaka,2022,1008.6,8057,6210,Insurance & Financial Services,111.2
+Melaka,2022,1008.6,8057,6210,Overall,124.2
+Melaka,2022,1008.6,8057,6210,Personal Care & Miscellaneous,117.2
+Melaka,2022,1008.6,8057,6210,"Recreation, Sport & Culture",114.9
+Melaka,2022,1008.6,8057,6210,Restaurants & Accommodation,132.8
+Melaka,2022,1008.6,8057,6210,Transport,109.5
+Melaka,2024,1046.7,8686,6891,Alcoholic Beverages & Tobacco,171.5
+Melaka,2024,1046.7,8686,6891,Clothing & Footwear,74.7
+Melaka,2024,1046.7,8686,6891,Education Services,134.5
+Melaka,2024,1046.7,8686,6891,Food & Beverages,153.4
+Melaka,2024,1046.7,8686,6891,Furnishings & Household Maintenance,127.1
+Melaka,2024,1046.7,8686,6891,Health,125
+Melaka,2024,1046.7,8686,6891,Housing & Utilities,131.4
+Melaka,2024,1046.7,8686,6891,Information & Communication,95.3
+Melaka,2024,1046.7,8686,6891,Insurance & Financial Services,112.6
+Melaka,2024,1046.7,8686,6891,Overall,128.9
+Melaka,2024,1046.7,8686,6891,Personal Care & Miscellaneous,123.5
+Melaka,2024,1046.7,8686,6891,"Recreation, Sport & Culture",116.8
+Melaka,2024,1046.7,8686,6891,Restaurants & Accommodation,138.4
+Melaka,2024,1046.7,8686,6891,Transport,112.4
+Negeri Sembilan,2012,1057.7,4576,3575,Alcoholic Beverages & Tobacco,104.9
+Negeri Sembilan,2012,1057.7,4576,3575,Clothing & Footwear,98.6
+Negeri Sembilan,2012,1057.7,4576,3575,Education Services,102.8
+Negeri Sembilan,2012,1057.7,4576,3575,Food & Beverages,107.6
+Negeri Sembilan,2012,1057.7,4576,3575,Furnishings & Household Maintenance,104.9
+Negeri Sembilan,2012,1057.7,4576,3575,Health,103.6
+Negeri Sembilan,2012,1057.7,4576,3575,Housing & Utilities,103.3
+Negeri Sembilan,2012,1057.7,4576,3575,Information & Communication,99.6
+Negeri Sembilan,2012,1057.7,4576,3575,Insurance & Financial Services,100
+Negeri Sembilan,2012,1057.7,4576,3575,Overall,105.1
+Negeri Sembilan,2012,1057.7,4576,3575,Personal Care & Miscellaneous,102.4
+Negeri Sembilan,2012,1057.7,4576,3575,"Recreation, Sport & Culture",104.2
+Negeri Sembilan,2012,1057.7,4576,3575,Restaurants & Accommodation,108.5
+Negeri Sembilan,2012,1057.7,4576,3575,Transport,106.2
+Negeri Sembilan,2014,1079.6,5271,4128,Alcoholic Beverages & Tobacco,124.5
+Negeri Sembilan,2014,1079.6,5271,4128,Clothing & Footwear,98.3
+Negeri Sembilan,2014,1079.6,5271,4128,Education Services,108.2
+Negeri Sembilan,2014,1079.6,5271,4128,Food & Beverages,113.8
+Negeri Sembilan,2014,1079.6,5271,4128,Furnishings & Household Maintenance,107.7
+Negeri Sembilan,2014,1079.6,5271,4128,Health,108.6
+Negeri Sembilan,2014,1079.6,5271,4128,Housing & Utilities,107.3
+Negeri Sembilan,2014,1079.6,5271,4128,Information & Communication,98.6
+Negeri Sembilan,2014,1079.6,5271,4128,Insurance & Financial Services,100
+Negeri Sembilan,2014,1079.6,5271,4128,Overall,110.4
+Negeri Sembilan,2014,1079.6,5271,4128,Personal Care & Miscellaneous,102.1
+Negeri Sembilan,2014,1079.6,5271,4128,"Recreation, Sport & Culture",106.9
+Negeri Sembilan,2014,1079.6,5271,4128,Restaurants & Accommodation,113.6
+Negeri Sembilan,2014,1079.6,5271,4128,Transport,115.5
+Negeri Sembilan,2016,1099.3,5887,4579,Alcoholic Beverages & Tobacco,165.8
+Negeri Sembilan,2016,1099.3,5887,4579,Clothing & Footwear,100.9
+Negeri Sembilan,2016,1099.3,5887,4579,Education Services,113
+Negeri Sembilan,2016,1099.3,5887,4579,Food & Beverages,124.1
+Negeri Sembilan,2016,1099.3,5887,4579,Furnishings & Household Maintenance,112.1
+Negeri Sembilan,2016,1099.3,5887,4579,Health,117
+Negeri Sembilan,2016,1099.3,5887,4579,Housing & Utilities,113.3
+Negeri Sembilan,2016,1099.3,5887,4579,Information & Communication,99.6
+Negeri Sembilan,2016,1099.3,5887,4579,Insurance & Financial Services,100
+Negeri Sembilan,2016,1099.3,5887,4579,Overall,115.4
+Negeri Sembilan,2016,1099.3,5887,4579,Personal Care & Miscellaneous,107.4
+Negeri Sembilan,2016,1099.3,5887,4579,"Recreation, Sport & Culture",110
+Negeri Sembilan,2016,1099.3,5887,4579,Restaurants & Accommodation,119.4
+Negeri Sembilan,2016,1099.3,5887,4579,Transport,102.8
+Negeri Sembilan,2019,1126.2,6707,5005,Alcoholic Beverages & Tobacco,170.3
+Negeri Sembilan,2019,1126.2,6707,5005,Clothing & Footwear,100.1
+Negeri Sembilan,2019,1126.2,6707,5005,Education Services,114.4
+Negeri Sembilan,2019,1126.2,6707,5005,Food & Beverages,132.5
+Negeri Sembilan,2019,1126.2,6707,5005,Furnishings & Household Maintenance,115
+Negeri Sembilan,2019,1126.2,6707,5005,Health,125
+Negeri Sembilan,2019,1126.2,6707,5005,Housing & Utilities,120.3
+Negeri Sembilan,2019,1126.2,6707,5005,Information & Communication,100
+Negeri Sembilan,2019,1126.2,6707,5005,Insurance & Financial Services,101.6
+Negeri Sembilan,2019,1126.2,6707,5005,Overall,122.5
+Negeri Sembilan,2019,1126.2,6707,5005,Personal Care & Miscellaneous,109.4
+Negeri Sembilan,2019,1126.2,6707,5005,"Recreation, Sport & Culture",114.8
+Negeri Sembilan,2019,1126.2,6707,5005,Restaurants & Accommodation,125.4
+Negeri Sembilan,2019,1126.2,6707,5005,Transport,116
+Negeri Sembilan,2020,1200,6184,4478,Alcoholic Beverages & Tobacco,170.3
+Negeri Sembilan,2020,1200,6184,4478,Clothing & Footwear,99.5
+Negeri Sembilan,2020,1200,6184,4478,Education Services,115.1
+Negeri Sembilan,2020,1200,6184,4478,Food & Beverages,134.1
+Negeri Sembilan,2020,1200,6184,4478,Furnishings & Household Maintenance,115
+Negeri Sembilan,2020,1200,6184,4478,Health,125.9
+Negeri Sembilan,2020,1200,6184,4478,Housing & Utilities,116.6
+Negeri Sembilan,2020,1200,6184,4478,Information & Communication,102.6
+Negeri Sembilan,2020,1200,6184,4478,Insurance & Financial Services,101.6
+Negeri Sembilan,2020,1200,6184,4478,Overall,120.5
+Negeri Sembilan,2020,1200,6184,4478,Personal Care & Miscellaneous,111.1
+Negeri Sembilan,2020,1200,6184,4478,"Recreation, Sport & Culture",115.6
+Negeri Sembilan,2020,1200,6184,4478,Restaurants & Accommodation,124.9
+Negeri Sembilan,2020,1200,6184,4478,Transport,102.4
+Negeri Sembilan,2022,1207.9,6788,5226,Alcoholic Beverages & Tobacco,171
+Negeri Sembilan,2022,1207.9,6788,5226,Clothing & Footwear,99.8
+Negeri Sembilan,2022,1207.9,6788,5226,Education Services,115.1
+Negeri Sembilan,2022,1207.9,6788,5226,Food & Beverages,142.8
+Negeri Sembilan,2022,1207.9,6788,5226,Furnishings & Household Maintenance,118.7
+Negeri Sembilan,2022,1207.9,6788,5226,Health,127.4
+Negeri Sembilan,2022,1207.9,6788,5226,Housing & Utilities,121.9
+Negeri Sembilan,2022,1207.9,6788,5226,Information & Communication,102.6
+Negeri Sembilan,2022,1207.9,6788,5226,Insurance & Financial Services,101.6
+Negeri Sembilan,2022,1207.9,6788,5226,Overall,127
+Negeri Sembilan,2022,1207.9,6788,5226,Personal Care & Miscellaneous,112.1
+Negeri Sembilan,2022,1207.9,6788,5226,"Recreation, Sport & Culture",117
+Negeri Sembilan,2022,1207.9,6788,5226,Restaurants & Accommodation,129.7
+Negeri Sembilan,2022,1207.9,6788,5226,Transport,117.9
+Negeri Sembilan,2024,1239.5,7305,5591,Alcoholic Beverages & Tobacco,172.9
+Negeri Sembilan,2024,1239.5,7305,5591,Clothing & Footwear,100.2
+Negeri Sembilan,2024,1239.5,7305,5591,Education Services,117.6
+Negeri Sembilan,2024,1239.5,7305,5591,Food & Beverages,151
+Negeri Sembilan,2024,1239.5,7305,5591,Furnishings & Household Maintenance,121.3
+Negeri Sembilan,2024,1239.5,7305,5591,Health,129.5
+Negeri Sembilan,2024,1239.5,7305,5591,Housing & Utilities,126.3
+Negeri Sembilan,2024,1239.5,7305,5591,Information & Communication,97.6
+Negeri Sembilan,2024,1239.5,7305,5591,Insurance & Financial Services,101.6
+Negeri Sembilan,2024,1239.5,7305,5591,Overall,131.1
+Negeri Sembilan,2024,1239.5,7305,5591,Personal Care & Miscellaneous,115.6
+Negeri Sembilan,2024,1239.5,7305,5591,"Recreation, Sport & Culture",120.8
+Negeri Sembilan,2024,1239.5,7305,5591,Restaurants & Accommodation,136.8
+Negeri Sembilan,2024,1239.5,7305,5591,Transport,119.1
+Pahang,2012,1547.1,3745,3067,Alcoholic Beverages & Tobacco,105.7
+Pahang,2012,1547.1,3745,3067,Clothing & Footwear,100.6
+Pahang,2012,1547.1,3745,3067,Education Services,103.2
+Pahang,2012,1547.1,3745,3067,Food & Beverages,108.2
+Pahang,2012,1547.1,3745,3067,Furnishings & Household Maintenance,103.6
+Pahang,2012,1547.1,3745,3067,Health,104.8
+Pahang,2012,1547.1,3745,3067,Housing & Utilities,102.8
+Pahang,2012,1547.1,3745,3067,Information & Communication,98.9
+Pahang,2012,1547.1,3745,3067,Insurance & Financial Services,102.2
+Pahang,2012,1547.1,3745,3067,Overall,105
+Pahang,2012,1547.1,3745,3067,Personal Care & Miscellaneous,108
+Pahang,2012,1547.1,3745,3067,"Recreation, Sport & Culture",101.6
+Pahang,2012,1547.1,3745,3067,Restaurants & Accommodation,106.3
+Pahang,2012,1547.1,3745,3067,Transport,104.3
+Pahang,2014,1591.7,4343,3389,Alcoholic Beverages & Tobacco,126.9
+Pahang,2014,1591.7,4343,3389,Clothing & Footwear,101
+Pahang,2014,1591.7,4343,3389,Education Services,108.7
+Pahang,2014,1591.7,4343,3389,Food & Beverages,117.3
+Pahang,2014,1591.7,4343,3389,Furnishings & Household Maintenance,108.3
+Pahang,2014,1591.7,4343,3389,Health,109.6
+Pahang,2014,1591.7,4343,3389,Housing & Utilities,107.6
+Pahang,2014,1591.7,4343,3389,Information & Communication,97.1
+Pahang,2014,1591.7,4343,3389,Insurance & Financial Services,103.5
+Pahang,2014,1591.7,4343,3389,Overall,110.6
+Pahang,2014,1591.7,4343,3389,Personal Care & Miscellaneous,105.3
+Pahang,2014,1591.7,4343,3389,"Recreation, Sport & Culture",103.1
+Pahang,2014,1591.7,4343,3389,Restaurants & Accommodation,112.3
+Pahang,2014,1591.7,4343,3389,Transport,110.8
+Pahang,2016,1626.7,5012,3979,Alcoholic Beverages & Tobacco,171.7
+Pahang,2016,1626.7,5012,3979,Clothing & Footwear,98.9
+Pahang,2016,1626.7,5012,3979,Education Services,114.4
+Pahang,2016,1626.7,5012,3979,Food & Beverages,125.7
+Pahang,2016,1626.7,5012,3979,Furnishings & Household Maintenance,113.7
+Pahang,2016,1626.7,5012,3979,Health,116.2
+Pahang,2016,1626.7,5012,3979,Housing & Utilities,112.4
+Pahang,2016,1626.7,5012,3979,Information & Communication,96.9
+Pahang,2016,1626.7,5012,3979,Insurance & Financial Services,107.4
+Pahang,2016,1626.7,5012,3979,Overall,114.4
+Pahang,2016,1626.7,5012,3979,Personal Care & Miscellaneous,111.4
+Pahang,2016,1626.7,5012,3979,"Recreation, Sport & Culture",104.7
+Pahang,2016,1626.7,5012,3979,Restaurants & Accommodation,116.9
+Pahang,2016,1626.7,5012,3979,Transport,100
+Pahang,2019,1671.4,5667,4440,Alcoholic Beverages & Tobacco,175.7
+Pahang,2019,1671.4,5667,4440,Clothing & Footwear,95.2
+Pahang,2019,1671.4,5667,4440,Education Services,118
+Pahang,2019,1671.4,5667,4440,Food & Beverages,131.5
+Pahang,2019,1671.4,5667,4440,Furnishings & Household Maintenance,116.4
+Pahang,2019,1671.4,5667,4440,Health,119.6
+Pahang,2019,1671.4,5667,4440,Housing & Utilities,117.2
+Pahang,2019,1671.4,5667,4440,Information & Communication,98.6
+Pahang,2019,1671.4,5667,4440,Insurance & Financial Services,107.6
+Pahang,2019,1671.4,5667,4440,Overall,119
+Pahang,2019,1671.4,5667,4440,Personal Care & Miscellaneous,111.6
+Pahang,2019,1671.4,5667,4440,"Recreation, Sport & Culture",106.7
+Pahang,2019,1671.4,5667,4440,Restaurants & Accommodation,120.7
+Pahang,2019,1671.4,5667,4440,Transport,110.4
+Pahang,2020,1591.3,5144,4033,Alcoholic Beverages & Tobacco,176.1
+Pahang,2020,1591.3,5144,4033,Clothing & Footwear,94.9
+Pahang,2020,1591.3,5144,4033,Education Services,120.4
+Pahang,2020,1591.3,5144,4033,Food & Beverages,133.3
+Pahang,2020,1591.3,5144,4033,Furnishings & Household Maintenance,117.2
+Pahang,2020,1591.3,5144,4033,Health,121.3
+Pahang,2020,1591.3,5144,4033,Housing & Utilities,113.6
+Pahang,2020,1591.3,5144,4033,Information & Communication,104.3
+Pahang,2020,1591.3,5144,4033,Insurance & Financial Services,107.6
+Pahang,2020,1591.3,5144,4033,Overall,117.6
+Pahang,2020,1591.3,5144,4033,Personal Care & Miscellaneous,113.8
+Pahang,2020,1591.3,5144,4033,"Recreation, Sport & Culture",107.5
+Pahang,2020,1591.3,5144,4033,Restaurants & Accommodation,120.7
+Pahang,2020,1591.3,5144,4033,Transport,97.1
+Pahang,2022,1614.3,5777,4753,Alcoholic Beverages & Tobacco,177
+Pahang,2022,1614.3,5777,4753,Clothing & Footwear,95.1
+Pahang,2022,1614.3,5777,4753,Education Services,121.1
+Pahang,2022,1614.3,5777,4753,Food & Beverages,143
+Pahang,2022,1614.3,5777,4753,Furnishings & Household Maintenance,123.5
+Pahang,2022,1614.3,5777,4753,Health,121.4
+Pahang,2022,1614.3,5777,4753,Housing & Utilities,118.7
+Pahang,2022,1614.3,5777,4753,Information & Communication,104.2
+Pahang,2022,1614.3,5777,4753,Insurance & Financial Services,107.8
+Pahang,2022,1614.3,5777,4753,Overall,124.7
+Pahang,2022,1614.3,5777,4753,Personal Care & Miscellaneous,116.7
+Pahang,2022,1614.3,5777,4753,"Recreation, Sport & Culture",108.9
+Pahang,2022,1614.3,5777,4753,Restaurants & Accommodation,125
+Pahang,2022,1614.3,5777,4753,Transport,114.6
+Pahang,2024,1667.7,6066,4975,Alcoholic Beverages & Tobacco,178.1
+Pahang,2024,1667.7,6066,4975,Clothing & Footwear,94.1
+Pahang,2024,1667.7,6066,4975,Education Services,123.7
+Pahang,2024,1667.7,6066,4975,Food & Beverages,153
+Pahang,2024,1667.7,6066,4975,Furnishings & Household Maintenance,130.2
+Pahang,2024,1667.7,6066,4975,Health,126.2
+Pahang,2024,1667.7,6066,4975,Housing & Utilities,128.2
+Pahang,2024,1667.7,6066,4975,Information & Communication,100.9
+Pahang,2024,1667.7,6066,4975,Insurance & Financial Services,107.9
+Pahang,2024,1667.7,6066,4975,Overall,131.1
+Pahang,2024,1667.7,6066,4975,Personal Care & Miscellaneous,122.7
+Pahang,2024,1667.7,6066,4975,"Recreation, Sport & Culture",110.8
+Pahang,2024,1667.7,6066,4975,Restaurants & Accommodation,138.6
+Pahang,2024,1667.7,6066,4975,Transport,118.1
+Perak,2012,2427,3548,2665,Alcoholic Beverages & Tobacco,105.2
+Perak,2012,2427,3548,2665,Clothing & Footwear,98.7
+Perak,2012,2427,3548,2665,Education Services,104.3
+Perak,2012,2427,3548,2665,Food & Beverages,106.3
+Perak,2012,2427,3548,2665,Furnishings & Household Maintenance,103.9
+Perak,2012,2427,3548,2665,Health,103.8
+Perak,2012,2427,3548,2665,Housing & Utilities,103.2
+Perak,2012,2427,3548,2665,Information & Communication,98.4
+Perak,2012,2427,3548,2665,Insurance & Financial Services,100.7
+Perak,2012,2427,3548,2665,Overall,104.3
+Perak,2012,2427,3548,2665,Personal Care & Miscellaneous,105.1
+Perak,2012,2427,3548,2665,"Recreation, Sport & Culture",101.5
+Perak,2012,2427,3548,2665,Restaurants & Accommodation,107.4
+Perak,2012,2427,3548,2665,Transport,104.1
+Perak,2014,2458.8,4268,3451,Alcoholic Beverages & Tobacco,123.6
+Perak,2014,2458.8,4268,3451,Clothing & Footwear,97.5
+Perak,2014,2458.8,4268,3451,Education Services,107.9
+Perak,2014,2458.8,4268,3451,Food & Beverages,111.9
+Perak,2014,2458.8,4268,3451,Furnishings & Household Maintenance,105.9
+Perak,2014,2458.8,4268,3451,Health,106.9
+Perak,2014,2458.8,4268,3451,Housing & Utilities,108.2
+Perak,2014,2458.8,4268,3451,Information & Communication,97.4
+Perak,2014,2458.8,4268,3451,Insurance & Financial Services,103.8
+Perak,2014,2458.8,4268,3451,Overall,109
+Perak,2014,2458.8,4268,3451,Personal Care & Miscellaneous,105.7
+Perak,2014,2458.8,4268,3451,"Recreation, Sport & Culture",103.2
+Perak,2014,2458.8,4268,3451,Restaurants & Accommodation,114.3
+Perak,2014,2458.8,4268,3451,Transport,111
+Perak,2016,2482.1,5065,4006,Alcoholic Beverages & Tobacco,162.8
+Perak,2016,2482.1,5065,4006,Clothing & Footwear,95.6
+Perak,2016,2482.1,5065,4006,Education Services,111.8
+Perak,2016,2482.1,5065,4006,Food & Beverages,119.1
+Perak,2016,2482.1,5065,4006,Furnishings & Household Maintenance,111.4
+Perak,2016,2482.1,5065,4006,Health,113.5
+Perak,2016,2482.1,5065,4006,Housing & Utilities,111.6
+Perak,2016,2482.1,5065,4006,Information & Communication,99.5
+Perak,2016,2482.1,5065,4006,Insurance & Financial Services,110.4
+Perak,2016,2482.1,5065,4006,Overall,112.3
+Perak,2016,2482.1,5065,4006,Personal Care & Miscellaneous,112.5
+Perak,2016,2482.1,5065,4006,"Recreation, Sport & Culture",106.2
+Perak,2016,2482.1,5065,4006,Restaurants & Accommodation,122.3
+Perak,2016,2482.1,5065,4006,Transport,100.3
+Perak,2019,2508.8,5645,4273,Alcoholic Beverages & Tobacco,165.7
+Perak,2019,2508.8,5645,4273,Clothing & Footwear,92.4
+Perak,2019,2508.8,5645,4273,Education Services,113.7
+Perak,2019,2508.8,5645,4273,Food & Beverages,126.2
+Perak,2019,2508.8,5645,4273,Furnishings & Household Maintenance,114.7
+Perak,2019,2508.8,5645,4273,Health,118
+Perak,2019,2508.8,5645,4273,Housing & Utilities,114.8
+Perak,2019,2508.8,5645,4273,Information & Communication,100
+Perak,2019,2508.8,5645,4273,Insurance & Financial Services,116.5
+Perak,2019,2508.8,5645,4273,Overall,117.5
+Perak,2019,2508.8,5645,4273,Personal Care & Miscellaneous,115.6
+Perak,2019,2508.8,5645,4273,"Recreation, Sport & Culture",108.5
+Perak,2019,2508.8,5645,4273,Restaurants & Accommodation,126.2
+Perak,2019,2508.8,5645,4273,Transport,111.3
+Perak,2020,2496,5081,3759,Alcoholic Beverages & Tobacco,166.7
+Perak,2020,2496,5081,3759,Clothing & Footwear,92.1
+Perak,2020,2496,5081,3759,Education Services,114.2
+Perak,2020,2496,5081,3759,Food & Beverages,128.2
+Perak,2020,2496,5081,3759,Furnishings & Household Maintenance,114.9
+Perak,2020,2496,5081,3759,Health,119.6
+Perak,2020,2496,5081,3759,Housing & Utilities,110.9
+Perak,2020,2496,5081,3759,Information & Communication,101.7
+Perak,2020,2496,5081,3759,Insurance & Financial Services,116.5
+Perak,2020,2496,5081,3759,Overall,116
+Perak,2020,2496,5081,3759,Personal Care & Miscellaneous,118.3
+Perak,2020,2496,5081,3759,"Recreation, Sport & Culture",109.2
+Perak,2020,2496,5081,3759,Restaurants & Accommodation,126.5
+Perak,2020,2496,5081,3759,Transport,99.3
+Perak,2022,2514.4,5779,4494,Alcoholic Beverages & Tobacco,168.2
+Perak,2022,2514.4,5779,4494,Clothing & Footwear,91.8
+Perak,2022,2514.4,5779,4494,Education Services,115
+Perak,2022,2514.4,5779,4494,Food & Beverages,137.5
+Perak,2022,2514.4,5779,4494,Furnishings & Household Maintenance,120.9
+Perak,2022,2514.4,5779,4494,Health,123.7
+Perak,2022,2514.4,5779,4494,Housing & Utilities,115.9
+Perak,2022,2514.4,5779,4494,Information & Communication,101.7
+Perak,2022,2514.4,5779,4494,Insurance & Financial Services,116.5
+Perak,2022,2514.4,5779,4494,Overall,123
+Perak,2022,2514.4,5779,4494,Personal Care & Miscellaneous,120.3
+Perak,2022,2514.4,5779,4494,"Recreation, Sport & Culture",111.8
+Perak,2022,2514.4,5779,4494,Restaurants & Accommodation,134.1
+Perak,2022,2514.4,5779,4494,Transport,114.8
+Perak,2024,2569.4,6173,4687,Alcoholic Beverages & Tobacco,170.7
+Perak,2024,2569.4,6173,4687,Clothing & Footwear,90.8
+Perak,2024,2569.4,6173,4687,Education Services,118.4
+Perak,2024,2569.4,6173,4687,Food & Beverages,145
+Perak,2024,2569.4,6173,4687,Furnishings & Household Maintenance,123.9
+Perak,2024,2569.4,6173,4687,Health,127.7
+Perak,2024,2569.4,6173,4687,Housing & Utilities,120.2
+Perak,2024,2569.4,6173,4687,Information & Communication,98.2
+Perak,2024,2569.4,6173,4687,Insurance & Financial Services,116.5
+Perak,2024,2569.4,6173,4687,Overall,127.7
+Perak,2024,2569.4,6173,4687,Personal Care & Miscellaneous,126.6
+Perak,2024,2569.4,6173,4687,"Recreation, Sport & Culture",117.4
+Perak,2024,2569.4,6173,4687,Restaurants & Accommodation,146.8
+Perak,2024,2569.4,6173,4687,Transport,118
+Perlis,2012,239.4,3538,2387,Alcoholic Beverages & Tobacco,105.9
+Perlis,2012,239.4,3538,2387,Clothing & Footwear,101.4
+Perlis,2012,239.4,3538,2387,Education Services,102.2
+Perlis,2012,239.4,3538,2387,Food & Beverages,104.6
+Perlis,2012,239.4,3538,2387,Furnishings & Household Maintenance,101.4
+Perlis,2012,239.4,3538,2387,Health,102.5
+Perlis,2012,239.4,3538,2387,Housing & Utilities,103.5
+Perlis,2012,239.4,3538,2387,Information & Communication,99.2
+Perlis,2012,239.4,3538,2387,Insurance & Financial Services,108.5
+Perlis,2012,239.4,3538,2387,Overall,104.2
+Perlis,2012,239.4,3538,2387,Personal Care & Miscellaneous,107.8
+Perlis,2012,239.4,3538,2387,"Recreation, Sport & Culture",101.7
+Perlis,2012,239.4,3538,2387,Restaurants & Accommodation,107.7
+Perlis,2012,239.4,3538,2387,Transport,105.8
+Perlis,2014,245.1,4445,3500,Alcoholic Beverages & Tobacco,129.5
+Perlis,2014,245.1,4445,3500,Clothing & Footwear,100
+Perlis,2014,245.1,4445,3500,Education Services,115
+Perlis,2014,245.1,4445,3500,Food & Beverages,108.1
+Perlis,2014,245.1,4445,3500,Furnishings & Household Maintenance,102.2
+Perlis,2014,245.1,4445,3500,Health,104
+Perlis,2014,245.1,4445,3500,Housing & Utilities,108
+Perlis,2014,245.1,4445,3500,Information & Communication,98.4
+Perlis,2014,245.1,4445,3500,Insurance & Financial Services,108.5
+Perlis,2014,245.1,4445,3500,Overall,108.3
+Perlis,2014,245.1,4445,3500,Personal Care & Miscellaneous,103.6
+Perlis,2014,245.1,4445,3500,"Recreation, Sport & Culture",104.1
+Perlis,2014,245.1,4445,3500,Restaurants & Accommodation,112
+Perlis,2014,245.1,4445,3500,Transport,114
+Perlis,2016,251,4998,4204,Alcoholic Beverages & Tobacco,179.4
+Perlis,2016,251,4998,4204,Clothing & Footwear,100.2
+Perlis,2016,251,4998,4204,Education Services,116.7
+Perlis,2016,251,4998,4204,Food & Beverages,115.3
+Perlis,2016,251,4998,4204,Furnishings & Household Maintenance,103.9
+Perlis,2016,251,4998,4204,Health,108.8
+Perlis,2016,251,4998,4204,Housing & Utilities,110.9
+Perlis,2016,251,4998,4204,Information & Communication,98.9
+Perlis,2016,251,4998,4204,Insurance & Financial Services,115.3
+Perlis,2016,251,4998,4204,Overall,110.9
+Perlis,2016,251,4998,4204,Personal Care & Miscellaneous,106.6
+Perlis,2016,251,4998,4204,"Recreation, Sport & Culture",107.2
+Perlis,2016,251,4998,4204,Restaurants & Accommodation,120.2
+Perlis,2016,251,4998,4204,Transport,99.8
+Perlis,2019,254,5476,4594,Alcoholic Beverages & Tobacco,183.9
+Perlis,2019,254,5476,4594,Clothing & Footwear,90.7
+Perlis,2019,254,5476,4594,Education Services,125.7
+Perlis,2019,254,5476,4594,Food & Beverages,122.2
+Perlis,2019,254,5476,4594,Furnishings & Household Maintenance,107
+Perlis,2019,254,5476,4594,Health,114.2
+Perlis,2019,254,5476,4594,Housing & Utilities,114
+Perlis,2019,254,5476,4594,Information & Communication,99.6
+Perlis,2019,254,5476,4594,Insurance & Financial Services,115.2
+Perlis,2019,254,5476,4594,Overall,115.6
+Perlis,2019,254,5476,4594,Personal Care & Miscellaneous,106.3
+Perlis,2019,254,5476,4594,"Recreation, Sport & Culture",112.4
+Perlis,2019,254,5476,4594,Restaurants & Accommodation,125.4
+Perlis,2019,254,5476,4594,Transport,111
+Perlis,2020,284.9,4971,4043,Alcoholic Beverages & Tobacco,183.9
+Perlis,2020,284.9,4971,4043,Clothing & Footwear,90
+Perlis,2020,284.9,4971,4043,Education Services,126
+Perlis,2020,284.9,4971,4043,Food & Beverages,122.9
+Perlis,2020,284.9,4971,4043,Furnishings & Household Maintenance,107.1
+Perlis,2020,284.9,4971,4043,Health,115
+Perlis,2020,284.9,4971,4043,Housing & Utilities,109.6
+Perlis,2020,284.9,4971,4043,Information & Communication,102.1
+Perlis,2020,284.9,4971,4043,Insurance & Financial Services,120.6
+Perlis,2020,284.9,4971,4043,Overall,113.2
+Perlis,2020,284.9,4971,4043,Personal Care & Miscellaneous,108
+Perlis,2020,284.9,4971,4043,"Recreation, Sport & Culture",115
+Perlis,2020,284.9,4971,4043,Restaurants & Accommodation,124.3
+Perlis,2020,284.9,4971,4043,Transport,95.2
+Perlis,2022,289.8,5664,4713,Alcoholic Beverages & Tobacco,183.9
+Perlis,2022,289.8,5664,4713,Clothing & Footwear,90.1
+Perlis,2022,289.8,5664,4713,Education Services,126
+Perlis,2022,289.8,5664,4713,Food & Beverages,130.7
+Perlis,2022,289.8,5664,4713,Furnishings & Household Maintenance,113.1
+Perlis,2022,289.8,5664,4713,Health,117.5
+Perlis,2022,289.8,5664,4713,Housing & Utilities,114.8
+Perlis,2022,289.8,5664,4713,Information & Communication,102.1
+Perlis,2022,289.8,5664,4713,Insurance & Financial Services,121.7
+Perlis,2022,289.8,5664,4713,Overall,120.2
+Perlis,2022,289.8,5664,4713,Personal Care & Miscellaneous,110.4
+Perlis,2022,289.8,5664,4713,"Recreation, Sport & Culture",118.6
+Perlis,2022,289.8,5664,4713,Restaurants & Accommodation,131
+Perlis,2022,289.8,5664,4713,Transport,112.3
+Perlis,2024,296.8,5996,4950,Alcoholic Beverages & Tobacco,184.7
+Perlis,2024,296.8,5996,4950,Clothing & Footwear,88.5
+Perlis,2024,296.8,5996,4950,Education Services,126
+Perlis,2024,296.8,5996,4950,Food & Beverages,137.6
+Perlis,2024,296.8,5996,4950,Furnishings & Household Maintenance,116.4
+Perlis,2024,296.8,5996,4950,Health,120.8
+Perlis,2024,296.8,5996,4950,Housing & Utilities,119.7
+Perlis,2024,296.8,5996,4950,Information & Communication,98.4
+Perlis,2024,296.8,5996,4950,Insurance & Financial Services,121.7
+Perlis,2024,296.8,5996,4950,Overall,124.9
+Perlis,2024,296.8,5996,4950,Personal Care & Miscellaneous,115.3
+Perlis,2024,296.8,5996,4950,"Recreation, Sport & Culture",127.2
+Perlis,2024,296.8,5996,4950,Restaurants & Accommodation,147.1
+Perlis,2024,296.8,5996,4950,Transport,114.2
+Pulau Pinang,2012,1623.2,5055,4039,Alcoholic Beverages & Tobacco,104.4
+Pulau Pinang,2012,1623.2,5055,4039,Clothing & Footwear,99.6
+Pulau Pinang,2012,1623.2,5055,4039,Education Services,105.4
+Pulau Pinang,2012,1623.2,5055,4039,Food & Beverages,108.6
+Pulau Pinang,2012,1623.2,5055,4039,Furnishings & Household Maintenance,103.6
+Pulau Pinang,2012,1623.2,5055,4039,Health,106.9
+Pulau Pinang,2012,1623.2,5055,4039,Housing & Utilities,102.8
+Pulau Pinang,2012,1623.2,5055,4039,Information & Communication,98.8
+Pulau Pinang,2012,1623.2,5055,4039,Insurance & Financial Services,101.8
+Pulau Pinang,2012,1623.2,5055,4039,Overall,105.1
+Pulau Pinang,2012,1623.2,5055,4039,Personal Care & Miscellaneous,105.5
+Pulau Pinang,2012,1623.2,5055,4039,"Recreation, Sport & Culture",102.8
+Pulau Pinang,2012,1623.2,5055,4039,Restaurants & Accommodation,109.4
+Pulau Pinang,2012,1623.2,5055,4039,Transport,105.3
+Pulau Pinang,2014,1678.1,5993,4702,Alcoholic Beverages & Tobacco,121.8
+Pulau Pinang,2014,1678.1,5993,4702,Clothing & Footwear,97.6
+Pulau Pinang,2014,1678.1,5993,4702,Education Services,107.7
+Pulau Pinang,2014,1678.1,5993,4702,Food & Beverages,116.9
+Pulau Pinang,2014,1678.1,5993,4702,Furnishings & Household Maintenance,104.5
+Pulau Pinang,2014,1678.1,5993,4702,Health,111.2
+Pulau Pinang,2014,1678.1,5993,4702,Housing & Utilities,109.2
+Pulau Pinang,2014,1678.1,5993,4702,Information & Communication,97.3
+Pulau Pinang,2014,1678.1,5993,4702,Insurance & Financial Services,104.3
+Pulau Pinang,2014,1678.1,5993,4702,Overall,110.7
+Pulau Pinang,2014,1678.1,5993,4702,Personal Care & Miscellaneous,106.9
+Pulau Pinang,2014,1678.1,5993,4702,"Recreation, Sport & Culture",104.1
+Pulau Pinang,2014,1678.1,5993,4702,Restaurants & Accommodation,116.9
+Pulau Pinang,2014,1678.1,5993,4702,Transport,113.4
+Pulau Pinang,2016,1717.7,6771,5409,Alcoholic Beverages & Tobacco,159.5
+Pulau Pinang,2016,1717.7,6771,5409,Clothing & Footwear,97.5
+Pulau Pinang,2016,1717.7,6771,5409,Education Services,112.7
+Pulau Pinang,2016,1717.7,6771,5409,Food & Beverages,127.6
+Pulau Pinang,2016,1717.7,6771,5409,Furnishings & Household Maintenance,111.2
+Pulau Pinang,2016,1717.7,6771,5409,Health,122.1
+Pulau Pinang,2016,1717.7,6771,5409,Housing & Utilities,115.4
+Pulau Pinang,2016,1717.7,6771,5409,Information & Communication,96.3
+Pulau Pinang,2016,1717.7,6771,5409,Insurance & Financial Services,111
+Pulau Pinang,2016,1717.7,6771,5409,Overall,116.2
+Pulau Pinang,2016,1717.7,6771,5409,Personal Care & Miscellaneous,115.5
+Pulau Pinang,2016,1717.7,6771,5409,"Recreation, Sport & Culture",107.7
+Pulau Pinang,2016,1717.7,6771,5409,Restaurants & Accommodation,126.3
+Pulau Pinang,2016,1717.7,6771,5409,Transport,102.3
+Pulau Pinang,2019,1768.8,7774,6169,Alcoholic Beverages & Tobacco,164.9
+Pulau Pinang,2019,1768.8,7774,6169,Clothing & Footwear,93.7
+Pulau Pinang,2019,1768.8,7774,6169,Education Services,118.7
+Pulau Pinang,2019,1768.8,7774,6169,Food & Beverages,138
+Pulau Pinang,2019,1768.8,7774,6169,Furnishings & Household Maintenance,115.4
+Pulau Pinang,2019,1768.8,7774,6169,Health,128.3
+Pulau Pinang,2019,1768.8,7774,6169,Housing & Utilities,122.6
+Pulau Pinang,2019,1768.8,7774,6169,Information & Communication,95.3
+Pulau Pinang,2019,1768.8,7774,6169,Insurance & Financial Services,115.7
+Pulau Pinang,2019,1768.8,7774,6169,Overall,123.3
+Pulau Pinang,2019,1768.8,7774,6169,Personal Care & Miscellaneous,120.1
+Pulau Pinang,2019,1768.8,7774,6169,"Recreation, Sport & Culture",110.6
+Pulau Pinang,2019,1768.8,7774,6169,Restaurants & Accommodation,132.9
+Pulau Pinang,2019,1768.8,7774,6169,Transport,113.2
+Pulau Pinang,2020,1740.4,6850,5474,Alcoholic Beverages & Tobacco,164.6
+Pulau Pinang,2020,1740.4,6850,5474,Clothing & Footwear,91.8
+Pulau Pinang,2020,1740.4,6850,5474,Education Services,119.2
+Pulau Pinang,2020,1740.4,6850,5474,Food & Beverages,139.8
+Pulau Pinang,2020,1740.4,6850,5474,Furnishings & Household Maintenance,115.7
+Pulau Pinang,2020,1740.4,6850,5474,Health,129.6
+Pulau Pinang,2020,1740.4,6850,5474,Housing & Utilities,121.4
+Pulau Pinang,2020,1740.4,6850,5474,Information & Communication,95.9
+Pulau Pinang,2020,1740.4,6850,5474,Insurance & Financial Services,115.7
+Pulau Pinang,2020,1740.4,6850,5474,Overall,122.3
+Pulau Pinang,2020,1740.4,6850,5474,Personal Care & Miscellaneous,122.9
+Pulau Pinang,2020,1740.4,6850,5474,"Recreation, Sport & Culture",111.2
+Pulau Pinang,2020,1740.4,6850,5474,Restaurants & Accommodation,134.1
+Pulau Pinang,2020,1740.4,6850,5474,Transport,100.4
+Pulau Pinang,2022,1740.9,8267,6502,Alcoholic Beverages & Tobacco,167
+Pulau Pinang,2022,1740.9,8267,6502,Clothing & Footwear,90.8
+Pulau Pinang,2022,1740.9,8267,6502,Education Services,122.2
+Pulau Pinang,2022,1740.9,8267,6502,Food & Beverages,149.9
+Pulau Pinang,2022,1740.9,8267,6502,Furnishings & Household Maintenance,120.3
+Pulau Pinang,2022,1740.9,8267,6502,Health,131
+Pulau Pinang,2022,1740.9,8267,6502,Housing & Utilities,126
+Pulau Pinang,2022,1740.9,8267,6502,Information & Communication,96
+Pulau Pinang,2022,1740.9,8267,6502,Insurance & Financial Services,115.7
+Pulau Pinang,2022,1740.9,8267,6502,Overall,128.9
+Pulau Pinang,2022,1740.9,8267,6502,Personal Care & Miscellaneous,124.6
+Pulau Pinang,2022,1740.9,8267,6502,"Recreation, Sport & Culture",113.7
+Pulau Pinang,2022,1740.9,8267,6502,Restaurants & Accommodation,142.6
+Pulau Pinang,2022,1740.9,8267,6502,Transport,117.8
+Pulau Pinang,2024,1800.5,9152,7386,Alcoholic Beverages & Tobacco,169.6
+Pulau Pinang,2024,1800.5,9152,7386,Clothing & Footwear,88.9
+Pulau Pinang,2024,1800.5,9152,7386,Education Services,123.9
+Pulau Pinang,2024,1800.5,9152,7386,Food & Beverages,161.6
+Pulau Pinang,2024,1800.5,9152,7386,Furnishings & Household Maintenance,125
+Pulau Pinang,2024,1800.5,9152,7386,Health,135.3
+Pulau Pinang,2024,1800.5,9152,7386,Housing & Utilities,135.9
+Pulau Pinang,2024,1800.5,9152,7386,Information & Communication,91.3
+Pulau Pinang,2024,1800.5,9152,7386,Insurance & Financial Services,115.7
+Pulau Pinang,2024,1800.5,9152,7386,Overall,135.7
+Pulau Pinang,2024,1800.5,9152,7386,Personal Care & Miscellaneous,131.5
+Pulau Pinang,2024,1800.5,9152,7386,"Recreation, Sport & Culture",118.1
+Pulau Pinang,2024,1800.5,9152,7386,Restaurants & Accommodation,155
+Pulau Pinang,2024,1800.5,9152,7386,Transport,120.1
+Sabah,2012,3432.7,4013,2860,Alcoholic Beverages & Tobacco,105.7
+Sabah,2012,3432.7,4013,2860,Clothing & Footwear,98.6
+Sabah,2012,3432.7,4013,2860,Education Services,103.2
+Sabah,2012,3432.7,4013,2860,Food & Beverages,107.5
+Sabah,2012,3432.7,4013,2860,Furnishings & Household Maintenance,105.9
+Sabah,2012,3432.7,4013,2860,Health,106.7
+Sabah,2012,3432.7,4013,2860,Housing & Utilities,102.6
+Sabah,2012,3432.7,4013,2860,Information & Communication,99.8
+Sabah,2012,3432.7,4013,2860,Insurance & Financial Services,100.8
+Sabah,2012,3432.7,4013,2860,Overall,104.7
+Sabah,2012,3432.7,4013,2860,Personal Care & Miscellaneous,104.4
+Sabah,2012,3432.7,4013,2860,"Recreation, Sport & Culture",106.5
+Sabah,2012,3432.7,4013,2860,Restaurants & Accommodation,108.8
+Sabah,2012,3432.7,4013,2860,Transport,103.9
+Sabah,2014,3669.9,4879,3745,Alcoholic Beverages & Tobacco,127.1
+Sabah,2014,3669.9,4879,3745,Clothing & Footwear,96.9
+Sabah,2014,3669.9,4879,3745,Education Services,106.3
+Sabah,2014,3669.9,4879,3745,Food & Beverages,112.4
+Sabah,2014,3669.9,4879,3745,Furnishings & Household Maintenance,108.7
+Sabah,2014,3669.9,4879,3745,Health,114.6
+Sabah,2014,3669.9,4879,3745,Housing & Utilities,105.9
+Sabah,2014,3669.9,4879,3745,Information & Communication,98.9
+Sabah,2014,3669.9,4879,3745,Insurance & Financial Services,111.9
+Sabah,2014,3669.9,4879,3745,Overall,108.9
+Sabah,2014,3669.9,4879,3745,Personal Care & Miscellaneous,107.7
+Sabah,2014,3669.9,4879,3745,"Recreation, Sport & Culture",109.7
+Sabah,2014,3669.9,4879,3745,Restaurants & Accommodation,118.7
+Sabah,2014,3669.9,4879,3745,Transport,109.9
+Sabah,2016,3802.8,5354,4110,Alcoholic Beverages & Tobacco,171.1
+Sabah,2016,3802.8,5354,4110,Clothing & Footwear,97.1
+Sabah,2016,3802.8,5354,4110,Education Services,108.7
+Sabah,2016,3802.8,5354,4110,Food & Beverages,116.5
+Sabah,2016,3802.8,5354,4110,Furnishings & Household Maintenance,111.4
+Sabah,2016,3802.8,5354,4110,Health,122.9
+Sabah,2016,3802.8,5354,4110,Housing & Utilities,106.3
+Sabah,2016,3802.8,5354,4110,Information & Communication,99.7
+Sabah,2016,3802.8,5354,4110,Insurance & Financial Services,114.6
+Sabah,2016,3802.8,5354,4110,Overall,110.6
+Sabah,2016,3802.8,5354,4110,Personal Care & Miscellaneous,114
+Sabah,2016,3802.8,5354,4110,"Recreation, Sport & Culture",114.4
+Sabah,2016,3802.8,5354,4110,Restaurants & Accommodation,129.1
+Sabah,2016,3802.8,5354,4110,Transport,100
+Sabah,2019,3904.4,5745,4235,Alcoholic Beverages & Tobacco,172.1
+Sabah,2019,3904.4,5745,4235,Clothing & Footwear,92.2
+Sabah,2019,3904.4,5745,4235,Education Services,112.3
+Sabah,2019,3904.4,5745,4235,Food & Beverages,123
+Sabah,2019,3904.4,5745,4235,Furnishings & Household Maintenance,112.6
+Sabah,2019,3904.4,5745,4235,Health,126.9
+Sabah,2019,3904.4,5745,4235,Housing & Utilities,110.4
+Sabah,2019,3904.4,5745,4235,Information & Communication,98.7
+Sabah,2019,3904.4,5745,4235,Insurance & Financial Services,110.5
+Sabah,2019,3904.4,5745,4235,Overall,115
+Sabah,2019,3904.4,5745,4235,Personal Care & Miscellaneous,111.7
+Sabah,2019,3904.4,5745,4235,"Recreation, Sport & Culture",116.4
+Sabah,2019,3904.4,5745,4235,Restaurants & Accommodation,134.4
+Sabah,2019,3904.4,5745,4235,Transport,109.8
+Sabah,2020,3418.8,5215,3773,Alcoholic Beverages & Tobacco,172.2
+Sabah,2020,3418.8,5215,3773,Clothing & Footwear,91.4
+Sabah,2020,3418.8,5215,3773,Education Services,112.6
+Sabah,2020,3418.8,5215,3773,Food & Beverages,123.2
+Sabah,2020,3418.8,5215,3773,Furnishings & Household Maintenance,112.2
+Sabah,2020,3418.8,5215,3773,Health,128.3
+Sabah,2020,3418.8,5215,3773,Housing & Utilities,108.1
+Sabah,2020,3418.8,5215,3773,Information & Communication,99.1
+Sabah,2020,3418.8,5215,3773,Insurance & Financial Services,110.5
+Sabah,2020,3418.8,5215,3773,Overall,112.8
+Sabah,2020,3418.8,5215,3773,Personal Care & Miscellaneous,113.4
+Sabah,2020,3418.8,5215,3773,"Recreation, Sport & Culture",116.4
+Sabah,2020,3418.8,5215,3773,Restaurants & Accommodation,135.3
+Sabah,2020,3418.8,5215,3773,Transport,98
+Sabah,2022,3414.9,6171,4577,Alcoholic Beverages & Tobacco,173
+Sabah,2022,3414.9,6171,4577,Clothing & Footwear,91.1
+Sabah,2022,3414.9,6171,4577,Education Services,113.7
+Sabah,2022,3414.9,6171,4577,Food & Beverages,130.3
+Sabah,2022,3414.9,6171,4577,Furnishings & Household Maintenance,115.9
+Sabah,2022,3414.9,6171,4577,Health,130.5
+Sabah,2022,3414.9,6171,4577,Housing & Utilities,108.9
+Sabah,2022,3414.9,6171,4577,Information & Communication,99
+Sabah,2022,3414.9,6171,4577,Insurance & Financial Services,110.5
+Sabah,2022,3414.9,6171,4577,Overall,118
+Sabah,2022,3414.9,6171,4577,Personal Care & Miscellaneous,116
+Sabah,2022,3414.9,6171,4577,"Recreation, Sport & Culture",119.4
+Sabah,2022,3414.9,6171,4577,Restaurants & Accommodation,145.7
+Sabah,2022,3414.9,6171,4577,Transport,114.2
+Sabah,2024,3742,6498,4890,Alcoholic Beverages & Tobacco,174.6
+Sabah,2024,3742,6498,4890,Clothing & Footwear,90.7
+Sabah,2024,3742,6498,4890,Education Services,118.7
+Sabah,2024,3742,6498,4890,Food & Beverages,137.7
+Sabah,2024,3742,6498,4890,Furnishings & Household Maintenance,118.4
+Sabah,2024,3742,6498,4890,Health,133.9
+Sabah,2024,3742,6498,4890,Housing & Utilities,113.4
+Sabah,2024,3742,6498,4890,Information & Communication,97.4
+Sabah,2024,3742,6498,4890,Insurance & Financial Services,111.1
+Sabah,2024,3742,6498,4890,Overall,122.3
+Sabah,2024,3742,6498,4890,Personal Care & Miscellaneous,122.2
+Sabah,2024,3742,6498,4890,"Recreation, Sport & Culture",120.6
+Sabah,2024,3742,6498,4890,Restaurants & Accommodation,158.3
+Sabah,2024,3742,6498,4890,Transport,114.5
+Sarawak,2012,2569.7,4293,3047,Alcoholic Beverages & Tobacco,104.1
+Sarawak,2012,2569.7,4293,3047,Clothing & Footwear,98
+Sarawak,2012,2569.7,4293,3047,Education Services,102.2
+Sarawak,2012,2569.7,4293,3047,Food & Beverages,106.8
+Sarawak,2012,2569.7,4293,3047,Furnishings & Household Maintenance,102
+Sarawak,2012,2569.7,4293,3047,Health,105.6
+Sarawak,2012,2569.7,4293,3047,Housing & Utilities,103.4
+Sarawak,2012,2569.7,4293,3047,Information & Communication,99.2
+Sarawak,2012,2569.7,4293,3047,Insurance & Financial Services,101.2
+Sarawak,2012,2569.7,4293,3047,Overall,104.4
+Sarawak,2012,2569.7,4293,3047,Personal Care & Miscellaneous,103.1
+Sarawak,2012,2569.7,4293,3047,"Recreation, Sport & Culture",100.3
+Sarawak,2012,2569.7,4293,3047,Restaurants & Accommodation,107.8
+Sarawak,2012,2569.7,4293,3047,Transport,105.3
+Sarawak,2014,2664,4934,3778,Alcoholic Beverages & Tobacco,117.9
+Sarawak,2014,2664,4934,3778,Clothing & Footwear,97.2
+Sarawak,2014,2664,4934,3778,Education Services,104.8
+Sarawak,2014,2664,4934,3778,Food & Beverages,113.8
+Sarawak,2014,2664,4934,3778,Furnishings & Household Maintenance,102.5
+Sarawak,2014,2664,4934,3778,Health,112.3
+Sarawak,2014,2664,4934,3778,Housing & Utilities,107.6
+Sarawak,2014,2664,4934,3778,Information & Communication,97.6
+Sarawak,2014,2664,4934,3778,Insurance & Financial Services,101.3
+Sarawak,2014,2664,4934,3778,Overall,109.4
+Sarawak,2014,2664,4934,3778,Personal Care & Miscellaneous,104.3
+Sarawak,2014,2664,4934,3778,"Recreation, Sport & Culture",101.3
+Sarawak,2014,2664,4934,3778,Restaurants & Accommodation,113.7
+Sarawak,2014,2664,4934,3778,Transport,113.7
+Sarawak,2016,2738.7,5387,4163,Alcoholic Beverages & Tobacco,148.7
+Sarawak,2016,2738.7,5387,4163,Clothing & Footwear,96.6
+Sarawak,2016,2738.7,5387,4163,Education Services,108.2
+Sarawak,2016,2738.7,5387,4163,Food & Beverages,121.3
+Sarawak,2016,2738.7,5387,4163,Furnishings & Household Maintenance,106
+Sarawak,2016,2738.7,5387,4163,Health,120.1
+Sarawak,2016,2738.7,5387,4163,Housing & Utilities,108.4
+Sarawak,2016,2738.7,5387,4163,Information & Communication,97
+Sarawak,2016,2738.7,5387,4163,Insurance & Financial Services,108.1
+Sarawak,2016,2738.7,5387,4163,Overall,112.6
+Sarawak,2016,2738.7,5387,4163,Personal Care & Miscellaneous,112.1
+Sarawak,2016,2738.7,5387,4163,"Recreation, Sport & Culture",104.1
+Sarawak,2016,2738.7,5387,4163,Restaurants & Accommodation,119.7
+Sarawak,2016,2738.7,5387,4163,Transport,104.5
+Sarawak,2019,2806,5959,4544,Alcoholic Beverages & Tobacco,146.6
+Sarawak,2019,2806,5959,4544,Clothing & Footwear,91
+Sarawak,2019,2806,5959,4544,Education Services,111.3
+Sarawak,2019,2806,5959,4544,Food & Beverages,127.7
+Sarawak,2019,2806,5959,4544,Furnishings & Household Maintenance,108.1
+Sarawak,2019,2806,5959,4544,Health,127.1
+Sarawak,2019,2806,5959,4544,Housing & Utilities,111.2
+Sarawak,2019,2806,5959,4544,Information & Communication,95.3
+Sarawak,2019,2806,5959,4544,Insurance & Financial Services,103
+Sarawak,2019,2806,5959,4544,Overall,116.8
+Sarawak,2019,2806,5959,4544,Personal Care & Miscellaneous,111.4
+Sarawak,2019,2806,5959,4544,"Recreation, Sport & Culture",104.9
+Sarawak,2019,2806,5959,4544,Restaurants & Accommodation,126.7
+Sarawak,2019,2806,5959,4544,Transport,117.6
+Sarawak,2020,2453.7,5087,3831,Alcoholic Beverages & Tobacco,146.8
+Sarawak,2020,2453.7,5087,3831,Clothing & Footwear,90.2
+Sarawak,2020,2453.7,5087,3831,Education Services,114.4
+Sarawak,2020,2453.7,5087,3831,Food & Beverages,128.5
+Sarawak,2020,2453.7,5087,3831,Furnishings & Household Maintenance,107.9
+Sarawak,2020,2453.7,5087,3831,Health,128.9
+Sarawak,2020,2453.7,5087,3831,Housing & Utilities,109.2
+Sarawak,2020,2453.7,5087,3831,Information & Communication,95.9
+Sarawak,2020,2453.7,5087,3831,Insurance & Financial Services,103
+Sarawak,2020,2453.7,5087,3831,Overall,114.7
+Sarawak,2020,2453.7,5087,3831,Personal Care & Miscellaneous,114.2
+Sarawak,2020,2453.7,5087,3831,"Recreation, Sport & Culture",104.4
+Sarawak,2020,2453.7,5087,3831,Restaurants & Accommodation,127.3
+Sarawak,2020,2453.7,5087,3831,Transport,101.6
+Sarawak,2022,2473.5,6457,4978,Alcoholic Beverages & Tobacco,147.5
+Sarawak,2022,2473.5,6457,4978,Clothing & Footwear,89.8
+Sarawak,2022,2473.5,6457,4978,Education Services,115.3
+Sarawak,2022,2473.5,6457,4978,Food & Beverages,137.1
+Sarawak,2022,2473.5,6457,4978,Furnishings & Household Maintenance,111.4
+Sarawak,2022,2473.5,6457,4978,Health,128.2
+Sarawak,2022,2473.5,6457,4978,Housing & Utilities,109.7
+Sarawak,2022,2473.5,6457,4978,Information & Communication,95.9
+Sarawak,2022,2473.5,6457,4978,Insurance & Financial Services,103
+Sarawak,2022,2473.5,6457,4978,Overall,120.8
+Sarawak,2022,2473.5,6457,4978,Personal Care & Miscellaneous,116.2
+Sarawak,2022,2473.5,6457,4978,"Recreation, Sport & Culture",107.8
+Sarawak,2022,2473.5,6457,4978,Restaurants & Accommodation,134.8
+Sarawak,2022,2473.5,6457,4978,Transport,122.2
+Sarawak,2024,2517.5,6947,5504,Alcoholic Beverages & Tobacco,150.3
+Sarawak,2024,2517.5,6947,5504,Clothing & Footwear,90
+Sarawak,2024,2517.5,6947,5504,Education Services,119.4
+Sarawak,2024,2517.5,6947,5504,Food & Beverages,148.2
+Sarawak,2024,2517.5,6947,5504,Furnishings & Household Maintenance,115
+Sarawak,2024,2517.5,6947,5504,Health,132.2
+Sarawak,2024,2517.5,6947,5504,Housing & Utilities,118
+Sarawak,2024,2517.5,6947,5504,Information & Communication,93.3
+Sarawak,2024,2517.5,6947,5504,Insurance & Financial Services,103
+Sarawak,2024,2517.5,6947,5504,Overall,127.5
+Sarawak,2024,2517.5,6947,5504,Personal Care & Miscellaneous,121.9
+Sarawak,2024,2517.5,6947,5504,"Recreation, Sport & Culture",110.7
+Sarawak,2024,2517.5,6947,5504,Restaurants & Accommodation,146.6
+Sarawak,2024,2517.5,6947,5504,Transport,124.2
+Selangor,2012,5702.4,7023,5353,Alcoholic Beverages & Tobacco,104.5
+Selangor,2012,5702.4,7023,5353,Clothing & Footwear,101.2
+Selangor,2012,5702.4,7023,5353,Education Services,104.6
+Selangor,2012,5702.4,7023,5353,Food & Beverages,108
+Selangor,2012,5702.4,7023,5353,Furnishings & Household Maintenance,105.2
+Selangor,2012,5702.4,7023,5353,Health,105
+Selangor,2012,5702.4,7023,5353,Housing & Utilities,103.6
+Selangor,2012,5702.4,7023,5353,Information & Communication,99.4
+Selangor,2012,5702.4,7023,5353,Insurance & Financial Services,98.7
+Selangor,2012,5702.4,7023,5353,Overall,105.1
+Selangor,2012,5702.4,7023,5353,Personal Care & Miscellaneous,102.7
+Selangor,2012,5702.4,7023,5353,"Recreation, Sport & Culture",103.3
+Selangor,2012,5702.4,7023,5353,Restaurants & Accommodation,111.3
+Selangor,2012,5702.4,7023,5353,Transport,105.8
+Selangor,2014,6051.3,8252,6214,Alcoholic Beverages & Tobacco,123.7
+Selangor,2014,6051.3,8252,6214,Clothing & Footwear,101.3
+Selangor,2014,6051.3,8252,6214,Education Services,111.4
+Selangor,2014,6051.3,8252,6214,Food & Beverages,116.9
+Selangor,2014,6051.3,8252,6214,Furnishings & Household Maintenance,108.9
+Selangor,2014,6051.3,8252,6214,Health,110.5
+Selangor,2014,6051.3,8252,6214,Housing & Utilities,109.8
+Selangor,2014,6051.3,8252,6214,Information & Communication,98.2
+Selangor,2014,6051.3,8252,6214,Insurance & Financial Services,99.8
+Selangor,2014,6051.3,8252,6214,Overall,111.2
+Selangor,2014,6051.3,8252,6214,Personal Care & Miscellaneous,102.2
+Selangor,2014,6051.3,8252,6214,"Recreation, Sport & Culture",105.6
+Selangor,2014,6051.3,8252,6214,Restaurants & Accommodation,122.4
+Selangor,2014,6051.3,8252,6214,Transport,112
+Selangor,2016,6291.5,9463,7225,Alcoholic Beverages & Tobacco,164.3
+Selangor,2016,6291.5,9463,7225,Clothing & Footwear,102.5
+Selangor,2016,6291.5,9463,7225,Education Services,116
+Selangor,2016,6291.5,9463,7225,Food & Beverages,126.6
+Selangor,2016,6291.5,9463,7225,Furnishings & Household Maintenance,115
+Selangor,2016,6291.5,9463,7225,Health,118
+Selangor,2016,6291.5,9463,7225,Housing & Utilities,116.5
+Selangor,2016,6291.5,9463,7225,Information & Communication,98.2
+Selangor,2016,6291.5,9463,7225,Insurance & Financial Services,107.1
+Selangor,2016,6291.5,9463,7225,Overall,116.6
+Selangor,2016,6291.5,9463,7225,Personal Care & Miscellaneous,109.1
+Selangor,2016,6291.5,9463,7225,"Recreation, Sport & Culture",111
+Selangor,2016,6291.5,9463,7225,Restaurants & Accommodation,131.1
+Selangor,2016,6291.5,9463,7225,Transport,103.1
+Selangor,2019,6506.1,10827,8210,Alcoholic Beverages & Tobacco,167
+Selangor,2019,6506.1,10827,8210,Clothing & Footwear,99.7
+Selangor,2019,6506.1,10827,8210,Education Services,120.8
+Selangor,2019,6506.1,10827,8210,Food & Beverages,136.6
+Selangor,2019,6506.1,10827,8210,Furnishings & Household Maintenance,121.6
+Selangor,2019,6506.1,10827,8210,Health,122.8
+Selangor,2019,6506.1,10827,8210,Housing & Utilities,126.3
+Selangor,2019,6506.1,10827,8210,Information & Communication,95.7
+Selangor,2019,6506.1,10827,8210,Insurance & Financial Services,102.8
+Selangor,2019,6506.1,10827,8210,Overall,124.2
+Selangor,2019,6506.1,10827,8210,Personal Care & Miscellaneous,108.3
+Selangor,2019,6506.1,10827,8210,"Recreation, Sport & Culture",113.9
+Selangor,2019,6506.1,10827,8210,Restaurants & Accommodation,139.2
+Selangor,2019,6506.1,10827,8210,Transport,115.6
+Selangor,2020,6994.4,9668,7300,Alcoholic Beverages & Tobacco,167.5
+Selangor,2020,6994.4,9668,7300,Clothing & Footwear,99.1
+Selangor,2020,6994.4,9668,7300,Education Services,122.2
+Selangor,2020,6994.4,9668,7300,Food & Beverages,139.4
+Selangor,2020,6994.4,9668,7300,Furnishings & Household Maintenance,121.9
+Selangor,2020,6994.4,9668,7300,Health,124.1
+Selangor,2020,6994.4,9668,7300,Housing & Utilities,124.6
+Selangor,2020,6994.4,9668,7300,Information & Communication,96.4
+Selangor,2020,6994.4,9668,7300,Insurance & Financial Services,102.3
+Selangor,2020,6994.4,9668,7300,Overall,123.5
+Selangor,2020,6994.4,9668,7300,Personal Care & Miscellaneous,112.4
+Selangor,2020,6994.4,9668,7300,"Recreation, Sport & Culture",114.9
+Selangor,2020,6994.4,9668,7300,Restaurants & Accommodation,141.4
+Selangor,2020,6994.4,9668,7300,Transport,105.9
+Selangor,2022,7050.3,12233,9983,Alcoholic Beverages & Tobacco,169.3
+Selangor,2022,7050.3,12233,9983,Clothing & Footwear,99.4
+Selangor,2022,7050.3,12233,9983,Education Services,124.6
+Selangor,2022,7050.3,12233,9983,Food & Beverages,153.3
+Selangor,2022,7050.3,12233,9983,Furnishings & Household Maintenance,131
+Selangor,2022,7050.3,12233,9983,Health,126.7
+Selangor,2022,7050.3,12233,9983,Housing & Utilities,129.2
+Selangor,2022,7050.3,12233,9983,Information & Communication,96.4
+Selangor,2022,7050.3,12233,9983,Insurance & Financial Services,102.3
+Selangor,2022,7050.3,12233,9983,Overall,132.1
+Selangor,2022,7050.3,12233,9983,Personal Care & Miscellaneous,116
+Selangor,2022,7050.3,12233,9983,"Recreation, Sport & Culture",119.8
+Selangor,2022,7050.3,12233,9983,Restaurants & Accommodation,148.4
+Selangor,2022,7050.3,12233,9983,Transport,123.6
+Selangor,2024,7362.7,13296,10726,Alcoholic Beverages & Tobacco,171.4
+Selangor,2024,7362.7,13296,10726,Clothing & Footwear,100.6
+Selangor,2024,7362.7,13296,10726,Education Services,128.1
+Selangor,2024,7362.7,13296,10726,Food & Beverages,167.9
+Selangor,2024,7362.7,13296,10726,Furnishings & Household Maintenance,134.5
+Selangor,2024,7362.7,13296,10726,Health,133.4
+Selangor,2024,7362.7,13296,10726,Housing & Utilities,134.2
+Selangor,2024,7362.7,13296,10726,Information & Communication,92.2
+Selangor,2024,7362.7,13296,10726,Insurance & Financial Services,102.2
+Selangor,2024,7362.7,13296,10726,Overall,138.8
+Selangor,2024,7362.7,13296,10726,Personal Care & Miscellaneous,124.2
+Selangor,2024,7362.7,13296,10726,"Recreation, Sport & Culture",123.9
+Selangor,2024,7362.7,13296,10726,Restaurants & Accommodation,162.8
+Selangor,2024,7362.7,13296,10726,Transport,127.4
+Terengganu,2012,1094.1,3967,3034,Alcoholic Beverages & Tobacco,105.8
+Terengganu,2012,1094.1,3967,3034,Clothing & Footwear,99.7
+Terengganu,2012,1094.1,3967,3034,Education Services,107.3
+Terengganu,2012,1094.1,3967,3034,Food & Beverages,107.2
+Terengganu,2012,1094.1,3967,3034,Furnishings & Household Maintenance,102
+Terengganu,2012,1094.1,3967,3034,Health,104.3
+Terengganu,2012,1094.1,3967,3034,Housing & Utilities,103.8
+Terengganu,2012,1094.1,3967,3034,Information & Communication,98.9
+Terengganu,2012,1094.1,3967,3034,Insurance & Financial Services,101.1
+Terengganu,2012,1094.1,3967,3034,Overall,104.9
+Terengganu,2012,1094.1,3967,3034,Personal Care & Miscellaneous,105.1
+Terengganu,2012,1094.1,3967,3034,"Recreation, Sport & Culture",101.2
+Terengganu,2012,1094.1,3967,3034,Restaurants & Accommodation,105.9
+Terengganu,2012,1094.1,3967,3034,Transport,104.9
+Terengganu,2014,1140.4,4816,3777,Alcoholic Beverages & Tobacco,129.2
+Terengganu,2014,1140.4,4816,3777,Clothing & Footwear,99
+Terengganu,2014,1140.4,4816,3777,Education Services,113.8
+Terengganu,2014,1140.4,4816,3777,Food & Beverages,113.3
+Terengganu,2014,1140.4,4816,3777,Furnishings & Household Maintenance,103.8
+Terengganu,2014,1140.4,4816,3777,Health,108.8
+Terengganu,2014,1140.4,4816,3777,Housing & Utilities,107.8
+Terengganu,2014,1140.4,4816,3777,Information & Communication,97.5
+Terengganu,2014,1140.4,4816,3777,Insurance & Financial Services,112.5
+Terengganu,2014,1140.4,4816,3777,Overall,109.8
+Terengganu,2014,1140.4,4816,3777,Personal Care & Miscellaneous,106.4
+Terengganu,2014,1140.4,4816,3777,"Recreation, Sport & Culture",102.1
+Terengganu,2014,1140.4,4816,3777,Restaurants & Accommodation,108.4
+Terengganu,2014,1140.4,4816,3777,Transport,112
+Terengganu,2016,1183.4,5776,4694,Alcoholic Beverages & Tobacco,177.9
+Terengganu,2016,1183.4,5776,4694,Clothing & Footwear,98
+Terengganu,2016,1183.4,5776,4694,Education Services,118.8
+Terengganu,2016,1183.4,5776,4694,Food & Beverages,119.8
+Terengganu,2016,1183.4,5776,4694,Furnishings & Household Maintenance,110.3
+Terengganu,2016,1183.4,5776,4694,Health,115.7
+Terengganu,2016,1183.4,5776,4694,Housing & Utilities,111.6
+Terengganu,2016,1183.4,5776,4694,Information & Communication,97.3
+Terengganu,2016,1183.4,5776,4694,Insurance & Financial Services,125.1
+Terengganu,2016,1183.4,5776,4694,Overall,113
+Terengganu,2016,1183.4,5776,4694,Personal Care & Miscellaneous,115.4
+Terengganu,2016,1183.4,5776,4694,"Recreation, Sport & Culture",103.8
+Terengganu,2016,1183.4,5776,4694,Restaurants & Accommodation,113.4
+Terengganu,2016,1183.4,5776,4694,Transport,101.2
+Terengganu,2019,1244.5,6815,5545,Alcoholic Beverages & Tobacco,182.4
+Terengganu,2019,1244.5,6815,5545,Clothing & Footwear,93.8
+Terengganu,2019,1244.5,6815,5545,Education Services,125.1
+Terengganu,2019,1244.5,6815,5545,Food & Beverages,125.8
+Terengganu,2019,1244.5,6815,5545,Furnishings & Household Maintenance,110.5
+Terengganu,2019,1244.5,6815,5545,Health,121.4
+Terengganu,2019,1244.5,6815,5545,Housing & Utilities,114.9
+Terengganu,2019,1244.5,6815,5545,Information & Communication,96.7
+Terengganu,2019,1244.5,6815,5545,Insurance & Financial Services,122.2
+Terengganu,2019,1244.5,6815,5545,Overall,117
+Terengganu,2019,1244.5,6815,5545,Personal Care & Miscellaneous,116.1
+Terengganu,2019,1244.5,6815,5545,"Recreation, Sport & Culture",106.3
+Terengganu,2019,1244.5,6815,5545,Restaurants & Accommodation,117.8
+Terengganu,2019,1244.5,6815,5545,Transport,110.6
+Terengganu,2020,1149.4,6051,4790,Alcoholic Beverages & Tobacco,182.8
+Terengganu,2020,1149.4,6051,4790,Clothing & Footwear,93.2
+Terengganu,2020,1149.4,6051,4790,Education Services,126.6
+Terengganu,2020,1149.4,6051,4790,Food & Beverages,127.6
+Terengganu,2020,1149.4,6051,4790,Furnishings & Household Maintenance,110.7
+Terengganu,2020,1149.4,6051,4790,Health,123.4
+Terengganu,2020,1149.4,6051,4790,Housing & Utilities,111.2
+Terengganu,2020,1149.4,6051,4790,Information & Communication,97.6
+Terengganu,2020,1149.4,6051,4790,Insurance & Financial Services,122.2
+Terengganu,2020,1149.4,6051,4790,Overall,115.6
+Terengganu,2020,1149.4,6051,4790,Personal Care & Miscellaneous,122.2
+Terengganu,2020,1149.4,6051,4790,"Recreation, Sport & Culture",107.5
+Terengganu,2020,1149.4,6051,4790,Restaurants & Accommodation,119.3
+Terengganu,2020,1149.4,6051,4790,Transport,98.3
+Terengganu,2022,1186.6,7248,5878,Alcoholic Beverages & Tobacco,183.8
+Terengganu,2022,1186.6,7248,5878,Clothing & Footwear,93.5
+Terengganu,2022,1186.6,7248,5878,Education Services,128.9
+Terengganu,2022,1186.6,7248,5878,Food & Beverages,136.9
+Terengganu,2022,1186.6,7248,5878,Furnishings & Household Maintenance,115.5
+Terengganu,2022,1186.6,7248,5878,Health,125.5
+Terengganu,2022,1186.6,7248,5878,Housing & Utilities,114.9
+Terengganu,2022,1186.6,7248,5878,Information & Communication,97.4
+Terengganu,2022,1186.6,7248,5878,Insurance & Financial Services,122.2
+Terengganu,2022,1186.6,7248,5878,Overall,123.2
+Terengganu,2022,1186.6,7248,5878,Personal Care & Miscellaneous,126.6
+Terengganu,2022,1186.6,7248,5878,"Recreation, Sport & Culture",109.6
+Terengganu,2022,1186.6,7248,5878,Restaurants & Accommodation,126.1
+Terengganu,2022,1186.6,7248,5878,Transport,117.1
+Terengganu,2024,1231.5,7627,6627,Alcoholic Beverages & Tobacco,184.6
+Terengganu,2024,1231.5,7627,6627,Clothing & Footwear,94.2
+Terengganu,2024,1231.5,7627,6627,Education Services,132.7
+Terengganu,2024,1231.5,7627,6627,Food & Beverages,144.4
+Terengganu,2024,1231.5,7627,6627,Furnishings & Household Maintenance,118.4
+Terengganu,2024,1231.5,7627,6627,Health,127.5
+Terengganu,2024,1231.5,7627,6627,Housing & Utilities,117.7
+Terengganu,2024,1231.5,7627,6627,Information & Communication,93.7
+Terengganu,2024,1231.5,7627,6627,Insurance & Financial Services,122.2
+Terengganu,2024,1231.5,7627,6627,Overall,127.3
+Terengganu,2024,1231.5,7627,6627,Personal Care & Miscellaneous,134.9
+Terengganu,2024,1231.5,7627,6627,"Recreation, Sport & Culture",110.8
+Terengganu,2024,1231.5,7627,6627,Restaurants & Accommodation,134.5
+Terengganu,2024,1231.5,7627,6627,Transport,118.8
+W.P. Kuala Lumpur,2012,1702.1,8586,5847,Alcoholic Beverages & Tobacco,105.1
+W.P. Kuala Lumpur,2012,1702.1,8586,5847,Clothing & Footwear,97.8
+W.P. Kuala Lumpur,2012,1702.1,8586,5847,Education Services,108.2
+W.P. Kuala Lumpur,2012,1702.1,8586,5847,Food & Beverages,106
+W.P. Kuala Lumpur,2012,1702.1,8586,5847,Furnishings & Household Maintenance,100.4
+W.P. Kuala Lumpur,2012,1702.1,8586,5847,Health,103.7
+W.P. Kuala Lumpur,2012,1702.1,8586,5847,Housing & Utilities,103.4
+W.P. Kuala Lumpur,2012,1702.1,8586,5847,Information & Communication,98.5
+W.P. Kuala Lumpur,2012,1702.1,8586,5847,Insurance & Financial Services,101.2
+W.P. Kuala Lumpur,2012,1702.1,8586,5847,Overall,104.1
+W.P. Kuala Lumpur,2012,1702.1,8586,5847,Personal Care & Miscellaneous,104.8
+W.P. Kuala Lumpur,2012,1702.1,8586,5847,"Recreation, Sport & Culture",101.8
+W.P. Kuala Lumpur,2012,1702.1,8586,5847,Restaurants & Accommodation,108.4
+W.P. Kuala Lumpur,2012,1702.1,8586,5847,Transport,106.1
+W.P. Kuala Lumpur,2014,1737.4,10629,7620,Alcoholic Beverages & Tobacco,123.1
+W.P. Kuala Lumpur,2014,1737.4,10629,7620,Clothing & Footwear,97.6
+W.P. Kuala Lumpur,2014,1737.4,10629,7620,Education Services,111.8
+W.P. Kuala Lumpur,2014,1737.4,10629,7620,Food & Beverages,111.9
+W.P. Kuala Lumpur,2014,1737.4,10629,7620,Furnishings & Household Maintenance,102.1
+W.P. Kuala Lumpur,2014,1737.4,10629,7620,Health,106.9
+W.P. Kuala Lumpur,2014,1737.4,10629,7620,Housing & Utilities,110.7
+W.P. Kuala Lumpur,2014,1737.4,10629,7620,Information & Communication,95.6
+W.P. Kuala Lumpur,2014,1737.4,10629,7620,Insurance & Financial Services,101.9
+W.P. Kuala Lumpur,2014,1737.4,10629,7620,Overall,109.3
+W.P. Kuala Lumpur,2014,1737.4,10629,7620,Personal Care & Miscellaneous,105.8
+W.P. Kuala Lumpur,2014,1737.4,10629,7620,"Recreation, Sport & Culture",102.4
+W.P. Kuala Lumpur,2014,1737.4,10629,7620,Restaurants & Accommodation,115.4
+W.P. Kuala Lumpur,2014,1737.4,10629,7620,Transport,114.1
+W.P. Kuala Lumpur,2016,1789.7,11692,9073,Alcoholic Beverages & Tobacco,161.2
+W.P. Kuala Lumpur,2016,1789.7,11692,9073,Clothing & Footwear,98.9
+W.P. Kuala Lumpur,2016,1789.7,11692,9073,Education Services,117.7
+W.P. Kuala Lumpur,2016,1789.7,11692,9073,Food & Beverages,121.6
+W.P. Kuala Lumpur,2016,1789.7,11692,9073,Furnishings & Household Maintenance,110
+W.P. Kuala Lumpur,2016,1789.7,11692,9073,Health,114.7
+W.P. Kuala Lumpur,2016,1789.7,11692,9073,Housing & Utilities,117.5
+W.P. Kuala Lumpur,2016,1789.7,11692,9073,Information & Communication,95
+W.P. Kuala Lumpur,2016,1789.7,11692,9073,Insurance & Financial Services,106.2
+W.P. Kuala Lumpur,2016,1789.7,11692,9073,Overall,115.5
+W.P. Kuala Lumpur,2016,1789.7,11692,9073,Personal Care & Miscellaneous,112.9
+W.P. Kuala Lumpur,2016,1789.7,11692,9073,"Recreation, Sport & Culture",110.4
+W.P. Kuala Lumpur,2016,1789.7,11692,9073,Restaurants & Accommodation,127.2
+W.P. Kuala Lumpur,2016,1789.7,11692,9073,Transport,106.5
+W.P. Kuala Lumpur,2019,1782.5,13257,10549,Alcoholic Beverages & Tobacco,161.3
+W.P. Kuala Lumpur,2019,1782.5,13257,10549,Clothing & Footwear,86.8
+W.P. Kuala Lumpur,2019,1782.5,13257,10549,Education Services,126.3
+W.P. Kuala Lumpur,2019,1782.5,13257,10549,Food & Beverages,136.8
+W.P. Kuala Lumpur,2019,1782.5,13257,10549,Furnishings & Household Maintenance,117.5
+W.P. Kuala Lumpur,2019,1782.5,13257,10549,Health,115.8
+W.P. Kuala Lumpur,2019,1782.5,13257,10549,Housing & Utilities,125.7
+W.P. Kuala Lumpur,2019,1782.5,13257,10549,Information & Communication,91.4
+W.P. Kuala Lumpur,2019,1782.5,13257,10549,Insurance & Financial Services,105.5
+W.P. Kuala Lumpur,2019,1782.5,13257,10549,Overall,123
+W.P. Kuala Lumpur,2019,1782.5,13257,10549,Personal Care & Miscellaneous,110.4
+W.P. Kuala Lumpur,2019,1782.5,13257,10549,"Recreation, Sport & Culture",111.5
+W.P. Kuala Lumpur,2019,1782.5,13257,10549,Restaurants & Accommodation,132.4
+W.P. Kuala Lumpur,2019,1782.5,13257,10549,Transport,119.7
+W.P. Kuala Lumpur,2020,1982.1,11728,9093,Alcoholic Beverages & Tobacco,163.2
+W.P. Kuala Lumpur,2020,1982.1,11728,9093,Clothing & Footwear,86.1
+W.P. Kuala Lumpur,2020,1982.1,11728,9093,Education Services,127.7
+W.P. Kuala Lumpur,2020,1982.1,11728,9093,Food & Beverages,137.8
+W.P. Kuala Lumpur,2020,1982.1,11728,9093,Furnishings & Household Maintenance,118.7
+W.P. Kuala Lumpur,2020,1982.1,11728,9093,Health,117.7
+W.P. Kuala Lumpur,2020,1982.1,11728,9093,Housing & Utilities,125.7
+W.P. Kuala Lumpur,2020,1982.1,11728,9093,Information & Communication,91.9
+W.P. Kuala Lumpur,2020,1982.1,11728,9093,Insurance & Financial Services,105.6
+W.P. Kuala Lumpur,2020,1982.1,11728,9093,Overall,122.3
+W.P. Kuala Lumpur,2020,1982.1,11728,9093,Personal Care & Miscellaneous,113.1
+W.P. Kuala Lumpur,2020,1982.1,11728,9093,"Recreation, Sport & Culture",110.8
+W.P. Kuala Lumpur,2020,1982.1,11728,9093,Restaurants & Accommodation,129.4
+W.P. Kuala Lumpur,2020,1982.1,11728,9093,Transport,110.8
+W.P. Kuala Lumpur,2022,1961.2,13325,10234,Alcoholic Beverages & Tobacco,168.3
+W.P. Kuala Lumpur,2022,1961.2,13325,10234,Clothing & Footwear,83.8
+W.P. Kuala Lumpur,2022,1961.2,13325,10234,Education Services,128.1
+W.P. Kuala Lumpur,2022,1961.2,13325,10234,Food & Beverages,146.6
+W.P. Kuala Lumpur,2022,1961.2,13325,10234,Furnishings & Household Maintenance,124.1
+W.P. Kuala Lumpur,2022,1961.2,13325,10234,Health,115.3
+W.P. Kuala Lumpur,2022,1961.2,13325,10234,Housing & Utilities,130.2
+W.P. Kuala Lumpur,2022,1961.2,13325,10234,Information & Communication,91.9
+W.P. Kuala Lumpur,2022,1961.2,13325,10234,Insurance & Financial Services,105.6
+W.P. Kuala Lumpur,2022,1961.2,13325,10234,Overall,128.5
+W.P. Kuala Lumpur,2022,1961.2,13325,10234,Personal Care & Miscellaneous,117.9
+W.P. Kuala Lumpur,2022,1961.2,13325,10234,"Recreation, Sport & Culture",112.7
+W.P. Kuala Lumpur,2022,1961.2,13325,10234,Restaurants & Accommodation,137.9
+W.P. Kuala Lumpur,2022,1961.2,13325,10234,Transport,124.9
+W.P. Kuala Lumpur,2024,2067.5,13985,10802,Alcoholic Beverages & Tobacco,174.3
+W.P. Kuala Lumpur,2024,2067.5,13985,10802,Clothing & Footwear,78.8
+W.P. Kuala Lumpur,2024,2067.5,13985,10802,Education Services,131.5
+W.P. Kuala Lumpur,2024,2067.5,13985,10802,Food & Beverages,154.8
+W.P. Kuala Lumpur,2024,2067.5,13985,10802,Furnishings & Household Maintenance,127
+W.P. Kuala Lumpur,2024,2067.5,13985,10802,Health,118.2
+W.P. Kuala Lumpur,2024,2067.5,13985,10802,Housing & Utilities,136.5
+W.P. Kuala Lumpur,2024,2067.5,13985,10802,Information & Communication,84.6
+W.P. Kuala Lumpur,2024,2067.5,13985,10802,Insurance & Financial Services,108
+W.P. Kuala Lumpur,2024,2067.5,13985,10802,Overall,133
+W.P. Kuala Lumpur,2024,2067.5,13985,10802,Personal Care & Miscellaneous,122.3
+W.P. Kuala Lumpur,2024,2067.5,13985,10802,"Recreation, Sport & Culture",119
+W.P. Kuala Lumpur,2024,2067.5,13985,10802,Restaurants & Accommodation,152.6
+W.P. Kuala Lumpur,2024,2067.5,13985,10802,Transport,123.5
+W.P. Labuan,2012,90.5,6317,5063,Alcoholic Beverages & Tobacco,100
+W.P. Labuan,2012,90.5,6317,5063,Clothing & Footwear,97.1
+W.P. Labuan,2012,90.5,6317,5063,Education Services,105.6
+W.P. Labuan,2012,90.5,6317,5063,Food & Beverages,108.2
+W.P. Labuan,2012,90.5,6317,5063,Furnishings & Household Maintenance,105.5
+W.P. Labuan,2012,90.5,6317,5063,Health,98.5
+W.P. Labuan,2012,90.5,6317,5063,Housing & Utilities,108.9
+W.P. Labuan,2012,90.5,6317,5063,Information & Communication,100
+W.P. Labuan,2012,90.5,6317,5063,Insurance & Financial Services,100.2
+W.P. Labuan,2012,90.5,6317,5063,Overall,106.6
+W.P. Labuan,2012,90.5,6317,5063,Personal Care & Miscellaneous,100.3
+W.P. Labuan,2012,90.5,6317,5063,"Recreation, Sport & Culture",110.1
+W.P. Labuan,2012,90.5,6317,5063,Restaurants & Accommodation,107.8
+W.P. Labuan,2012,90.5,6317,5063,Transport,105.1
+W.P. Labuan,2014,93.8,7591,5684,Alcoholic Beverages & Tobacco,100
+W.P. Labuan,2014,93.8,7591,5684,Clothing & Footwear,97.2
+W.P. Labuan,2014,93.8,7591,5684,Education Services,122.4
+W.P. Labuan,2014,93.8,7591,5684,Food & Beverages,112.9
+W.P. Labuan,2014,93.8,7591,5684,Furnishings & Household Maintenance,108.9
+W.P. Labuan,2014,93.8,7591,5684,Health,106
+W.P. Labuan,2014,93.8,7591,5684,Housing & Utilities,119.2
+W.P. Labuan,2014,93.8,7591,5684,Information & Communication,100
+W.P. Labuan,2014,93.8,7591,5684,Insurance & Financial Services,101.4
+W.P. Labuan,2014,93.8,7591,5684,Overall,113.2
+W.P. Labuan,2014,93.8,7591,5684,Personal Care & Miscellaneous,103.6
+W.P. Labuan,2014,93.8,7591,5684,"Recreation, Sport & Culture",114.6
+W.P. Labuan,2014,93.8,7591,5684,Restaurants & Accommodation,125.3
+W.P. Labuan,2014,93.8,7591,5684,Transport,113
+W.P. Labuan,2016,96.8,8174,5928,Alcoholic Beverages & Tobacco,123.8
+W.P. Labuan,2016,96.8,8174,5928,Clothing & Footwear,99.2
+W.P. Labuan,2016,96.8,8174,5928,Education Services,126.3
+W.P. Labuan,2016,96.8,8174,5928,Food & Beverages,116.3
+W.P. Labuan,2016,96.8,8174,5928,Furnishings & Household Maintenance,107.8
+W.P. Labuan,2016,96.8,8174,5928,Health,114.8
+W.P. Labuan,2016,96.8,8174,5928,Housing & Utilities,125.3
+W.P. Labuan,2016,96.8,8174,5928,Information & Communication,101.8
+W.P. Labuan,2016,96.8,8174,5928,Insurance & Financial Services,105.5
+W.P. Labuan,2016,96.8,8174,5928,Overall,115.2
+W.P. Labuan,2016,96.8,8174,5928,Personal Care & Miscellaneous,105.7
+W.P. Labuan,2016,96.8,8174,5928,"Recreation, Sport & Culture",117.5
+W.P. Labuan,2016,96.8,8174,5928,Restaurants & Accommodation,127.6
+W.P. Labuan,2016,96.8,8174,5928,Transport,98.2
+W.P. Labuan,2019,99.3,8319,6726,Alcoholic Beverages & Tobacco,132.7
+W.P. Labuan,2019,99.3,8319,6726,Clothing & Footwear,91.6
+W.P. Labuan,2019,99.3,8319,6726,Education Services,130
+W.P. Labuan,2019,99.3,8319,6726,Food & Beverages,122.3
+W.P. Labuan,2019,99.3,8319,6726,Furnishings & Household Maintenance,107.5
+W.P. Labuan,2019,99.3,8319,6726,Health,128.3
+W.P. Labuan,2019,99.3,8319,6726,Housing & Utilities,123.8
+W.P. Labuan,2019,99.3,8319,6726,Information & Communication,99.6
+W.P. Labuan,2019,99.3,8319,6726,Insurance & Financial Services,105.5
+W.P. Labuan,2019,99.3,8319,6726,Overall,118.2
+W.P. Labuan,2019,99.3,8319,6726,Personal Care & Miscellaneous,109.3
+W.P. Labuan,2019,99.3,8319,6726,"Recreation, Sport & Culture",118.2
+W.P. Labuan,2019,99.3,8319,6726,Restaurants & Accommodation,129
+W.P. Labuan,2019,99.3,8319,6726,Transport,111.9
+W.P. Labuan,2020,95.1,7333,6126,Alcoholic Beverages & Tobacco,132.7
+W.P. Labuan,2020,95.1,7333,6126,Clothing & Footwear,89.4
+W.P. Labuan,2020,95.1,7333,6126,Education Services,130.2
+W.P. Labuan,2020,95.1,7333,6126,Food & Beverages,123.2
+W.P. Labuan,2020,95.1,7333,6126,Furnishings & Household Maintenance,107.3
+W.P. Labuan,2020,95.1,7333,6126,Health,130
+W.P. Labuan,2020,95.1,7333,6126,Housing & Utilities,120.5
+W.P. Labuan,2020,95.1,7333,6126,Information & Communication,100.3
+W.P. Labuan,2020,95.1,7333,6126,Insurance & Financial Services,105.5
+W.P. Labuan,2020,95.1,7333,6126,Overall,116
+W.P. Labuan,2020,95.1,7333,6126,Personal Care & Miscellaneous,111.8
+W.P. Labuan,2020,95.1,7333,6126,"Recreation, Sport & Culture",118.2
+W.P. Labuan,2020,95.1,7333,6126,Restaurants & Accommodation,126.4
+W.P. Labuan,2020,95.1,7333,6126,Transport,97.4
+W.P. Labuan,2022,96.9,8250,6904,Alcoholic Beverages & Tobacco,132.7
+W.P. Labuan,2022,96.9,8250,6904,Clothing & Footwear,88.9
+W.P. Labuan,2022,96.9,8250,6904,Education Services,130.2
+W.P. Labuan,2022,96.9,8250,6904,Food & Beverages,129.2
+W.P. Labuan,2022,96.9,8250,6904,Furnishings & Household Maintenance,107.7
+W.P. Labuan,2022,96.9,8250,6904,Health,131.6
+W.P. Labuan,2022,96.9,8250,6904,Housing & Utilities,120
+W.P. Labuan,2022,96.9,8250,6904,Information & Communication,99.7
+W.P. Labuan,2022,96.9,8250,6904,Insurance & Financial Services,105.5
+W.P. Labuan,2022,96.9,8250,6904,Overall,120.6
+W.P. Labuan,2022,96.9,8250,6904,Personal Care & Miscellaneous,113.5
+W.P. Labuan,2022,96.9,8250,6904,"Recreation, Sport & Culture",121.9
+W.P. Labuan,2022,96.9,8250,6904,Restaurants & Accommodation,128.6
+W.P. Labuan,2022,96.9,8250,6904,Transport,120.3
+W.P. Labuan,2024,100.8,8555,7383,Alcoholic Beverages & Tobacco,133.3
+W.P. Labuan,2024,100.8,8555,7383,Clothing & Footwear,87
+W.P. Labuan,2024,100.8,8555,7383,Education Services,133.2
+W.P. Labuan,2024,100.8,8555,7383,Food & Beverages,135.7
+W.P. Labuan,2024,100.8,8555,7383,Furnishings & Household Maintenance,105.6
+W.P. Labuan,2024,100.8,8555,7383,Health,139.4
+W.P. Labuan,2024,100.8,8555,7383,Housing & Utilities,122.8
+W.P. Labuan,2024,100.8,8555,7383,Information & Communication,95.6
+W.P. Labuan,2024,100.8,8555,7383,Insurance & Financial Services,105.5
+W.P. Labuan,2024,100.8,8555,7383,Overall,123.3
+W.P. Labuan,2024,100.8,8555,7383,Personal Care & Miscellaneous,118.8
+W.P. Labuan,2024,100.8,8555,7383,"Recreation, Sport & Culture",124.6
+W.P. Labuan,2024,100.8,8555,7383,Restaurants & Accommodation,145.3
+W.P. Labuan,2024,100.8,8555,7383,Transport,116.2
+W.P. Putrajaya,2012,78.3,8101,6486,Alcoholic Beverages & Tobacco,105.9
+W.P. Putrajaya,2012,78.3,8101,6486,Clothing & Footwear,93.8
+W.P. Putrajaya,2012,78.3,8101,6486,Education Services,103.6
+W.P. Putrajaya,2012,78.3,8101,6486,Food & Beverages,106.1
+W.P. Putrajaya,2012,78.3,8101,6486,Furnishings & Household Maintenance,106.5
+W.P. Putrajaya,2012,78.3,8101,6486,Health,104.3
+W.P. Putrajaya,2012,78.3,8101,6486,Housing & Utilities,104.9
+W.P. Putrajaya,2012,78.3,8101,6486,Information & Communication,98.3
+W.P. Putrajaya,2012,78.3,8101,6486,Insurance & Financial Services,101.8
+W.P. Putrajaya,2012,78.3,8101,6486,Overall,105.1
+W.P. Putrajaya,2012,78.3,8101,6486,Personal Care & Miscellaneous,103.1
+W.P. Putrajaya,2012,78.3,8101,6486,"Recreation, Sport & Culture",101.6
+W.P. Putrajaya,2012,78.3,8101,6486,Restaurants & Accommodation,112.2
+W.P. Putrajaya,2012,78.3,8101,6486,Transport,106.8
+W.P. Putrajaya,2014,80.9,10401,7512,Alcoholic Beverages & Tobacco,129.7
+W.P. Putrajaya,2014,80.9,10401,7512,Clothing & Footwear,89.2
+W.P. Putrajaya,2014,80.9,10401,7512,Education Services,107.6
+W.P. Putrajaya,2014,80.9,10401,7512,Food & Beverages,117
+W.P. Putrajaya,2014,80.9,10401,7512,Furnishings & Household Maintenance,108.6
+W.P. Putrajaya,2014,80.9,10401,7512,Health,104.5
+W.P. Putrajaya,2014,80.9,10401,7512,Housing & Utilities,108.4
+W.P. Putrajaya,2014,80.9,10401,7512,Information & Communication,96.4
+W.P. Putrajaya,2014,80.9,10401,7512,Insurance & Financial Services,102
+W.P. Putrajaya,2014,80.9,10401,7512,Overall,110.6
+W.P. Putrajaya,2014,80.9,10401,7512,Personal Care & Miscellaneous,105
+W.P. Putrajaya,2014,80.9,10401,7512,"Recreation, Sport & Culture",102.6
+W.P. Putrajaya,2014,80.9,10401,7512,Restaurants & Accommodation,113
+W.P. Putrajaya,2014,80.9,10401,7512,Transport,115
+W.P. Putrajaya,2016,84.4,11555,8275,Alcoholic Beverages & Tobacco,179.4
+W.P. Putrajaya,2016,84.4,11555,8275,Clothing & Footwear,90.8
+W.P. Putrajaya,2016,84.4,11555,8275,Education Services,117
+W.P. Putrajaya,2016,84.4,11555,8275,Food & Beverages,127.8
+W.P. Putrajaya,2016,84.4,11555,8275,Furnishings & Household Maintenance,123
+W.P. Putrajaya,2016,84.4,11555,8275,Health,107.2
+W.P. Putrajaya,2016,84.4,11555,8275,Housing & Utilities,112.5
+W.P. Putrajaya,2016,84.4,11555,8275,Information & Communication,99.5
+W.P. Putrajaya,2016,84.4,11555,8275,Insurance & Financial Services,104.3
+W.P. Putrajaya,2016,84.4,11555,8275,Overall,115.4
+W.P. Putrajaya,2016,84.4,11555,8275,Personal Care & Miscellaneous,109.8
+W.P. Putrajaya,2016,84.4,11555,8275,"Recreation, Sport & Culture",106.5
+W.P. Putrajaya,2016,84.4,11555,8275,Restaurants & Accommodation,125.2
+W.P. Putrajaya,2016,84.4,11555,8275,Transport,105
+W.P. Putrajaya,2019,103.7,12840,9983,Alcoholic Beverages & Tobacco,182.8
+W.P. Putrajaya,2019,103.7,12840,9983,Clothing & Footwear,87.4
+W.P. Putrajaya,2019,103.7,12840,9983,Education Services,125.8
+W.P. Putrajaya,2019,103.7,12840,9983,Food & Beverages,139
+W.P. Putrajaya,2019,103.7,12840,9983,Furnishings & Household Maintenance,125.6
+W.P. Putrajaya,2019,103.7,12840,9983,Health,109.1
+W.P. Putrajaya,2019,103.7,12840,9983,Housing & Utilities,115.8
+W.P. Putrajaya,2019,103.7,12840,9983,Information & Communication,96.6
+W.P. Putrajaya,2019,103.7,12840,9983,Insurance & Financial Services,103.6
+W.P. Putrajaya,2019,103.7,12840,9983,Overall,120.3
+W.P. Putrajaya,2019,103.7,12840,9983,Personal Care & Miscellaneous,107.4
+W.P. Putrajaya,2019,103.7,12840,9983,"Recreation, Sport & Culture",106.3
+W.P. Putrajaya,2019,103.7,12840,9983,Restaurants & Accommodation,134.5
+W.P. Putrajaya,2019,103.7,12840,9983,Transport,116.3
+W.P. Putrajaya,2020,109.2,12322,9743,Alcoholic Beverages & Tobacco,183.3
+W.P. Putrajaya,2020,109.2,12322,9743,Clothing & Footwear,86.3
+W.P. Putrajaya,2020,109.2,12322,9743,Education Services,121.6
+W.P. Putrajaya,2020,109.2,12322,9743,Food & Beverages,143.1
+W.P. Putrajaya,2020,109.2,12322,9743,Furnishings & Household Maintenance,122.3
+W.P. Putrajaya,2020,109.2,12322,9743,Health,108.9
+W.P. Putrajaya,2020,109.2,12322,9743,Housing & Utilities,114.7
+W.P. Putrajaya,2020,109.2,12322,9743,Information & Communication,96.6
+W.P. Putrajaya,2020,109.2,12322,9743,Insurance & Financial Services,108.4
+W.P. Putrajaya,2020,109.2,12322,9743,Overall,120
+W.P. Putrajaya,2020,109.2,12322,9743,Personal Care & Miscellaneous,116
+W.P. Putrajaya,2020,109.2,12322,9743,"Recreation, Sport & Culture",106.8
+W.P. Putrajaya,2020,109.2,12322,9743,Restaurants & Accommodation,138.4
+W.P. Putrajaya,2020,109.2,12322,9743,Transport,108.3
+W.P. Putrajaya,2022,117,13473,10056,Alcoholic Beverages & Tobacco,185.7
+W.P. Putrajaya,2022,117,13473,10056,Clothing & Footwear,87.3
+W.P. Putrajaya,2022,117,13473,10056,Education Services,129.4
+W.P. Putrajaya,2022,117,13473,10056,Food & Beverages,159.7
+W.P. Putrajaya,2022,117,13473,10056,Furnishings & Household Maintenance,133.5
+W.P. Putrajaya,2022,117,13473,10056,Health,111.3
+W.P. Putrajaya,2022,117,13473,10056,Housing & Utilities,130.5
+W.P. Putrajaya,2022,117,13473,10056,Information & Communication,96
+W.P. Putrajaya,2022,117,13473,10056,Insurance & Financial Services,109.1
+W.P. Putrajaya,2022,117,13473,10056,Overall,133.8
+W.P. Putrajaya,2022,117,13473,10056,Personal Care & Miscellaneous,121.3
+W.P. Putrajaya,2022,117,13473,10056,"Recreation, Sport & Culture",107.5
+W.P. Putrajaya,2022,117,13473,10056,Restaurants & Accommodation,164.6
+W.P. Putrajaya,2022,117,13473,10056,Transport,132.7
+W.P. Putrajaya,2024,120.3,13846,10769,Alcoholic Beverages & Tobacco,187.3
+W.P. Putrajaya,2024,120.3,13846,10769,Clothing & Footwear,89
+W.P. Putrajaya,2024,120.3,13846,10769,Education Services,130.5
+W.P. Putrajaya,2024,120.3,13846,10769,Food & Beverages,173.3
+W.P. Putrajaya,2024,120.3,13846,10769,Furnishings & Household Maintenance,137.5
+W.P. Putrajaya,2024,120.3,13846,10769,Health,117.2
+W.P. Putrajaya,2024,120.3,13846,10769,Housing & Utilities,138.1
+W.P. Putrajaya,2024,120.3,13846,10769,Information & Communication,88.6
+W.P. Putrajaya,2024,120.3,13846,10769,Insurance & Financial Services,109.6
+W.P. Putrajaya,2024,120.3,13846,10769,Overall,140.3
+W.P. Putrajaya,2024,120.3,13846,10769,Personal Care & Miscellaneous,127.6
+W.P. Putrajaya,2024,120.3,13846,10769,"Recreation, Sport & Culture",112.3
+W.P. Putrajaya,2024,120.3,13846,10769,Restaurants & Accommodation,175.3
+W.P. Putrajaya,2024,120.3,13846,10769,Transport,135.9
