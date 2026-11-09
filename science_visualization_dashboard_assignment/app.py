@@ -157,18 +157,6 @@ if page.startswith("1"):
     f.update_xaxes(title=f"% increase, {period}", ticksuffix="%")
     show(f)
 
-    with st.container(border=True):
-        st.markdown("**Key insights**")
-        k = min(3, n)
-        top, low = gap.sort_values(ascending=False).head(k), gap.sort_values().head(k)
-        w = real.idxmin()
-        beat = "every selected state" if (gap > 0).all() else f"{(gap > 0).sum()} of {n} states"
-        st.markdown(f"""
-- **Overall.** From {y0} to {y1}, median income grew faster than prices in {beat}. Income rose {M.inc_med_growth.min():.0f}–{M.inc_med_growth.max():.0f}% while prices rose {M.cpi_growth.min():.0f}–{M.cpi_growth.max():.0f}%.
-- **Became more affordable:** {', '.join(f"{A.short(i)} ({v:+.0f} pts)" for i, v in top.items())}. Income growth beat price growth by the widest margin.
-- **Falling behind (relatively):** {', '.join(f"{A.short(i)} ({v:+.0f} pts)" for i, v in low.items())}. The gap between income and price growth is smallest{", though still positive" if (low > 0).all() else ""}.
-- **Weakest real gain:** {A.short(w)}. Prices rose {M.cpi_growth[w]:.0f}% and median income rose {M.inc_med_growth[w]:.0f}%, so purchasing power changed by only {real[w]:+.0f}%.
-- **Caution:** a state that starts with a low income can show a large percentage gain. Growth does not show how affordable a state is today.""")
 
 # ================================================================== OBJECTIVE 2
 elif page.startswith("2"):
@@ -180,7 +168,6 @@ elif page.startswith("2"):
     if enough:
         r1 = stats.spearmanr(M.pop_end, M.inc_med_end)
         r2 = stats.spearmanr(M.pop_end, M.cpi_growth)
-        r3 = stats.spearmanr(M.inc_med_end, M.cpi_growth)
     top3 = M.pop_end.nlargest(min(3, n))
     c = st.columns(4)
     kpi(c[0], f"Population {y1}", f"{M.pop_end.sum() / 1000:.1f} M", "selected states")
@@ -208,23 +195,6 @@ elif page.startswith("2"):
     f.update_yaxes(title=f"Median household income {y1} (RM)", tickprefix="RM")
     show(f)
 
-    with st.container(border=True):
-        st.markdown("**Key insights**")
-        rich, big = M.inc_med_end.idxmax(), M.pop_end.idxmax()
-        topp = M.cpi_growth.sort_values(ascending=False).head(min(3, n))
-        if enough:
-            tail = ("richer states saw faster price rises, so pressure follows wealth and urban demand more than head-count."
-                    if r3[0] >= 0.25 else "price rises did not follow income level in this selection.")
-            st.markdown(f"""
-- **Population and income.** There is a {strength(r1[0])} link (ρ = {r1[0]:+.2f}, p = {r1[1]:.2f}). {A.short(big)} has the most people ({M.pop_end[big] / 1000:.1f} M) and {A.short(rich)} has the highest income (RM{M.inc_med_end[rich]:,.0f}).
-- **Population and prices.** There is a {strength(r2[0])} link with price growth (ρ = {r2[0]:+.2f}). Income level and price growth show a {strength(r3[0])} link (ρ = {r3[0]:+.2f}, p = {r3[1]:.2f}): {tail}
-- **Where pressure is greatest:** {', '.join(f"{A.short(i)} (+{v:.0f}%)" for i, v in topp.items())} had the fastest price growth over {period}.
-- **Caution:** at most 16 states, so these patterns are indications, not proof. Correlation is not causation.""")
-        else:
-            st.markdown(f"""
-- Select at least 5 states to see correlations.
-- {A.short(big)} has the most people ({M.pop_end[big] / 1000:.1f} M) and {A.short(rich)} has the highest income (RM{M.inc_med_end[rich]:,.0f}).
-- **Where pressure is greatest:** {', '.join(f"{A.short(i)} (+{v:.0f}%)" for i, v in topp.items())} had the fastest price growth over {period}.""")
 
 # ================================================================== OBJECTIVE 3
 else:
@@ -259,17 +229,5 @@ else:
                    range=[min(0, tot.min() * 1.1), tot.max() * 1.12])
     show(f)
 
-    with st.container(border=True):
-        st.markdown("**Key insights**")
-        k = min(3, n)
-        t3, b3 = list(tot.index[::-1][:k]), list(tot.index[:k])
-        fell = [c_ for c_, v in nat.items() if v < 0]
-        fell_txt = f" {', '.join(fell)} fell, so not every price went up." if fell else ""
-        st.markdown(f"""
-- **Categories that push prices up the most.** Over {period}, the biggest average rises were {nat.index[0]} ({nat.iloc[0]:+.0f}%), {nat.index[1]} ({nat.iloc[1]:+.0f}%) and {nat.index[2]} ({nat.iloc[2]:+.0f}%).{fell_txt}
-- **Everyday essentials.** Food & Beverages {nat['Food & Beverages']:+.0f}%, Housing & Utilities {nat['Housing & Utilities']:+.0f}% and Transport {nat['Transport']:+.0f}% on average.
-- **Highest pressure:** {names(t3)}, where the three essentials rose the most (for example food {ess.loc[t3[0], 'Food & Beverages']:+.0f}% in {A.short(t3[0])}).
-- **Lowest pressure:** {names(b3)}, where the three essentials rose the least.
-- **Caution:** the three bars are added together, not weighted by household spending. The chart shows how fast prices rose, not how expensive each state is.""")
 
 st.caption("Source: Department of Statistics Malaysia (DOSM) · JIE42403 Scientific Visualisation")
