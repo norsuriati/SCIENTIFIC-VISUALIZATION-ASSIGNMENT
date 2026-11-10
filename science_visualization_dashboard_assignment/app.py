@@ -73,14 +73,19 @@ page = st.sidebar.radio("DASHBOARD", [
     "03  Cost-of-Living Drivers",
 ], label_visibility="collapsed")
 st.sidebar.divider()
-st.sidebar.markdown("**Comparison period**")
-baseline = st.sidebar.selectbox("Baseline year", YEARS, index=0)
-valid_comparisons = [y for y in YEARS if y > baseline]
-if not valid_comparisons:
-    st.sidebar.warning("Choose an earlier baseline year.")
-    st.stop()
-comparison = st.sidebar.selectbox("Comparison year", valid_comparisons, index=len(valid_comparisons)-1)
-st.sidebar.caption(f"Comparing {baseline} with {comparison}")
+st.sidebar.markdown("**Year comparison**")
+st.sidebar.caption("Choose two years available in the dataset.")
+baseline = st.sidebar.selectbox("Baseline year (Year A)", YEARS, index=0, key="baseline_year")
+comparison_options = [y for y in YEARS if y != baseline]
+default_comparison = YEARS.index(YEARS[-1]) if YEARS[-1] != baseline else len(YEARS) - 2
+comparison = st.sidebar.selectbox(
+    "Comparison year (Year B)", comparison_options,
+    index=comparison_options.index(YEARS[default_comparison]),
+    key="comparison_year"
+)
+st.sidebar.caption(f"Selected comparison: {baseline} → {comparison}")
+with st.sidebar.expander("Available dataset years"):
+    st.write(", ".join(map(str, YEARS)))
 with st.sidebar.expander("Data & methodology"):
     st.write("Source: supplied OpenDOSM-derived merged dataset.")
     st.write("Population, mean/median household income and CPI are compared by state and year.")
@@ -90,6 +95,13 @@ with st.sidebar.expander("Data & methodology"):
 st.markdown('<div class="kicker">Malaysia · Cost of Living Intelligence</div>', unsafe_allow_html=True)
 st.title("Understanding the cost of living")
 st.markdown('<div class="subhead">Three focused views. One analytical question per chart.</div>', unsafe_allow_html=True)
+st.markdown(
+    f'<div class="objective" style="display:flex;justify-content:space-between;align-items:center;gap:12px;'
+    f'padding:.7rem 1rem;margin:.8rem 0 1rem 0;">'
+    f'<span><strong>ACTIVE COMPARISON PERIOD</strong><br>{baseline} <span style="color:{MUTED}">compared with</span> {comparison}</span>'
+    f'<span style="color:{MUTED};font-size:.85rem;">Only years available in the dataset are selectable</span></div>',
+    unsafe_allow_html=True
+)
 
 if page.startswith("01"):
     st.markdown('<div class="objective"><strong>OBJECTIVE 01</strong><br>Compare household income growth with overall price growth in each state to see whether income is keeping pace with the cost of living.</div>', unsafe_allow_html=True)
@@ -114,12 +126,18 @@ if page.startswith("01"):
     worse = int((growth.gap < 0).sum())
     avg_real = growth.real_growth.mean()
     k1, k2, k3 = st.columns(3)
-    k1.metric("Income grew faster", f"{better} / {len(growth)} states")
-    k2.metric("Prices grew faster", f"{worse} / {len(growth)} states")
-    k3.metric("Average real income growth", f"{avg_real:+.1f}%")
+    with k1:
+        st.metric("Income outpaced prices", f"{better} of {len(growth)} states")
+        st.caption("Income growth % is higher than Overall CPI growth %.")
+    with k2:
+        st.metric("Prices outpaced income", f"{worse} of {len(growth)} states")
+        st.caption("Overall CPI growth % is higher than income growth %.")
+    with k3:
+        st.metric("Average real income growth", f"{avg_real:+.1f}%")
+        st.caption("Average income growth after adjusting for CPI growth.")
 
     st.subheader(f"{income_measure_label} growth vs overall price growth")
-    st.caption(f"{baseline}–{comparison} · Percentage change (%)")
+    st.caption(f"Year A: {baseline}  →  Year B: {comparison} · Percentage change (%)")
     fig = go.Figure()
     fig.add_trace(go.Bar(y=growth.state, x=growth.income_growth, name=income_measure_label,
                          orientation="h", marker_color=TEAL,
@@ -150,6 +168,7 @@ elif page.startswith("02"):
 
     snap["state_label"] = snap.state.map(short_state)
     st.subheader(f"Population, household income and price level · {year}")
+    st.info(f"This page shows a single-year snapshot for **{year}**. Change the Snapshot year filter to view another available year; the comparison period above applies to Objectives 1 and 3.")
     st.caption("Population is on the horizontal axis, mean monthly household income on the vertical axis, and Overall CPI is shown by point colour. Points are equal-sized for easier reading.")
     fig = px.scatter(
         snap, x="population", y="income_mean", color="cpi",
@@ -185,7 +204,7 @@ else:
     if view == "Spending categories":
         rank = calc.category_growth_national(df, baseline, comparison).sort_values("price_growth", ascending=True)
         st.subheader("Which spending categories increased the most?")
-        st.caption(f"Average state-level CPI growth · {baseline}–{comparison}")
+        st.caption(f"Average state-level CPI growth · Year A: {baseline} → Year B: {comparison}")
         labels = rank.category.tolist()
         values = rank.price_growth.tolist()
         colors = [CORAL if x >= 0 else TEAL for x in values]
@@ -204,7 +223,7 @@ else:
         rank = calc.category_state_growth(df, baseline, comparison, "Overall")
         rank = rank.sort_values("price_growth", ascending=True)
         st.subheader("Which states had the highest overall price growth?")
-        st.caption(f"Overall CPI growth by state · {baseline}–{comparison}")
+        st.caption(f"Overall CPI growth by state · Year A: {baseline} → Year B: {comparison}")
         colors = [CORAL if x >= 0 else TEAL for x in rank.price_growth]
         fig = go.Figure(go.Bar(
             x=rank.price_growth, y=rank.state, orientation="h", marker_color=colors,
