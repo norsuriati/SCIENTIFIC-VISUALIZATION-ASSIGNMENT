@@ -8,7 +8,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-import analysis as calc
+import calc
 
 # ---------------------------------------------------------------- setup
 st.set_page_config(page_title="Malaysia Cost of Living", page_icon="📊", layout="wide")
@@ -49,7 +49,12 @@ st.markdown(
 
 @st.cache_data
 def get_data() -> pd.DataFrame:
-    return calc.load_data(str(Path(__file__).parent / "data" / "merged_dataset.csv"))
+    here = Path(__file__).parent
+    path = next((p for p in (here / "data" / "merged_dataset.csv", here / "merged_dataset.csv") if p.exists()), None)
+    if path is None:
+        st.error("merged_dataset.csv not found. Put it in the data folder next to app.py.")
+        st.stop()
+    return calc.load_data(str(path))
 
 
 df = get_data()
@@ -62,6 +67,18 @@ def show(fig: go.Figure) -> None:
         st.plotly_chart(fig, width="stretch", config=PLOT_CFG)
     except Exception:
         st.plotly_chart(fig, use_container_width=True, config=PLOT_CFG)
+
+
+def show_clickable(fig: go.Figure, key: str, on_click) -> None:
+    """Plotly chart where clicking a region calls on_click (falls back to a plain chart on old Streamlit)."""
+    try:
+        st.plotly_chart(fig, key=key, on_select=on_click, selection_mode="points", width="stretch", config=PLOT_CFG)
+    except Exception:
+        try:
+            st.plotly_chart(fig, key=key, on_select=on_click, selection_mode="points",
+                            use_container_width=True, config=PLOT_CFG)
+        except Exception:
+            show(fig)
 
 
 def style(fig: go.Figure, height: int) -> go.Figure:
@@ -262,50 +279,119 @@ else:
     )
 
     ALL = "All states (average)"
-    options = [ALL] + [f"{i}. {short_state(s)}  (overall {c.loc[s, calc.OVERALL]:+.0f}%)" for i, s in enumerate(c.index, 1)]
-    choice = st.selectbox(
-        "Show spending categories for", options,
-        help="States are ranked 1 = highest cost-of-living pressure (overall price growth).",
-    )
+    state_list = list(c.index)
+    key_to_state = {calc.norm(s): s for s in state_list}
+    rank = {s: i for i, s in enumerate(state_list, 1)}
+
+    def _on_map_click():
+        """Clicking a state on the map selects it (the menu and the bar chart follow)."""
+        try:
+            pts = st.session_state["map3"]["selection"]["points"]
+        except Exception:
+            return
+        for p in pts:
+            name = key_to_state.get(p.get("location"))
+            if name is None and p.get("curve_number", 0) == 0 and p.get("point_index") is not None:
+                name = state_list[p["point_index"]]
+            if name:
+                st.session_state["p3_state"] = name
+                return
+
+    if st.session_state.get("p3_state") not in [ALL] + state_list:
+        st.session_state["p3_state"] = ALL
+
+    left, right = st.columns([1.05, 1])
+
+    # ---------- left: map of overall pressure (click a state)
+    with left:
+        st.subheader("Overall price pressure by state")
+        geo_path = next((p for p in (Path(__file__).parent / "data" / "malaysia_states.geojson",
+                                     Path(__file__).parent / "malaysia_states.geojson") if p.exists()), None)
+        gj, no_shape = None, []
+        if geo_path is not None:
+            try:
+                gj, no_shape = calc.load_geojson(str(geo_path), state_list)
+            except Exception as err:
+                st.warning(f"Map file could not be read: {err}")
+        if gj is None:
+            st.info("Map file not found. Add **malaysia_states.geojson** to the data folder to show the map. "
+                    "You can still choose a state with the menu below.")
+        else:
+            fig_map = go.Figure(
+                go.Choropleth(
+                    geojson=gj, featureidkey="properties.state_key",
+                    locations=[calc.norm(s) for s in state_list], z=c[calc.OVERALL].values,
+                    text=[short_state(s) for s in state_list], colorscale="YlOrRd",
+                    marker_line_color="white", marker_line_width=1,
+                    colorbar=dict(title="Price growth<br>(%)", thickness=12, len=0.7),
+                    hovertemplate="<b>%{text}</b><br>Overall prices: %{z:+.0f}%<extra></extra>",
+                )
+            )
+            sel = st.session_state["p3_state"]
+            if sel != ALL:  # dark outline around the chosen state
+                fig_map.add_trace(
+                    go.Choropleth(
+                        geojson=gj, featureidkey="properties.state_key", locations=[calc.norm(sel)], z=[0],
+                        colorscale=[[0, "rgba(0,0,0,0)"], [1, "rgba(0,0,0,0)"]], showscale=False,
+                        marker_line_color=INK, marker_line_width=3, hoverinfo="skip",
+                    )
+                )
+            fig_map.update_geos(fitbounds="locations", visible=False, bgcolor="rgba(0,0,0,0)")
+            fig_map.update_layout(height=470, margin=dict(l=0, r=0, t=10, b=0), clickmode="event+select",
+                                  font=dict(family=FONT, size=13, color=INK))
+            show_clickable(fig_map, "map3", _on_map_click)
+            if no_shape:
+                st.caption("Too small to draw or missing from the map file: "
+                           + ", ".join(short_state(s) for s in no_shape) + ". Choose them from the menu.")
+        st.selectbox(
+            "Selected state (click the map, or choose here)", [ALL] + state_list, key="p3_state",
+            format_func=lambda s: s if s == ALL else f"{rank[s]}. {short_state(s)}  (overall {c.loc[s, calc.OVERALL]:+.0f}%)",
+            help="States are ranked 1 = highest cost-of-living pressure (overall price growth).",
+        )
+
+    choice = st.session_state["p3_state"]
     if choice == ALL:
         vals, overall, label = avg, float(c[calc.OVERALL].mean()), "all states"
     else:
-        state = c.index[options.index(choice) - 1]
-        vals = c.loc[state].drop(calc.OVERALL).sort_values(ascending=False)
-        overall, label = float(c.loc[state, calc.OVERALL]), short_state(state)
+        vals = c.loc[choice].drop(calc.OVERALL).sort_values(ascending=False)
+        overall, label = float(c.loc[choice, calc.OVERALL]), short_state(choice)
 
-    fig = go.Figure(
-        go.Bar(
-            y=[calc.SHORT[k] for k in vals.index], x=vals.values, orientation="h",
-            marker_color=["#DC2626" if v >= 0 else "#2563EB" for v in vals.values],
-            text=[f"{v:+.0f}%" for v in vals.values], textposition="outside", cliponaxis=False,
-            hovertemplate="<b>%{y}</b><br>Price growth: %{x:+.1f}%<extra></extra>",
+    # ---------- right: which spending categories pushed prices up in the selected state
+    with right:
+        st.subheader(f"Spending categories: {label}")
+        fig = go.Figure(
+            go.Bar(
+                y=[calc.SHORT[k] for k in vals.index], x=vals.values, orientation="h",
+                marker_color=["#DC2626" if v >= 0 else "#2563EB" for v in vals.values],
+                text=[f"{v:+.0f}%" for v in vals.values], textposition="outside", cliponaxis=False,
+                hovertemplate="<b>%{y}</b><br>Price growth: %{x:+.1f}%<extra></extra>",
+            )
         )
-    )
-    fig.add_vline(x=overall, line_dash="dash", line_color=INK,
-                  annotation_text=f"Overall {overall:+.0f}%", annotation_position="top right")
-    fig.update_yaxes(autorange="reversed")
-    fig.update_xaxes(title=f"Price growth {y0}–{y1} (%)", range=[min(0, vals.min()) - 6, vals.max() * 1.15 + 4],
-                     zeroline=True, zerolinecolor=MUTED)
-    fig.update_layout(bargap=0.3, showlegend=False)
-    st.subheader(f"Which spending categories pushed prices up? ({label}, {y0}–{y1})")
-    st.caption("Red bars = prices rose, blue bars = prices fell. Bars that reach past the dashed line "
-               "rose faster than overall prices.")
-    fig = style(fig, 560)
-    fig.update_layout(margin=dict(l=10, r=30, t=60, b=10))
-    show(fig)
+        fig.add_vline(x=overall, line_dash="dash", line_color=INK,
+                      annotation_text=f"Overall {overall:+.0f}%", annotation_position="top right")
+        fig.update_yaxes(autorange="reversed")
+        fig.update_xaxes(title=f"Price growth {y0}–{y1} (%)", range=[min(0, vals.min()) - 6, vals.max() * 1.15 + 4],
+                         zeroline=True, zerolinecolor=MUTED)
+        fig.update_layout(bargap=0.3, showlegend=False)
+        fig = style(fig, 540)
+        fig.update_layout(margin=dict(l=10, r=30, t=50, b=10))
+        show(fig)
+        st.caption("Red = prices rose, blue = prices fell. Bars past the dashed line rose faster than overall prices.")
 
     with st.container(border=True):
-        st.markdown("**What the chart shows**")
+        st.markdown("**What the charts show**")
         st.markdown(
+            f"- Ranking by overall pressure ({y0}–{y1}): highest in **{names(c.index, 3)}**, lowest in **{names(c.index[::-1], 3)}**.\n"
             f"- Across states, the fastest-rising categories are **{calc.SHORT[avg.index[0]]}** ({avg.iloc[0]:+.0f}%), "
             f"**{calc.SHORT[avg.index[1]]}** ({avg.iloc[1]:+.0f}%) and **{calc.SHORT[avg.index[2]]}** ({avg.iloc[2]:+.0f}%).\n"
             + (f"- **Food & Drink**, an everyday essential, changed {food:+.0f}% on average.\n"
                if "Food & Beverages" not in avg.index[:3] else "")
             + (f"- **{calc.SHORT[low_cat]}** changed {avg.iloc[-1]:+.0f}%, so not every price is going up.\n"
                if avg.iloc[-1] < -0.5 else f"- **{calc.SHORT[low_cat]}** changed the least ({avg.iloc[-1]:+.0f}%).\n")
-            + f"- Ranking by overall pressure: highest in **{names(c.index, 3)}**, lowest in **{names(c.index[::-1], 3)}**.\n"
             + (f"- In **{label}**, **{calc.SHORT[vals.index[0]]}** rose the most ({vals.iloc[0]:+.0f}%) against overall prices of {overall:+.0f}%."
-               if choice != ALL else "- Use the menu above to see the categories for one state.")
+               if choice != ALL else "- Click a state on the map to see which categories pushed its prices up.")
         )
-        st.caption("These are price changes per category. The chart does not show how much of a household budget each category takes.")
+        st.caption("These are price changes per category. The charts do not show how much of a household budget each category takes.")
+
+st.divider()
+st.caption("Source: OpenDOSM — Population, Household Income and Consumer Price Index by state. JIE42403 Scientific Visualisation.")
