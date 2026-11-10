@@ -247,61 +247,65 @@ else:
         unsafe_allow_html=True,
     )
     y0, y1 = period_picker("p3")
-    c = calc.category_growth(df, y0, y1)
-    cats = c.drop(columns=calc.OVERALL).mean().sort_values(ascending=False)
-    top_cat, low_cat = cats.index[0], cats.index[-1]
-    food = cats.get("Food & Beverages", float("nan"))
+    c = calc.category_growth(df, y0, y1)  # rows = states, already ranked by overall pressure
+    avg = c.drop(columns=calc.OVERALL).mean().sort_values(ascending=False)
+    top_cat, low_cat = avg.index[0], avg.index[-1]
+    food = avg.get("Food & Beverages", float("nan"))
 
     metric_row(
         [
             ("Highest pressure state", short_state(c.index[0]), f"Overall prices up {c[calc.OVERALL].iloc[0]:.0f}%."),
             ("Lowest pressure state", short_state(c.index[-1]), f"Overall prices up {c[calc.OVERALL].iloc[-1]:.0f}%."),
-            ("Fastest-rising category", calc.SHORT[top_cat], f"Up {cats.iloc[0]:.0f}% on average across states."),
-            ("Slowest category", calc.SHORT[low_cat], f"Changed {cats.iloc[-1]:+.0f}% on average across states."),
+            ("Fastest-rising category", calc.SHORT[top_cat], f"Up {avg.iloc[0]:.0f}% on average across states."),
+            ("Slowest category", calc.SHORT[low_cat], f"Changed {avg.iloc[-1]:+.0f}% on average across states."),
         ]
     )
 
-    z = c.values
-    zmax = float(abs(z).max())
-    xlabels = ["Overall"] + [calc.SHORT[x] for x in c.columns[1:]]
-    ylabels = [short_state(s) for s in c.index]
+    ALL = "All states (average)"
+    options = [ALL] + [f"{i}. {short_state(s)}  (overall {c.loc[s, calc.OVERALL]:+.0f}%)" for i, s in enumerate(c.index, 1)]
+    choice = st.selectbox(
+        "Show spending categories for", options,
+        help="States are ranked 1 = highest cost-of-living pressure (overall price growth).",
+    )
+    if choice == ALL:
+        vals, overall, label = avg, float(c[calc.OVERALL].mean()), "all states"
+    else:
+        state = c.index[options.index(choice) - 1]
+        vals = c.loc[state].drop(calc.OVERALL).sort_values(ascending=False)
+        overall, label = float(c.loc[state, calc.OVERALL]), short_state(state)
+
     fig = go.Figure(
-        go.Heatmap(
-            z=z, x=xlabels, y=ylabels, zmin=-zmax, zmax=zmax, colorscale="RdBu_r", xgap=2, ygap=2,
-            colorbar=dict(title="Price growth (%)", thickness=14),
-            hovertemplate="<b>%{y}</b><br>%{x}: %{z:+.1f}%<extra></extra>",
+        go.Bar(
+            y=[calc.SHORT[k] for k in vals.index], x=vals.values, orientation="h",
+            marker_color=["#DC2626" if v >= 0 else "#2563EB" for v in vals.values],
+            text=[f"{v:+.0f}%" for v in vals.values], textposition="outside", cliponaxis=False,
+            hovertemplate="<b>%{y}</b><br>Price growth: %{x:+.1f}%<extra></extra>",
         )
     )
-    fig.update_layout(
-        annotations=[
-            dict(x=xlabels[j], y=ylabels[i], text=f"{z[i][j]:.0f}", showarrow=False, font=dict(
-                size=11, color="white" if abs(z[i][j]) > 0.55 * zmax else INK))
-            for i in range(z.shape[0]) for j in range(z.shape[1])
-        ]
-    )
+    fig.add_vline(x=overall, line_dash="dash", line_color=INK,
+                  annotation_text=f"Overall {overall:+.0f}%", annotation_position="top right")
     fig.update_yaxes(autorange="reversed")
-    fig.update_xaxes(side="top", tickangle=-35)
-    fig.add_shape(type="line", xref="x", yref="paper", x0=0.5, x1=0.5, y0=0, y1=1, line=dict(color=INK, width=2))
-    st.subheader(f"Price growth by state and spending category, {y0}–{y1}")
-    st.caption("Numbers are % price growth. States are ranked by overall pressure, highest at the top. "
-               "Red = prices rose, blue = prices fell.")
-    fig = style(fig, 700)
-    fig.update_layout(margin=dict(l=10, r=10, t=110, b=10))
+    fig.update_xaxes(title=f"Price growth {y0}–{y1} (%)", range=[min(0, vals.min()) - 6, vals.max() * 1.15 + 4],
+                     zeroline=True, zerolinecolor=MUTED)
+    fig.update_layout(bargap=0.3, showlegend=False)
+    st.subheader(f"Which spending categories pushed prices up? ({label}, {y0}–{y1})")
+    st.caption("Red bars = prices rose, blue bars = prices fell. Bars that reach past the dashed line "
+               "rose faster than overall prices.")
+    fig = style(fig, 560)
+    fig.update_layout(margin=dict(l=10, r=30, t=60, b=10))
     show(fig)
 
     with st.container(border=True):
         st.markdown("**What the chart shows**")
         st.markdown(
-            f"- Across states, the fastest-rising categories are **{calc.SHORT[cats.index[0]]}** ({cats.iloc[0]:+.0f}%), "
-            f"**{calc.SHORT[cats.index[1]]}** ({cats.iloc[1]:+.0f}%) and **{calc.SHORT[cats.index[2]]}** ({cats.iloc[2]:+.0f}%).\n"
+            f"- Across states, the fastest-rising categories are **{calc.SHORT[avg.index[0]]}** ({avg.iloc[0]:+.0f}%), "
+            f"**{calc.SHORT[avg.index[1]]}** ({avg.iloc[1]:+.0f}%) and **{calc.SHORT[avg.index[2]]}** ({avg.iloc[2]:+.0f}%).\n"
             + (f"- **Food & Drink**, an everyday essential, changed {food:+.0f}% on average.\n"
-               if "Food & Beverages" not in cats.index[:3] else "")
-            + (f"- **{calc.SHORT[low_cat]}** changed {cats.iloc[-1]:+.0f}%, so not every price is going up.\n"
-               if cats.iloc[-1] < -0.5 else f"- **{calc.SHORT[low_cat]}** changed the least ({cats.iloc[-1]:+.0f}%).\n")
-            + f""
-            f"- Overall pressure is highest in **{names(c.index, 3)}** and lowest in **{names(c.index[::-1], 3)}**."
+               if "Food & Beverages" not in avg.index[:3] else "")
+            + (f"- **{calc.SHORT[low_cat]}** changed {avg.iloc[-1]:+.0f}%, so not every price is going up.\n"
+               if avg.iloc[-1] < -0.5 else f"- **{calc.SHORT[low_cat]}** changed the least ({avg.iloc[-1]:+.0f}%).\n")
+            + f"- Ranking by overall pressure: highest in **{names(c.index, 3)}**, lowest in **{names(c.index[::-1], 3)}**.\n"
+            + (f"- In **{label}**, **{calc.SHORT[vals.index[0]]}** rose the most ({vals.iloc[0]:+.0f}%) against overall prices of {overall:+.0f}%."
+               if choice != ALL else "- Use the menu above to see the categories for one state.")
         )
         st.caption("These are price changes per category. The chart does not show how much of a household budget each category takes.")
-
-st.divider()
-st.caption("Source: OpenDOSM — Population, Household Income and Consumer Price Index by state. JIE42403 Scientific Visualisation.")
