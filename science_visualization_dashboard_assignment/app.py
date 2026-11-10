@@ -1,4 +1,3 @@
-"""Malaysia Cost-of-Living Dashboard | JIE42403 Scientific Visualisation."""
 from pathlib import Path
 import pandas as pd
 import plotly.express as px
@@ -7,171 +6,173 @@ import streamlit as st
 import analysis as calc
 
 st.set_page_config(page_title="Malaysia Cost of Living", page_icon="📊", layout="wide")
-ROOT = Path(__file__).parent
-DATA_CANDIDATES = [ROOT / "data" / "merged_dataset.csv", ROOT / "merged_dataset.csv"]
-GEO_CANDIDATES = [ROOT / "data" / "geoBoundaries-MYS-ADM1.geojson",
-                  ROOT / "geoBoundaries-MYS-ADM1.geojson"]
-TEAL, AMBER, INK, MUTED = "#0F766E", "#F59E0B", "#0F172A", "#64748B"
-FONT = "Inter, Segoe UI, Arial, sans-serif"
-PLOT_CFG = {"displayModeBar": False, "responsive": True}
 
-st.markdown("""<style>
-.block-container{padding-top:1.4rem;padding-bottom:2rem;max-width:1500px}
-h1{font-size:2rem!important;letter-spacing:-.035em}
-[data-testid="stMetric"]{background:#fff;border:1px solid #e2e8f0;padding:13px 15px;border-radius:13px}
-[data-testid="stSidebar"]{border-right:1px solid #e2e8f0}
-div[data-testid="stPlotlyChart"]{border-radius:12px;overflow:hidden}
-.small-note{color:#64748b;font-size:.84rem}
-</style>""", unsafe_allow_html=True)
+# Calm editorial dashboard styling: neutral canvas, restrained teal/coral accents.
+BG, INK, MUTED = "#F6F8FA", "#17212B", "#667482"
+TEAL, CORAL, GOLD, GRID = "#168C83", "#E2765B", "#D7A441", "#E8EDF1"
+FONT = "Inter, Aptos, Segoe UI, sans-serif"
+PLOT_CONFIG = {"displayModeBar": False, "responsive": True}
+
+st.markdown(f"""
+<style>
+.stApp {{ background:{BG}; color:{INK}; }}
+.block-container {{ max-width:1480px; padding-top:2.0rem; padding-bottom:3rem; }}
+[data-testid="stSidebar"] {{ background:#FFFFFF; border-right:1px solid {GRID}; }}
+[data-testid="stSidebar"] > div:first-child {{ padding-top:1.5rem; }}
+h1,h2,h3 {{ color:{INK}; letter-spacing:-.035em; }}
+h1 {{ font-size:2.15rem !important; font-weight:720 !important; }}
+h2 {{ font-size:1.32rem !important; font-weight:680 !important; }}
+p, label {{ color:{INK}; }}
+.kicker {{ color:{TEAL}; font-size:.76rem; font-weight:750; letter-spacing:.12em; text-transform:uppercase; }}
+.subhead {{ color:{MUTED}; font-size:1rem; margin-top:-.25rem; }}
+.objective {{ background:#FFFFFF; border:1px solid {GRID}; border-left:4px solid {TEAL};
+  padding:1rem 1.15rem; border-radius:12px; margin:.8rem 0 1rem 0; color:{INK}; }}
+.objective strong {{ color:{TEAL}; }}
+.chart-note {{ color:{MUTED}; font-size:.88rem; margin-top:-.35rem; }}
+[data-testid="stMetric"] {{ background:#FFFFFF; border:1px solid {GRID}; border-radius:13px; padding:13px 16px; }}
+[data-testid="stMetricLabel"] p {{ color:{MUTED}; font-size:.82rem; }}
+[data-testid="stMetricValue"] {{ color:{INK}; font-size:1.55rem; font-weight:700; }}
+div[data-testid="stPlotlyChart"] {{ background:#FFFFFF; border:1px solid {GRID}; border-radius:14px; padding:8px; }}
+.stSelectbox, .stMultiSelect {{ background:#FFFFFF; }}
+hr {{ border-color:{GRID}; }}
+</style>
+""", unsafe_allow_html=True)
 
 @st.cache_data
-def get_data(path):
-    return calc.load_data(path)
+def load():
+    return calc.load_data()
 
-@st.cache_data
-def get_geo(path, states):
-    return calc.load_geojson(path, states)
+df = load()
+YEARS = sorted(df.year.unique().tolist())
+STATES = sorted(df.state.unique().tolist())
+CATEGORIES = sorted(c for c in df.division.unique() if c != "Overall")
 
-data_path = next((p for p in DATA_CANDIDATES if p.exists()), None)
-if data_path is None:
-    st.error("Dataset not found. Put merged_dataset.csv in the data/ folder beside app.py.")
-    st.stop()
-try:
-    df = get_data(str(data_path))
-except Exception as exc:
-    st.error(f"Unable to load dataset: {exc}")
-    st.stop()
-
-years = sorted(df.year.unique().tolist())
-states = sorted(df.state.dropna().unique().tolist())
-if not years or not states:
-    st.error("Dataset has no usable year or state records.")
-    st.stop()
-
-with st.sidebar:
-    st.title("📊 Cost of Living")
-    st.caption("Malaysia · State-level analysis")
-    page = st.radio("NAVIGATION", ["Overview", "State Comparison", "Price Drivers", "Data Explorer"])
-    st.divider()
-    default_y0 = years[0]
-    default_y1 = years[-1]
-    y0 = st.selectbox("Baseline year", years, index=years.index(default_y0))
-    later_years = [y for y in years if y > y0]
-    if not later_years:
-        st.warning("Select an earlier baseline year to compare.")
-        st.stop()
-    y1 = st.selectbox("Comparison year", later_years, index=len(later_years)-1)
-    selected_states = st.multiselect("States", states, default=states)
-
-if not selected_states:
-    st.info("Select at least one state from the sidebar.")
-    st.stop()
-
-metric = calc.metrics(df, int(y0), int(y1))
-metric = metric[metric.state.isin(selected_states)]
-pop = calc.population_table(df, int(y1))
-pop = pop[pop.state.isin(selected_states)]
-period = f"{y0} → {y1}"
-
-def layout_fig(fig, height=430):
-    fig.update_layout(height=height, template="plotly_white", font=dict(family=FONT,color=INK),
-                      margin=dict(l=15,r=15,t=45,b=15), paper_bgcolor="white",
-                      plot_bgcolor="white", legend_title_text="")
+def chart_layout(fig, height=560):
+    fig.update_layout(
+        template="plotly_white", height=height, paper_bgcolor="#FFFFFF", plot_bgcolor="#FFFFFF",
+        font=dict(family=FONT, color=INK, size=12),
+        margin=dict(l=18, r=24, t=52, b=24),
+        hoverlabel=dict(bgcolor="#17212B", font_color="#FFFFFF", font_size=12),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0),
+    )
+    fig.update_xaxes(showgrid=False, zeroline=False, linecolor=GRID)
+    fig.update_yaxes(gridcolor=GRID, zeroline=False, linecolor="rgba(0,0,0,0)")
     return fig
 
-def money(x):
-    return f"RM {x:,.0f}" if pd.notna(x) else "—"
+def short_state(s):
+    return {"W.P. Kuala Lumpur":"Kuala Lumpur", "W.P. Putrajaya":"Putrajaya",
+            "W.P. Labuan":"Labuan", "Pulau Pinang":"Penang",
+            "Negeri Sembilan":"Negeri Sembilan"}.get(s, s)
 
-st.title("Malaysia Cost-of-Living Dashboard")
-st.caption(f"OpenDOSM indicators · {period} · {len(selected_states)} selected states")
-st.markdown(f"""<div style="padding:13px 16px;border-left:4px solid {TEAL};background:#f0fdfa;border-radius:9px;margin:10px 0 18px">
-<b>Analytical objective:</b> Examine how changes in consumer prices relate to household income and population across Malaysian states.
-</div>""", unsafe_allow_html=True)
+st.sidebar.markdown("## 📊 Cost of Living")
+st.sidebar.caption("MALAYSIA · STATE-LEVEL ANALYSIS")
+st.sidebar.divider()
+page = st.sidebar.radio("DASHBOARD", [
+    "01  Income vs Price Growth",
+    "02  Population, Income & Prices",
+    "03  Cost-of-Living Drivers",
+], label_visibility="collapsed")
+st.sidebar.divider()
+st.sidebar.markdown("**Comparison period**")
+baseline = st.sidebar.selectbox("Baseline year", YEARS, index=0)
+valid_comparisons = [y for y in YEARS if y > baseline]
+if not valid_comparisons:
+    st.sidebar.warning("Choose an earlier baseline year.")
+    st.stop()
+comparison = st.sidebar.selectbox("Comparison year", valid_comparisons, index=len(valid_comparisons)-1)
+st.sidebar.caption(f"Comparing {baseline} with {comparison}")
+with st.sidebar.expander("Data & methodology"):
+    st.write("Source: supplied OpenDOSM-derived merged dataset.")
+    st.write("Population, mean/median household income and CPI are compared by state and year.")
+    st.write("CPI growth is calculated from the Overall CPI index. Category rankings use category CPI index growth.")
+    st.caption("Available years: " + ", ".join(map(str, YEARS)))
 
-if page == "Overview":
-    c1,c2,c3,c4 = st.columns(4)
-    c1.metric("States analysed", f"{len(metric):,}")
-    c2.metric("Average price growth", f"{metric.price_growth.mean():.1f}%" if len(metric) else "—")
-    c3.metric("Average income growth", f"{metric.income_growth.mean():.1f}%" if len(metric) else "—")
-    c4.metric("Average real income growth", f"{metric.real_growth.mean():.1f}%" if len(metric) else "—")
-    left,right = st.columns([1.2,1])
-    with left:
-        st.subheader("Income growth vs price growth")
-        if len(metric):
-            fig=go.Figure()
-            fig.add_trace(go.Bar(name="Household income",x=metric.state,y=metric.income_growth,marker_color=TEAL))
-            fig.add_trace(go.Bar(name="Consumer prices",x=metric.state,y=metric.price_growth,marker_color=AMBER))
-            fig.update_layout(barmode="group",yaxis_title="Growth (%)")
-            st.plotly_chart(layout_fig(fig,460),use_container_width=True,config=PLOT_CFG)
-        else: st.info("No comparable records for selected years and states.")
-    with right:
-        st.subheader("Population by state")
-        if len(pop):
-            p=pop.sort_values("population")
-            fig=px.bar(p,x="population",y="state",orientation="h",color="population",
-                       color_continuous_scale=["#ccfbf1",TEAL],labels={"population":"Population","state":"State"})
-            fig.update_layout(coloraxis_showscale=False)
-            st.plotly_chart(layout_fig(fig,460),use_container_width=True,config=PLOT_CFG)
-        else: st.info("No population data for the selected year.")
-    st.subheader("Malaysia state map · price growth")
-    geo_path=next((p for p in GEO_CANDIDATES if p.exists()),None)
-    if geo_path is None:
-        st.warning("GeoJSON boundary file not found. Put geoBoundaries-MYS-ADM1.geojson in data/.")
-    elif len(metric):
-        try:
-            geo=get_geo(str(geo_path),tuple(states))
-            map_df=metric.copy()
-            map_df["state_key"]=map_df.state.map(calc.norm)
-            # Map GeoJSON labels use dashboard_state, matching the dataset's W.P. labels.
-            fig=px.choropleth(map_df,geojson=geo,locations="state",featureidkey="properties.dashboard_state",
-                color="price_growth",hover_name="state",
-                hover_data={"income_growth":":.2f","price_growth":":.2f","real_growth":":.2f","state":False},
-                color_continuous_scale=["#d1fae5","#fbbf24","#b91c1c"],
-                labels={"price_growth":"Price growth (%)"})
-            fig.update_geos(fitbounds="locations",visible=False)
-            fig.update_layout(height=570,margin=dict(l=0,r=0,t=15,b=0),font=dict(family=FONT))
-            st.plotly_chart(fig,use_container_width=True,config=PLOT_CFG)
-        except Exception as exc:
-            st.error(f"Map could not be rendered: {exc}")
-    st.caption("Interpretation: positive income–price gap means mean household income growth exceeded consumer price growth.")
+st.markdown('<div class="kicker">Malaysia · Cost of Living Intelligence</div>', unsafe_allow_html=True)
+st.title("Understanding the cost of living")
+st.markdown('<div class="subhead">Three focused views. One analytical question per chart.</div>', unsafe_allow_html=True)
 
-elif page == "State Comparison":
-    st.subheader("State-level income and price performance")
-    if len(metric):
-        view=metric.sort_values("gap")
-        fig=px.bar(view,x="gap",y="state",orientation="h",color="gap",
-                   color_continuous_scale=["#b91c1c","#f8fafc",TEAL],
-                   labels={"gap":"Income growth minus price growth (percentage points)","state":"State"})
-        fig.add_vline(x=0,line_dash="dash",line_color=MUTED)
-        fig.update_layout(coloraxis_showscale=False)
-        st.plotly_chart(layout_fig(fig, max(420,25*len(view))),use_container_width=True,config=PLOT_CFG)
-        st.subheader("Detailed comparison")
-        show=metric.rename(columns={"income_growth":"Income growth (%)","price_growth":"Price growth (%)",
-                                    "real_growth":"Real income growth (%)","gap":"Income-price gap (pp)"})
-        st.dataframe(show.round(2),use_container_width=True,hide_index=True)
-    else: st.info("No comparable data.")
+if page.startswith("01"):
+    growth = calc.growth_comparison(df, baseline, comparison)
+    growth = growth.sort_values("gap", ascending=True)
+    better = int((growth.gap > 0).sum())
+    worse = int((growth.gap < 0).sum())
+    avg_real = growth.real_growth.mean()
+    st.markdown(f'<div class="objective"><strong>OBJECTIVE 01</strong><br>Compare income growth with price growth in each state to identify where household purchasing power improved or came under pressure.</div>', unsafe_allow_html=True)
+    k1,k2,k3 = st.columns(3)
+    k1.metric("States where income outpaced prices", f"{better} / {len(growth)}")
+    k2.metric("States where prices outpaced income", f"{worse} / {len(growth)}")
+    k3.metric("Average real income growth", f"{avg_real:+.1f}%")
+    st.subheader("Income growth vs price growth by state")
+    st.caption(f"Percentage change from {baseline} to {comparison} · Mean household income compared with Overall CPI")
+    fig = go.Figure()
+    fig.add_trace(go.Bar(y=growth.state, x=growth.income_growth, name="Mean income growth",
+                         orientation="h", marker_color=TEAL,
+                         hovertemplate="<b>%{y}</b><br>Income growth: %{x:.1f}%<extra></extra>"))
+    fig.add_trace(go.Bar(y=growth.state, x=growth.price_growth, name="Overall price growth",
+                         orientation="h", marker_color=CORAL,
+                         hovertemplate="<b>%{y}</b><br>Price growth: %{x:.1f}%<extra></extra>"))
+    fig.update_layout(barmode="group", xaxis_title="Growth (%)", yaxis_title="",
+                      bargap=.28, legend_title="")
+    fig.update_yaxes(categoryorder="array", categoryarray=growth.state.tolist(), autorange="reversed")
+    fig.add_vline(x=0, line_color="#AAB5BF", line_width=1)
+    st.plotly_chart(chart_layout(fig, max(520, 32*len(growth)+100)), use_container_width=True, config=PLOT_CONFIG)
+    st.markdown('<div class="chart-note">Interpretation: when the teal bar is longer than the coral bar, mean income grew faster than overall prices. This is a purchasing-power indicator, not a direct measure of every household’s affordability.</div>', unsafe_allow_html=True)
 
-elif page == "Price Drivers":
-    st.subheader("Consumer price growth by expenditure division")
-    cat=calc.category_growth(df,int(y0),int(y1))
-    cat=cat.loc[cat.index.intersection(selected_states)]
-    if not cat.empty:
-        cat=cat.rename(columns=calc.SHORT)
-        fig=px.imshow(cat,aspect="auto",color_continuous_scale=["#d1fae5","#fbbf24","#b91c1c"],
-                      labels=dict(x="Expenditure division",y="State",color="Growth (%)"),
-                      text_auto=".1f")
-        fig.update_layout(height=max(450,30*len(cat)),xaxis_tickangle=-35)
-        st.plotly_chart(layout_fig(fig,max(450,30*len(cat))),use_container_width=True,config=PLOT_CFG)
-        st.caption("Values represent percentage change in CPI index between the selected years; they are not price levels.")
-    else: st.info("No category records available for this comparison.")
+elif page.startswith("02"):
+    year = st.selectbox("Snapshot year", YEARS, index=len(YEARS)-1, key="snapshot_year")
+    snap = calc.population_income_snapshot(df, year)
+    st.markdown('<div class="objective"><strong>OBJECTIVE 02</strong><br>Examine whether states with larger populations also have higher household incomes and price levels, to locate possible concentrations of cost-of-living pressure.</div>', unsafe_allow_html=True)
+    st.subheader(f"Population, household income and price level · {year}")
+    st.caption("Each bubble represents one state. Horizontal position = population; vertical position = mean monthly household income; bubble size = Overall CPI index.")
+    snap["state_label"] = snap.state.map(short_state)
+    fig = px.scatter(snap, x="population", y="income_mean", size="cpi", color="cpi",
+                     color_continuous_scale=["#BFE7E2", TEAL, "#155E59"],
+                     hover_name="state_label",
+                     hover_data={"population":":,.0f","income_mean":"RM {:,.0f}","cpi":":.1f","state":False,"state_label":False},
+                     size_max=48, opacity=.84)
+    fig.update_traces(marker=dict(line=dict(color="#FFFFFF", width=1.5)),
+                      customdata=snap[["cpi"]].to_numpy(),
+                      hovertemplate="<b>%{hovertext}</b><br>Population: %{x:,.0f}<br>Mean monthly income: RM %{y:,.0f}<br>Overall CPI: %{customdata[0]:.1f}<extra></extra>")
+    fig.update_layout(xaxis_title="Population (persons, dataset unit)", yaxis_title="Mean monthly household income (RM)",
+                      coloraxis_colorbar=dict(title="Overall CPI", thickness=12, len=.72))
+    st.plotly_chart(chart_layout(fig, 610), use_container_width=True, config=PLOT_CONFIG)
+    st.markdown('<div class="chart-note">Read the chart by looking for states toward the upper-right (larger population and higher mean income), then compare bubble size and colour for the CPI price level. Association does not imply that population causes higher prices.</div>', unsafe_allow_html=True)
 
 else:
-    st.subheader("Dataset explorer")
-    division_options=sorted(df.division.unique().tolist())
-    chosen_div=st.selectbox("Expenditure division",division_options,
-                            index=division_options.index("Overall") if "Overall" in division_options else 0)
-    filtered=df[(df.state.isin(selected_states))&(df.year.isin([int(y0),int(y1)]))&(df.division==chosen_div)]
-    st.metric("Records shown",f"{len(filtered):,}")
-    st.dataframe(filtered.sort_values(["state","year"]),use_container_width=True,hide_index=True)
-    st.download_button("Download filtered CSV",filtered.to_csv(index=False).encode("utf-8"),
-                       file_name="cost_of_living_filtered.csv",mime="text/csv")
+    st.markdown('<div class="objective"><strong>OBJECTIVE 03</strong><br>Identify which spending categories record the strongest price increases, and compare which states experience the greatest overall cost-of-living pressure.</div>', unsafe_allow_html=True)
+    view = st.radio("Ranking view", ["Spending categories", "States"], horizontal=True)
+    if view == "Spending categories":
+        rank = calc.category_growth_national(df, baseline, comparison)
+        rank = rank.sort_values("price_growth", ascending=True)
+        st.subheader("Which spending categories increased the most?")
+        st.caption(f"Unweighted mean of state-level CPI growth · {baseline} to {comparison}")
+        labels = rank.category.tolist()
+        values = rank.price_growth.tolist()
+        colors = [CORAL if x >= 0 else TEAL for x in values]
+        fig = go.Figure(go.Bar(x=values, y=labels, orientation="h", marker_color=colors,
+                               hovertemplate="<b>%{y}</b><br>Average state-level price growth: %{x:.1f}%<extra></extra>"))
+        fig.update_layout(xaxis_title="Mean state-level price growth (%)", yaxis_title="", showlegend=False, bargap=.28)
+        fig.update_yaxes(categoryorder="array", categoryarray=labels, autorange="reversed")
+        fig.add_vline(x=0, line_color="#AAB5BF", line_width=1)
+        st.plotly_chart(chart_layout(fig, 570), use_container_width=True, config=PLOT_CONFIG)
+        st.caption("Categories are ranked using the unweighted mean of available state-level CPI growth rates. This is not an expenditure-weighted contribution to inflation.")
+    else:
+        category = st.selectbox("Price index to rank", ["Overall"] + CATEGORIES,
+                                index=0, format_func=lambda x: "Overall cost of living" if x == "Overall" else x)
+        rank = calc.category_state_growth(df, baseline, comparison, category)
+        rank = rank.sort_values("price_growth", ascending=True)
+        label = "Overall CPI" if category == "Overall" else f"{category} CPI"
+        st.subheader(f"Which states face the highest increase? · {label}")
+        st.caption(f"State ranking by price index growth · {baseline} to {comparison}")
+        colors = [CORAL if x >= 0 else TEAL for x in rank.price_growth]
+        fig = go.Figure(go.Bar(x=rank.price_growth, y=rank.state, orientation="h",
+                               marker_color=colors,
+                               hovertemplate="<b>%{y}</b><br>Price growth: %{x:.1f}%<extra></extra>"))
+        fig.update_layout(xaxis_title="Price index growth (%)", yaxis_title="", showlegend=False, bargap=.24)
+        fig.update_yaxes(categoryorder="array", categoryarray=rank.state.tolist(), autorange="reversed")
+        fig.add_vline(x=0, line_color="#AAB5BF", line_width=1)
+        st.plotly_chart(chart_layout(fig, max(520, 32*len(rank)+100)), use_container_width=True, config=PLOT_CONFIG)
+        st.caption("This ranks states for the selected CPI index. Growth rates show price change, not the category’s weighted contribution share to total inflation.")
+
+st.divider()
+st.caption("Dashboard calculations use the supplied dataset only. Missing state-year/category combinations are not imputed.")
