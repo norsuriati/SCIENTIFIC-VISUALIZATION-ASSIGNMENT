@@ -112,7 +112,7 @@ if page.startswith("01"):
     if growth.empty:
         st.warning("No matching state data for this selection.")
         st.stop()
-    growth = growth.sort_values("gap", ascending=True)
+    growth = growth.sort_values("gap", ascending=False)
 
     avg_income_growth = growth["income_growth"].mean()
     avg_price_growth = growth["price_growth"].mean()
@@ -123,7 +123,28 @@ if page.startswith("01"):
     k2.metric("Average price growth", f"{avg_price_growth:+.1f}%",
               help="Average Overall CPI growth across the same selected states.")
     k3.metric("Income growth advantage", f"{avg_gap:+.1f} pp",
-              help="Income growth minus price growth, in percentage points. Positive means income grew faster on average.")
+              help="Average income growth minus average price growth, in percentage points.")
+
+    # Identify states using the income-growth minus price-growth gap.
+    most_improved = growth.loc[growth["gap"].idxmax()]
+    least_improved = growth.loc[growth["gap"].idxmin()]
+
+    s1, s2 = st.columns(2)
+    with s1:
+        st.metric(
+            "Most improved state",
+            short_state(most_improved["state"]),
+            delta=f"{most_improved['gap']:+.1f} pp income advantage",
+            help="State with the largest difference between income growth and Overall CPI growth."
+        )
+    with s2:
+        st.metric(
+            "Least improved state",
+            short_state(least_improved["state"]),
+            delta=f"{least_improved['gap']:+.1f} pp income advantage",
+            delta_color="normal",
+            help="State with the smallest difference between income growth and Overall CPI growth. A positive value still means income growth exceeded price growth."
+        )
 
     st.subheader(f"{income_measure_label} vs overall price growth")
     fig = go.Figure()
