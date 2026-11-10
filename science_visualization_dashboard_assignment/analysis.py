@@ -94,3 +94,4 @@ def norm(name) -> str:
         "pulau pinang": "pulau pinang",
         "pinang": "pulau pinang",
         "kuala lumpur": "kuala lumpur",
+    }
