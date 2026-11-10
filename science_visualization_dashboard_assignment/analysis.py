@@ -1,12 +1,12 @@
-"""Pure-pandas calculations for the dashboard (no Streamlit here, so they are easy to test)."""
+"""Pure-pandas calculations for Malaysia Cost of Living dashboard."""
 import json
 import re
+from pathlib import Path
 
 import pandas as pd
 
 OVERALL = "Overall"
 
-# Short labels so the heatmap columns stay readable
 SHORT = {
     "Food & Beverages": "Food & Drink",
     "Alcoholic Beverages & Tobacco": "Alcohol & Tobacco",
@@ -23,75 +23,93 @@ SHORT = {
     "Personal Care & Miscellaneous": "Personal Care",
 }
 
+ALIASES = {
+    "penang": "pulau pinang", "pinang": "pulau pinang",
+    "malacca": "melaka", "trengganu": "terengganu",
+    "johore": "johor", "n sembilan": "negeri sembilan",
+    "kuala lumpur": "kuala lumpur", "labuan": "labuan",
+    "putrajaya": "putrajaya",
+}
 
 def load_data(path: str) -> pd.DataFrame:
     df = pd.read_csv(path)
+    required = {"state", "year", "population", "income_mean", "income_median", "division", "index"}
+    missing = required.difference(df.columns)
+    if missing:
+        raise ValueError(f"Dataset is missing columns: {', '.join(sorted(missing))}")
+    df["year"] = pd.to_numeric(df["year"], errors="coerce")
+    df["index"] = pd.to_numeric(df["index"], errors="coerce")
+    for c in ["population", "income_mean", "income_median"]:
+        df[c] = pd.to_numeric(df[c], errors="coerce")
+    df = df.dropna(subset=["state", "year", "division", "index"]).copy()
     df["year"] = df["year"].astype(int)
+    df["state"] = df["state"].astype(str).str.strip()
+    df["division"] = df["division"].astype(str).str.strip()
     return df
 
-
 def state_year(df: pd.DataFrame) -> pd.DataFrame:
-    """One row per state-year with population, income and overall CPI."""
     base = df.drop_duplicates(["state", "year"])[
-        ["state", "year", "population", "income_mean", "income_median"]
-    ]
-    cpi = df[df["division"] == OVERALL][["state", "year", "index"]].rename(columns={"index": "cpi"})
-    return base.merge(cpi, on=["state", "year"])
-
+        ["state", "year", "population", "income_mean", "income_median"]]
+    cpi = df[df["division"].str.casefold() == OVERALL.casefold()][
+        ["state", "year", "index"]].rename(columns={"index": "cpi"})
+    return base.merge(cpi, on=["state", "year"], how="inner")
 
 def growth_table(df: pd.DataFrame, y0: int, y1: int) -> pd.DataFrame:
-    """Income growth vs price growth between two years (all in %)."""
     sy = state_year(df)
-    a = sy[sy["year"] == y0].set_index("state")
-    b = sy[sy["year"] == y1].set_index("state")
-    out = pd.DataFrame(
-        {
-            "income_growth": (b["income_mean"] / a["income_mean"] - 1) * 100,
-            "price_growth": (b["cpi"] / a["cpi"] - 1) * 100,
-        }
-    )
-    # Real income growth: how much income grew AFTER removing price increases
-    out["real_growth"] = ((1 + out["income_growth"] / 100) / (1 + out["price_growth"] / 100) - 1) * 100
-    out["gap"] = out["income_growth"] - out["price_growth"]
-    return out.dropna().reset_index()
-
+    a, b = sy[sy.year == y0].set_index("state"), sy[sy.year == y1].set_index("state")
+    common = a.index.intersection(b.index)
+    a, b = a.loc[common], b.loc[common]
+    out = pd.DataFrame(index=common)
+    out["income_growth"] = (b.income_mean / a.income_mean - 1) * 100
+    out["price_growth"] = (b.cpi / a.cpi - 1) * 100
+    out["real_growth"] = ((1 + out.income_growth / 100) / (1 + out.price_growth / 100) - 1) * 100
+    out["gap"] = out.income_growth - out.price_growth
+    return out.replace([float("inf"), -float("inf")], pd.NA).dropna().reset_index(names="state")
 
 def population_table(df: pd.DataFrame, year: int) -> pd.DataFrame:
-    sy = state_year(df)
-    return sy[sy["year"] == year].reset_index(drop=True)
-
+    return state_year(df).query("year == @year").reset_index(drop=True)
 
 def category_growth(df: pd.DataFrame, y0: int, y1: int) -> pd.DataFrame:
-    """Price growth (%) per state and spending category between two years.
-    Rows = states, columns = categories (plus 'Overall'), sorted by overall pressure."""
-    a = df[df["year"] == y0].set_index(["state", "division"])["index"]
-    b = df[df["year"] == y1].set_index(["state", "division"])["index"]
+    d = df[df["division"] != OVERALL]
+    a = d[d.year == y0].set_index(["state", "division"])["index"]
+    b = d[d.year == y1].set_index(["state", "division"])["index"]
     g = ((b / a - 1) * 100).unstack("division")
-    g = g.sort_values(OVERALL, ascending=False)
-    cols = [OVERALL] + [c for c in g.columns if c != OVERALL]
-    return g[cols]
-
-
-# ------------------------------------------------------------------ map helpers
-ALIASES = {
-    "penang": "pulau pinang",
-    "malacca": "melaka",
-    "trengganu": "terengganu",
-    "johore": "johor",
-    "n sembilan": "negeri sembilan",
-}
-
+    if OVERALL in df["division"].unique():
+        overall = growth_table(df, y0, y1).set_index("state")["price_growth"]
+        g[OVERALL] = overall
+    if OVERALL in g.columns:
+        g = g.sort_values(OVERALL, ascending=False)
+        g = g[[OVERALL] + [c for c in g.columns if c != OVERALL]]
+    return g
 
 def norm(name) -> str:
-    """Normalise Malaysian state labels from DOSM and common GeoJSON sources."""
-    s = str(name or "").strip().lower()
-    s = s.replace("&", " and ")
-    s = re.sub(r"federal territory of|wilayah persekutuan|w\.p\.|\bwp\b", " ", s)
+    s = str(name or "").strip().lower().replace("&", " and ")
+    s = re.sub(r"federal territory of|wilayah persekutuan|w\\.p\\.|\\bwp\\b", " ", s)
     s = re.sub(r"[^a-z ]", " ", s)
-    s = re.sub(r"\s+", " ", s).strip()
-    aliases = {
-        **ALIASES,
-        "pulau pinang": "pulau pinang",
-        "pinang": "pulau pinang",
-        "kuala lumpur": "kuala lumpur",
-    }
+    s = re.sub(r"\\s+", " ", s).strip()
+    return ALIASES.get(s, s)
+
+def load_geojson(path: str, state_names=None):
+    """Load ADM1 GeoJSON and normalize its feature labels to dataset state names."""
+    with open(path, "r", encoding="utf-8") as f:
+        geo = json.load(f)
+    if not isinstance(geo.get("features"), list):
+        raise ValueError("GeoJSON does not contain a features array.")
+    lookup = {norm(s): s for s in (state_names or [])}
+    # geoBoundaries names Kuala Lumpur / Labuan / Putrajaya without W.P. prefix.
+    for feature in geo["features"]:
+        props = feature.setdefault("properties", {})
+        raw = props.get("shapeName") or props.get("NAME_1") or props.get("name")
+        key = norm(raw)
+        if key in lookup:
+            props["dashboard_state"] = lookup[key]
+        elif key in {"kuala lumpur", "labuan", "putrajaya"}:
+            candidate = "W.P. " + key.title()
+            props["dashboard_state"] = candidate if candidate in (state_names or []) else raw
+        else:
+            props["dashboard_state"] = raw
+    return geo
+
+def metrics(df: pd.DataFrame, y0: int, y1: int) -> pd.DataFrame:
+    """Compatibility alias for the app's metrics call."""
+    return growth_table(df, y0, y1)
