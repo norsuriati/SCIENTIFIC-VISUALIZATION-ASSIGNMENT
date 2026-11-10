@@ -84,88 +84,135 @@ with st.sidebar.expander("About this dashboard"):
 st.markdown('<div class="page-kicker">MALAYSIA · COST OF LIVING</div>', unsafe_allow_html=True)
 st.title("Cost of Living Dashboard")
 
-with st.container(border=True):
-    st.markdown('<div class="filter-heading">COMPARISON PERIOD</div>', unsafe_allow_html=True)
-    fy1, fy2 = st.columns(2)
-    with fy1:
-        baseline = st.selectbox("Baseline year", YEARS, index=0, key="baseline_year")
-    comparison_options = [y for y in YEARS if y != baseline]
-    default_comparison = YEARS[-1] if YEARS[-1] != baseline else YEARS[-2]
-    with fy2:
-        comparison = st.selectbox("Compare with", comparison_options,
-                                  index=comparison_options.index(default_comparison),
-                                  key="comparison_year")
+# Choose whether to compare a period or inspect one year.
+if page.startswith("02"):
+    selected_year = st.selectbox("Year", YEARS, index=len(YEARS)-1, key="obj2_year")
+    baseline = comparison = selected_year
+    view_mode = "Single year"
+else:
+    view_mode = st.radio(
+        "View",
+        ["Compare years", "Single year"],
+        horizontal=True,
+        key="global_view_mode"
+    )
+    with st.container(border=True):
+        if view_mode == "Compare years":
+            st.markdown('<div class="filter-heading">YEAR COMPARISON</div>', unsafe_allow_html=True)
+            fy1, fy2 = st.columns(2)
+            with fy1:
+                baseline = st.selectbox("From year", YEARS, index=0, key="baseline_year")
+            comparison_options = [y for y in YEARS if y != baseline]
+            default_comparison = YEARS[-1] if YEARS[-1] != baseline else YEARS[-2]
+            with fy2:
+                comparison = st.selectbox(
+                    "To year", comparison_options,
+                    index=comparison_options.index(default_comparison),
+                    key="comparison_year"
+                )
+            selected_year = comparison
+        else:
+            st.markdown('<div class="filter-heading">SELECT YEAR</div>', unsafe_allow_html=True)
+            selected_year = st.selectbox(
+                "Year", YEARS, index=len(YEARS)-1, key="single_year"
+            )
+            baseline = comparison = selected_year
 
 if page.startswith("01"):
-    
     f1, f2 = st.columns([1, 1])
     with f1:
-        income_measure_label = st.selectbox("Income measure", ["Mean income", "Median income"],
-                                            help="Choose which income statistic to compare against Overall CPI.")
+        income_measure_label = st.selectbox("Income measure", ["Mean income", "Median income"])
     with f2:
         selected_states = st.multiselect(
-            "State", STATES, default=[],
-            help="Leave empty to show all states."
+            "State", STATES, default=[], help="Leave empty to show all states."
         )
+
     measure_col = "income_mean" if income_measure_label == "Mean income" else "income_median"
-    growth = calc.growth_comparison(df, baseline, comparison, measure_col)
-    if selected_states:
-        growth = growth[growth.state.isin(selected_states)]
-    if growth.empty:
-        st.warning("No matching state data for this selection.")
-        st.stop()
-    growth = growth.sort_values("gap", ascending=False)
 
-    avg_income_growth = growth["income_growth"].mean()
-    avg_price_growth = growth["price_growth"].mean()
-    avg_gap = growth["gap"].mean()
-    k1, k2, k3 = st.columns(3)
-    k1.metric("Average income growth", f"{avg_income_growth:+.1f}%",
-              help=f"Average {income_measure_label.lower()} growth across the selected states.")
-    k2.metric("Average price increase", f"{avg_price_growth:+.1f}%",
-              help="Average Overall CPI growth across the same selected states.")
-    k3.metric("Income advantage", f"{avg_gap:+.1f} pp",
-              help="Average income growth minus average price growth, in percentage points.")
+    if view_mode == "Compare years":
+        growth = calc.growth_comparison(df, baseline, comparison, measure_col)
+        if selected_states:
+            growth = growth[growth.state.isin(selected_states)]
+        if growth.empty:
+            st.warning("No data available for this selection.")
+            st.stop()
 
-    # Identify states using the income-growth minus price-growth gap.
-    most_improved = growth.loc[growth["gap"].idxmax()]
-    least_improved = growth.loc[growth["gap"].idxmin()]
+        growth = growth.sort_values("gap", ascending=False)
+        avg_income_growth = growth["income_growth"].mean()
+        avg_price_growth = growth["price_growth"].mean()
+        avg_gap = growth["gap"].mean()
 
-    s1, s2 = st.columns(2)
-    with s1:
-        st.metric(
-            "Highest income advantage",
-            short_state(most_improved["state"]),
-            delta=f"{most_improved['gap']:+.1f} pp income advantage",
-            help="State with the largest difference between income growth and Overall CPI growth."
+        k1, k2, k3 = st.columns(3)
+        k1.metric("Average income growth", f"{avg_income_growth:+.1f}%")
+        k2.metric("Average price growth", f"{avg_price_growth:+.1f}%")
+        k3.metric("Income–price gap", f"{avg_gap:+.1f} pp",
+                  help="Income growth minus price growth, in percentage points.")
+
+        most_improved = growth.loc[growth["gap"].idxmax()]
+        least_improved = growth.loc[growth["gap"].idxmin()]
+        s1, s2 = st.columns(2)
+        s1.metric("Highest income–price gap", short_state(most_improved["state"]),
+                  delta=f"{most_improved['gap']:+.1f} pp")
+        s2.metric("Lowest income–price gap", short_state(least_improved["state"]),
+                  delta=f"{least_improved['gap']:+.1f} pp")
+
+        st.subheader(f"{income_measure_label} and price growth by state")
+        fig = go.Figure()
+        fig.add_trace(go.Bar(
+            y=growth.state, x=growth.income_growth, name="Income growth",
+            orientation="h", marker_color=TEAL,
+            hovertemplate="<b>%{y}</b><br>Income growth: %{x:.1f}%<extra></extra>"
+        ))
+        fig.add_trace(go.Bar(
+            y=growth.state, x=growth.price_growth, name="Price growth",
+            orientation="h", marker_color=CORAL,
+            hovertemplate="<b>%{y}</b><br>Price growth: %{x:.1f}%<extra></extra>"
+        ))
+        fig.update_layout(barmode="group", xaxis_title="Growth (%)", yaxis_title="",
+                          bargap=.22, bargroupgap=.08, legend_title="", height=590)
+        fig.update_yaxes(categoryorder="array", categoryarray=growth.state.tolist(),
+                         autorange="reversed", tickfont=dict(size=11))
+        fig.update_xaxes(ticksuffix="%", showgrid=True, gridcolor=GRID,
+                         zeroline=True, zerolinecolor="#AAB5BF")
+        st.plotly_chart(chart_layout(fig, 590), use_container_width=True, config=PLOT_CONFIG)
+
+    else:
+        snap = calc.population_income_snapshot(df, selected_year)
+        if selected_states:
+            snap = snap[snap.state.isin(selected_states)]
+        if snap.empty:
+            st.warning("No data available for this selection.")
+            st.stop()
+
+        income_avg = snap[measure_col].mean()
+        cpi_avg = snap["cpi"].mean()
+        k1, k2, k3 = st.columns(3)
+        k1.metric(f"Average {income_measure_label.lower()}",
+                  f"RM {income_avg:,.0f}")
+        k2.metric("Average Overall CPI", f"{cpi_avg:.1f}")
+        k3.metric("States shown", f"{len(snap)}")
+
+        st.subheader(f"{income_measure_label} and Overall CPI by state · {selected_year}")
+        fig = px.scatter(
+            snap, x="cpi", y=measure_col, hover_name=snap.state.map(short_state),
+            color_discrete_sequence=[TEAL], opacity=.88
         )
-    with s2:
-        st.metric(
-            "Lowest income advantage",
-            short_state(least_improved["state"]),
-            delta=f"{least_improved['gap']:+.1f} pp income advantage",
-            delta_color="normal",
-            help="State with the smallest difference between income growth and Overall CPI growth. A positive value still means income growth exceeded price growth."
+        fig.update_traces(
+            marker=dict(size=13, line=dict(color="#FFFFFF", width=1.2)),
+            hovertemplate="<b>%{hovertext}</b><br>Overall CPI: %{x:.1f}<br>"
+                          + income_measure_label + ": RM %{y:,.0f}<extra></extra>"
         )
-
-    st.subheader(f"{income_measure_label} and price growth by state")
-    fig = go.Figure()
-    fig.add_trace(go.Bar(y=growth.state, x=growth.income_growth, name=income_measure_label,
-                         orientation="h", marker_color=TEAL,
-                         hovertemplate="<b>%{y}</b><br>" + income_measure_label + " growth: %{x:.1f}%<extra></extra>"))
-    fig.add_trace(go.Bar(y=growth.state, x=growth.price_growth, name="Price growth",
-                         orientation="h", marker_color=CORAL,
-                         hovertemplate="<b>%{y}</b><br>Overall price growth: %{x:.1f}%<extra></extra>"))
-    fig.update_layout(barmode="group", xaxis_title="Growth rate (%)", yaxis_title="",
-                      bargap=.22, bargroupgap=.08, legend_title="", height=590)
-    fig.update_yaxes(categoryorder="array", categoryarray=growth.state.tolist(), autorange="reversed",
-                     tickfont=dict(size=11), title_standoff=14)
-    fig.update_xaxes(title="Growth rate (%)", ticksuffix="%", showgrid=True, gridcolor=GRID,
-                     zeroline=True, zerolinecolor="#AAB5BF")
-    st.plotly_chart(chart_layout(fig, 590), use_container_width=True, config=PLOT_CONFIG)
+        fig.update_layout(
+            xaxis_title="Overall CPI index",
+            yaxis_title=f"{income_measure_label} (RM per month)",
+            height=590
+        )
+        fig.update_xaxes(showgrid=True, gridcolor=GRID)
+        fig.update_yaxes(showgrid=True, gridcolor=GRID)
+        st.plotly_chart(chart_layout(fig, 590), use_container_width=True, config=PLOT_CONFIG)
 
 elif page.startswith("02"):
-    year = st.selectbox("Year", YEARS, index=len(YEARS)-1, key="snapshot_year")
+    year = selected_year
     snap = calc.population_income_snapshot(df, year)
     
     selected_states_2 = st.multiselect(
@@ -201,40 +248,67 @@ elif page.startswith("02"):
     st.plotly_chart(chart_layout(fig, 590), use_container_width=True, config=PLOT_CONFIG)
 
 else:
-    
-    view = st.radio("Rank by", ["Spending category", "State"],
-                    horizontal=True,
-                    help="Choose whether to rank CPI spending categories or states.")
+    view = st.radio("Rank by", ["Spending category", "State"], horizontal=True)
 
     if view == "Spending category":
-        rank = calc.category_growth_national(df, baseline, comparison).sort_values("price_growth", ascending=True)
-        st.subheader("Price growth by spending category")
+        if view_mode == "Compare years":
+            rank = calc.category_growth_national(df, baseline, comparison)
+            value_col = "price_growth"
+            chart_title = "Price growth by spending category"
+            axis_title = "Price growth (%)"
+            hover_label = "Price growth"
+        else:
+            selected = df[(df.year == selected_year) & (df.division != "Overall")]
+            rank = (selected.groupby("division", as_index=False)["index"]
+                    .mean().rename(columns={"division": "category", "index": "cpi_index"}))
+            value_col = "cpi_index"
+            chart_title = f"CPI by spending category · {selected_year}"
+            axis_title = "CPI index"
+            hover_label = "CPI index"
+
+        rank = rank.sort_values(value_col, ascending=True)
         labels = rank.category.tolist()
-        values = rank.price_growth.tolist()
-        colors = [CORAL if x >= 0 else TEAL for x in values]
+        values = rank[value_col].tolist()
         fig = go.Figure(go.Bar(
-            x=values, y=labels, orientation="h", marker_color=colors,
-            hovertemplate="<b>%{y}</b><br>Average price growth: %{x:.1f}%<extra></extra>"
+            x=values, y=labels, orientation="h", marker_color=CORAL,
+            hovertemplate=f"<b>%{{y}}</b><br>{hover_label}: %{{x:.1f}}<extra></extra>"
         ))
-        fig.update_layout(xaxis_title="Average price growth (%)", yaxis_title="",
+        fig.update_layout(xaxis_title=axis_title, yaxis_title="",
                           showlegend=False, bargap=.25, height=590)
         fig.update_yaxes(categoryorder="array", categoryarray=labels, autorange="reversed")
-        fig.update_xaxes(showgrid=True, gridcolor=GRID, zeroline=True, zerolinecolor="#AAB5BF",
-                         ticksuffix="%")
+        fig.update_xaxes(showgrid=True, gridcolor=GRID)
+        if view_mode == "Compare years":
+            fig.update_xaxes(ticksuffix="%")
+        st.subheader(chart_title)
         st.plotly_chart(chart_layout(fig, 590), use_container_width=True, config=PLOT_CONFIG)
+
     else:
-        rank = calc.category_state_growth(df, baseline, comparison, "Overall")
-        rank = rank.sort_values("price_growth", ascending=True)
-        st.subheader("Price growth by state")
-        colors = [CORAL if x >= 0 else TEAL for x in rank.price_growth]
+        if view_mode == "Compare years":
+            rank = calc.category_state_growth(df, baseline, comparison, "Overall")
+            value_col = "price_growth"
+            chart_title = "Price growth by state"
+            axis_title = "Price growth (%)"
+            hover_label = "Price growth"
+        else:
+            rank = df[(df.year == selected_year) & (df.division == "Overall")][
+                ["state", "index"]
+            ].rename(columns={"index": "cpi_index"})
+            value_col = "cpi_index"
+            chart_title = f"Overall CPI by state · {selected_year}"
+            axis_title = "Overall CPI index"
+            hover_label = "Overall CPI"
+
+        rank = rank.sort_values(value_col, ascending=True)
         fig = go.Figure(go.Bar(
-            x=rank.price_growth, y=rank.state, orientation="h", marker_color=colors,
-            hovertemplate="<b>%{y}</b><br>Overall price growth: %{x:.1f}%<extra></extra>"
+            x=rank[value_col], y=rank.state, orientation="h", marker_color=CORAL,
+            hovertemplate=f"<b>%{{y}}</b><br>{hover_label}: %{{x:.1f}}<extra></extra>"
         ))
-        fig.update_layout(xaxis_title="Price growth (%)", yaxis_title="State",
+        fig.update_layout(xaxis_title=axis_title, yaxis_title="",
                           showlegend=False, bargap=.22, height=590)
         fig.update_yaxes(categoryorder="array", categoryarray=rank.state.tolist(), autorange="reversed")
-        fig.update_xaxes(showgrid=True, gridcolor=GRID, zeroline=True, zerolinecolor="#AAB5BF",
-                         ticksuffix="%")
+        fig.update_xaxes(showgrid=True, gridcolor=GRID)
+        if view_mode == "Compare years":
+            fig.update_xaxes(ticksuffix="%")
+        st.subheader(chart_title)
         st.plotly_chart(chart_layout(fig, 590), use_container_width=True, config=PLOT_CONFIG)
 
