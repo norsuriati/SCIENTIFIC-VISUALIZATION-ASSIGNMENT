@@ -86,7 +86,7 @@ st.title("Cost of Living Dashboard")
 
 with st.container(border=True):
     st.markdown('<div class="filter-heading">COMPARISON PERIOD</div>', unsafe_allow_html=True)
-    fy1, fy2, fy_note = st.columns([1, 1, 1.35])
+    fy1, fy2 = st.columns(2)
     with fy1:
         baseline = st.selectbox("Baseline year", YEARS, index=0, key="baseline_year")
     comparison_options = [y for y in YEARS if y != baseline]
@@ -95,12 +95,6 @@ with st.container(border=True):
         comparison = st.selectbox("Compare with", comparison_options,
                                   index=comparison_options.index(default_comparison),
                                   key="comparison_year")
-    with fy_note:
-        st.markdown(
-            f'<div style="padding:.55rem 0 .7rem;color:{INK};font-size:.98rem;font-weight:650;">'
-            f'{baseline} → {comparison}</div>',
-            unsafe_allow_html=True
-        )
 
 if page.startswith("01"):
     
@@ -120,16 +114,16 @@ if page.startswith("01"):
         st.stop()
     growth = growth.sort_values("gap", ascending=True)
 
-    better = int((growth.gap > 0).sum())
-    worse = int((growth.gap < 0).sum())
-    avg_real = growth.real_growth.mean()
+    avg_income_growth = growth["income_growth"].mean()
+    avg_price_growth = growth["price_growth"].mean()
+    avg_gap = growth["gap"].mean()
     k1, k2, k3 = st.columns(3)
-    k1.metric("Income grew faster", f"{better} / {len(growth)}",
-              help="Selected states where income growth exceeded Overall CPI growth.")
-    k2.metric("Prices grew faster", f"{worse} / {len(growth)}",
-              help="Selected states where Overall CPI growth exceeded income growth.")
-    k3.metric("Average real income growth", f"{avg_real:+.1f}%",
-              help="Average income growth adjusted for Overall CPI growth.")
+    k1.metric("Average income growth", f"{avg_income_growth:+.1f}%",
+              help=f"Average {income_measure_label.lower()} growth across the selected states.")
+    k2.metric("Average price growth", f"{avg_price_growth:+.1f}%",
+              help="Average Overall CPI growth across the same selected states.")
+    k3.metric("Income growth advantage", f"{avg_gap:+.1f} pp",
+              help="Income growth minus price growth, in percentage points. Positive means income grew faster on average.")
 
     st.subheader(f"{income_measure_label} vs overall price growth")
     fig = go.Figure()
