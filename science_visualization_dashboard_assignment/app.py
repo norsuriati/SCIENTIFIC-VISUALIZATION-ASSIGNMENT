@@ -162,36 +162,92 @@ if page.startswith("01"):
         s2.metric("Lowest income–price gap", short_state(least_improved["state"]),
                   delta=f"{least_improved['gap']:+.1f} pp")
 
-        st.subheader(f"{income_measure_label} and price growth by state")
-        chart_growth = growth_all.copy()
+        income_name = f"{income_measure_label} household income"
+        st.subheader(f"Income and price growth by state")
+        chart_growth = growth_all.sort_values("income_growth", ascending=False).copy()
+        chart_growth["state_label"] = chart_growth.state.map(short_state)
+
+        # Match the reference: paired horizontal bars, clear category colours,
+        # and percentage labels at the end of each bar.
+        income_blue = "#2864E8"
+        price_orange = "#F05A0A"
         selected_set = set(selected_states)
         if selected_states:
-            income_colors = [TEAL if state in selected_set else "#D9DEE5"
-                             for state in chart_growth.state]
-            price_colors = [CORAL if state in selected_set else "#D9DEE5"
-                            for state in chart_growth.state]
+            income_colors = [
+                income_blue if state in selected_set else "#D9DEE5"
+                for state in chart_growth.state
+            ]
+            price_colors = [
+                price_orange if state in selected_set else "#E5E7EB"
+                for state in chart_growth.state
+            ]
         else:
-            income_colors = [TEAL] * len(chart_growth)
-            price_colors = [CORAL] * len(chart_growth)
+            income_colors = [income_blue] * len(chart_growth)
+            price_colors = [price_orange] * len(chart_growth)
 
         fig = go.Figure()
         fig.add_trace(go.Bar(
-            y=chart_growth.state, x=chart_growth.income_growth, name="Income growth",
-            orientation="h", marker_color=income_colors,
-            hovertemplate="<b>%{y}</b><br>Income growth: %{x:.1f}%<extra></extra>"
+            y=chart_growth.state_label,
+            x=chart_growth.income_growth,
+            name=income_name,
+            orientation="h",
+            marker_color=income_colors,
+            text=[f"{v:.0f}%" for v in chart_growth.income_growth],
+            textposition="outside",
+            cliponaxis=False,
+            hovertemplate="<b>%{y}</b><br>" + income_name
+                          + ": %{x:.1f}%<extra></extra>"
         ))
         fig.add_trace(go.Bar(
-            y=chart_growth.state, x=chart_growth.price_growth, name="Price growth",
-            orientation="h", marker_color=price_colors,
-            hovertemplate="<b>%{y}</b><br>Price growth: %{x:.1f}%<extra></extra>"
+            y=chart_growth.state_label,
+            x=chart_growth.price_growth,
+            name="Prices (CPI)",
+            orientation="h",
+            marker_color=price_colors,
+            text=[f"{v:.0f}%" for v in chart_growth.price_growth],
+            textposition="outside",
+            cliponaxis=False,
+            hovertemplate="<b>%{y}</b><br>Prices (CPI): %{x:.1f}%<extra></extra>"
         ))
-        fig.update_layout(barmode="group", xaxis_title="Growth (%)", yaxis_title="",
-                          bargap=.22, bargroupgap=.08, legend_title="", height=590)
-        fig.update_yaxes(categoryorder="array", categoryarray=chart_growth.state.tolist(),
-                         autorange="reversed", tickfont=dict(size=11))
-        fig.update_xaxes(ticksuffix="%", showgrid=True, gridcolor=GRID,
-                         zeroline=True, zerolinecolor="#AAB5BF")
-        st.plotly_chart(chart_layout(fig, 590), use_container_width=True, config=PLOT_CONFIG)
+        max_value = max(
+            float(chart_growth.income_growth.max()),
+            float(chart_growth.price_growth.max()),
+            0
+        )
+        min_value = min(
+            float(chart_growth.income_growth.min()),
+            float(chart_growth.price_growth.min()),
+            0
+        )
+        fig.update_layout(
+            barmode="group",
+            yaxis_title="",
+            xaxis_title="Growth (%)",
+            bargap=.25,
+            bargroupgap=.08,
+            legend_title="",
+            height=max(590, 34 * len(chart_growth) + 120),
+            margin=dict(l=28, r=65, t=55, b=45)
+        )
+        fig.update_yaxes(
+            categoryorder="array",
+            categoryarray=chart_growth.state_label.tolist(),
+            autorange="reversed",
+            tickfont=dict(size=11)
+        )
+        fig.update_xaxes(
+            ticksuffix="%",
+            showgrid=True,
+            gridcolor=GRID,
+            zeroline=True,
+            zerolinecolor="#AAB5BF",
+            range=[min(0, min_value * 1.12), max_value * 1.16 if max_value > 0 else 1]
+        )
+        st.plotly_chart(
+            chart_layout(fig, max(590, 34 * len(chart_growth) + 120)),
+            use_container_width=True,
+            config=PLOT_CONFIG
+        )
 
     else:
         snap_all = calc.population_income_snapshot(df, selected_year)
