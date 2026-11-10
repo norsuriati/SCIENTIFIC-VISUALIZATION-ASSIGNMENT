@@ -99,6 +99,30 @@ def _round_coords(obj, nd=3):
     return round(obj, nd) if isinstance(obj, float) else obj
 
 
+def _ring_area(ring) -> float:
+    """Signed area of a ring in lon/lat (positive = counter-clockwise)."""
+    return sum((x1 * y2 - x2 * y1) for (x1, y1, *_), (x2, y2, *_) in zip(ring, ring[1:] + ring[:1])) / 2
+
+
+def _rewind_polygon(poly):
+    """Plotly (d3) needs outer rings clockwise and holes counter-clockwise.
+    Many GeoJSON files use the opposite order, which makes a state fill the whole map."""
+    out = []
+    for i, ring in enumerate(poly):
+        ccw = _ring_area(ring) > 0
+        if (i == 0 and ccw) or (i > 0 and not ccw):
+            ring = ring[::-1]
+        out.append(ring)
+    return out
+
+
+def _rewind_geometry(geom):
+    if geom["type"] == "Polygon":
+        geom["coordinates"] = _rewind_polygon(geom["coordinates"])
+    elif geom["type"] == "MultiPolygon":
+        geom["coordinates"] = [_rewind_polygon(p) for p in geom["coordinates"]]
+
+
 def load_geojson(path: str, state_names):
     """Read a Malaysia states GeoJSON. Finds which property holds the state name, and adds a
     'state_key' property (normalised name) to every feature.
@@ -119,5 +143,6 @@ def load_geojson(path: str, state_names):
         f["properties"]["state_key"] = norm(f["properties"].get(best) or "")
         if f.get("geometry"):
             f["geometry"]["coordinates"] = _round_coords(f["geometry"]["coordinates"])
+            _rewind_geometry(f["geometry"])
     drawn = {f["properties"]["state_key"] for f in feats}
     return gj, [s for s in state_names if norm(s) not in drawn]
