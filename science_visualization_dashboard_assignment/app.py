@@ -71,6 +71,10 @@ def short_state(s):
             "W.P. Labuan":"Labuan", "Pulau Pinang":"Penang",
             "Negeri Sembilan":"Negeri Sembilan"}.get(s, s)
 
+
+def save_income_measure():
+    st.session_state["shared_income_measure"] = st.session_state["income_measure_widget"]
+
 st.sidebar.markdown("## 📊 Cost of Living")
 st.sidebar.caption("MALAYSIA")
 st.sidebar.divider()
@@ -112,11 +116,6 @@ st.sidebar.caption(
     "Population, income and prices uses the selected year. "
     "When comparing years, it uses the To year."
 )
-st.sidebar.divider()
-with st.sidebar.expander("About this dashboard"):
-    st.write("State-level comparison of household income, population and consumer price indices.")
-    st.caption("Data years: " + " · ".join(map(str, YEARS)))
-
 st.markdown('<div class="page-kicker">MALAYSIA · COST OF LIVING</div>', unsafe_allow_html=True)
 st.title("Cost of Living Dashboard")
 
@@ -124,7 +123,15 @@ if page.startswith("01"):
     st.markdown('<div class="filter-heading">ANALYSIS FILTERS</div>', unsafe_allow_html=True)
     f1, f2 = st.columns([1, 1])
     with f1:
-        income_measure_label = st.selectbox("Income measure", ["Mean income", "Median income"])
+        if "income_measure_widget" not in st.session_state:
+            st.session_state["income_measure_widget"] = st.session_state.get(
+                "shared_income_measure", "Mean income"
+            )
+        income_measure_label = st.selectbox(
+            "Income measure", ["Mean income", "Median income"],
+            key="income_measure_widget", on_change=save_income_measure
+        )
+        st.session_state["shared_income_measure"] = income_measure_label
     with f2:
         selected_states = st.multiselect(
             "State", STATES, default=[], help="Leave empty to show all states."
@@ -275,66 +282,98 @@ if page.startswith("01"):
             for state in chart_data.state
         ]
 
-        # Separate panels are used because income (RM) and CPI (index points)
-        # have different units and should not share one misleading axis.
+        # Match the Compare Years visual style: horizontal bars, consistent
+        # blue/orange measure colours, synchronized state order and labels.
+        # Keep separate panels because income (RM) and CPI (index) use different units.
+        chart_data = snap_all.copy()
+        chart_data["state_label"] = chart_data.state.map(short_state)
+        chart_data = chart_data.sort_values("state_label")
+        selected_set = set(selected_states)
+        income_blue = "#2864E8"
+        cpi_orange = "#F05A0A"
+        income_colors = [
+            income_blue if (not selected_states or state in selected_set) else "#D9DEE5"
+            for state in chart_data.state
+        ]
+        cpi_colors = [
+            cpi_orange if (not selected_states or state in selected_set) else "#E5E7EB"
+            for state in chart_data.state
+        ]
+
         fig = make_subplots(
             rows=1, cols=2,
             subplot_titles=(
-                f"{income_measure_label} (RM per month)",
+                f"{income_measure_label} household income (RM/month)",
                 "Overall CPI index"
             ),
-            horizontal_spacing=0.16
+            horizontal_spacing=0.17,
+            shared_yaxes=True
         )
-        fig.add_trace(
-            go.Bar(
-                x=chart_data[measure_col],
-                y=chart_data.state_label,
-                orientation="h",
-                marker_color=bar_colors,
-                name=income_measure_label,
-                customdata=chart_data.state,
-                hovertemplate="<b>%{y}</b><br>" + income_measure_label
-                              + ": RM %{x:,.0f}<extra></extra>"
-            ),
-            row=1, col=1
-        )
-        fig.add_trace(
-            go.Bar(
-                x=chart_data["cpi"],
-                y=chart_data.state_label,
-                orientation="h",
-                marker_color=bar_colors,
-                name="Overall CPI",
-                customdata=chart_data.state,
-                hovertemplate="<b>%{y}</b><br>Overall CPI: %{x:.1f}<extra></extra>"
-            ),
-            row=1, col=2
-        )
+        fig.add_trace(go.Bar(
+            x=chart_data[measure_col],
+            y=chart_data.state_label,
+            orientation="h",
+            marker_color=income_colors,
+            name=f"{income_measure_label} household income",
+            text=[f"RM {v:,.0f}" for v in chart_data[measure_col]],
+            textposition="outside",
+            cliponaxis=False,
+            hovertemplate="<b>%{y}</b><br>" + income_measure_label
+                          + ": RM %{x:,.0f} per month<extra></extra>"
+        ), row=1, col=1)
+        fig.add_trace(go.Bar(
+            x=chart_data["cpi"],
+            y=chart_data.state_label,
+            orientation="h",
+            marker_color=cpi_colors,
+            name="Overall CPI",
+            text=[f"{v:.1f}" for v in chart_data["cpi"]],
+            textposition="outside",
+            cliponaxis=False,
+            hovertemplate="<b>%{y}</b><br>Overall CPI: %{x:.1f}<extra></extra>"
+        ), row=1, col=2)
         fig.update_layout(
             showlegend=False,
-            height=max(590, 34 * len(chart_data) + 150),
-            bargap=.28
+            bargap=.28,
+            height=max(590, 34 * len(chart_data) + 130),
+            margin=dict(l=25, r=65, t=65, b=45)
         )
-        fig.update_xaxes(title_text="RM per month", showgrid=True, gridcolor=GRID,
-                         tickprefix="RM ", row=1, col=1)
-        fig.update_xaxes(title_text="CPI index", showgrid=True, gridcolor=GRID,
-                         row=1, col=2)
-        fig.update_yaxes(
-            categoryorder="array", categoryarray=chart_data.state_label.tolist(),
-            autorange="reversed", showgrid=False, row=1, col=1
+        fig.update_xaxes(
+            title_text="RM per month",
+            showgrid=True, gridcolor=GRID,
+            tickprefix="RM ",
+            row=1, col=1
+        )
+        fig.update_xaxes(
+            title_text="CPI index",
+            showgrid=True, gridcolor=GRID,
+            row=1, col=2
         )
         fig.update_yaxes(
-            categoryorder="array", categoryarray=chart_data.state_label.tolist(),
-            autorange="reversed", showgrid=False, row=1, col=2,
-            showticklabels=False
+            categoryorder="array",
+            categoryarray=chart_data.state_label.tolist(),
+            autorange="reversed",
+            showgrid=False,
+            row=1, col=1
+        )
+        fig.update_yaxes(
+            categoryorder="array",
+            categoryarray=chart_data.state_label.tolist(),
+            autorange="reversed",
+            showgrid=False,
+            showticklabels=False,
+            row=1, col=2
         )
         st.plotly_chart(
-            chart_layout(fig, max(590, 34 * len(chart_data) + 150)),
-            use_container_width=True, config=PLOT_CONFIG
+            chart_layout(fig, max(590, 34 * len(chart_data) + 130)),
+            use_container_width=True,
+            config=PLOT_CONFIG
         )
 
 elif page.startswith("02"):
     year = selected_year
+    income_measure_label = st.session_state.get("shared_income_measure", "Mean income")
+    measure_col = "income_mean" if income_measure_label == "Mean income" else "income_median"
     snap = calc.population_income_snapshot(df, year)
     
     st.markdown('<div class="filter-heading">ANALYSIS FILTERS</div>', unsafe_allow_html=True)
@@ -349,20 +388,20 @@ elif page.startswith("02"):
         st.stop()
 
     snap["state_label"] = snap.state.map(short_state)
-    st.subheader(f"Population, income and prices · {year}")
+    st.subheader(f"Population, {income_measure_label.lower()} and prices · {year}")
     fig = px.scatter(
-        snap, x="population", y="income_mean", color="cpi",
+        snap, x="population", y=measure_col, color="cpi",
         color_continuous_scale=["#BFE7E2", "#55AAA1", "#155E59"],
         hover_name="state_label",
-        hover_data={"population":":,.0f", "income_mean":"RM {:,.0f}", "cpi":":.1f",
+        hover_data={"population":":,.0f", measure_col:"RM {:,.0f}", "cpi":":.1f",
                     "state":False, "state_label":False},
         opacity=.88
     )
     fig.update_traces(marker=dict(size=13, line=dict(color="#FFFFFF", width=1.2)),
-                      hovertemplate="<b>%{hovertext}</b><br>Population: %{x:,.0f} thousand persons<br>Mean monthly household income: RM %{y:,.0f}<br>Overall CPI: %{marker.color:.1f}<extra></extra>")
+                      hovertemplate="<b>%{hovertext}</b><br>Population: %{x:,.0f} thousand persons<br>" + income_measure_label + " monthly household income: RM %{y:,.0f}<br>Overall CPI: %{marker.color:.1f}<extra></extra>")
     fig.update_layout(
         xaxis_title="Population (thousand persons)",
-        yaxis_title="Mean monthly household income (RM)",
+        yaxis_title=f"{income_measure_label} monthly household income (RM)",
         coloraxis_colorbar=dict(title="Overall CPI", thickness=13, len=.72),
         height=650
     )
