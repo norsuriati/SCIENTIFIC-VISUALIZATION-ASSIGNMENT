@@ -28,13 +28,16 @@ def state_year(df):
                .rename(columns={"index": "cpi"}))
     return core.merge(overall, on=["state", "year"], how="inner")
 
-def growth_comparison(df, baseline, comparison):
+def growth_comparison(df, baseline, comparison, income_measure="income_mean"):
+    """Compare selected household income measure growth with Overall CPI growth."""
+    if income_measure not in {"income_mean", "income_median"}:
+        raise ValueError("income_measure must be 'income_mean' or 'income_median'")
     sy = state_year(df)
     a = sy[sy.year.eq(baseline)].set_index("state")
     b = sy[sy.year.eq(comparison)].set_index("state")
     common = a.index.intersection(b.index)
     out = pd.DataFrame(index=common)
-    out["income_growth"] = (b.loc[common, "income_mean"] / a.loc[common, "income_mean"] - 1) * 100
+    out["income_growth"] = (b.loc[common, income_measure] / a.loc[common, income_measure] - 1) * 100
     out["price_growth"] = (b.loc[common, "cpi"] / a.loc[common, "cpi"] - 1) * 100
     out["real_growth"] = ((1 + out["income_growth"] / 100) /
                           (1 + out["price_growth"] / 100) - 1) * 100
