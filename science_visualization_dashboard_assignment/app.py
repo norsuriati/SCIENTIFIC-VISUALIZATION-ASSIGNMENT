@@ -8,7 +8,10 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-import analysis as calc
+try:
+    import analysis as calc
+except ImportError:  # the file may be called analysis.py
+    import analysis as calc
 
 # ---------------------------------------------------------------- setup
 st.set_page_config(page_title="Malaysia Cost of Living", page_icon="📊", layout="wide")
@@ -59,6 +62,18 @@ def get_data() -> pd.DataFrame:
 
 df = get_data()
 YEARS = sorted(df["year"].unique().tolist())
+
+
+@st.cache_data
+def get_geojson(path: str, state_names: tuple):
+    return calc.load_geojson(path, list(state_names))
+
+
+def find_geojson():
+    here = Path(__file__).parent
+    names = [here / "data" / "malaysia_states.geojson", here / "malaysia_states.geojson"]
+    names += sorted(here.glob("*.geojson")) + sorted((here / "data").glob("*.geojson"))
+    return next((p for p in names if p.exists()), None)
 
 
 def show(fig: go.Figure) -> None:
@@ -300,54 +315,52 @@ else:
     if st.session_state.get("p3_state") not in [ALL] + state_list:
         st.session_state["p3_state"] = ALL
 
-    left, right = st.columns([1.05, 1])
-
-    # ---------- left: map of overall pressure (click a state)
-    with left:
-        st.subheader("Overall price pressure by state")
-        geo_path = next((p for p in (Path(__file__).parent / "data" / "malaysia_states.geojson",
-                                     Path(__file__).parent / "malaysia_states.geojson") if p.exists()), None)
-        gj, no_shape = None, []
-        if geo_path is not None:
-            try:
-                gj, no_shape = calc.load_geojson(str(geo_path), state_list)
-            except Exception as err:
-                st.warning(f"Map file could not be read: {err}")
-        if gj is None:
-            st.info("Map file not found. Add **malaysia_states.geojson** to the data folder to show the map. "
-                    "You can still choose a state with the menu below.")
-        else:
-            fig_map = go.Figure(
+    # ---------- top: map of overall pressure (click a state)
+    st.subheader("Overall price pressure by state")
+    geo_path = find_geojson()
+    gj, no_shape = None, []
+    if geo_path is not None:
+        try:
+            gj, no_shape = get_geojson(str(geo_path), tuple(state_list))
+        except Exception as err:
+            st.warning(f"Map file could not be read: {err}")
+    if gj is None:
+        st.info("Map file not found. Add a Malaysia states GeoJSON file (for example geoBoundaries-MYS-ADM1.geojson) "
+                "to the same folder as app.py. You can still choose a state with the menu below.")
+    else:
+        fig_map = go.Figure(
+            go.Choropleth(
+                geojson=gj, featureidkey="properties.state_key",
+                locations=[calc.norm(s) for s in state_list], z=c[calc.OVERALL].values,
+                text=[short_state(s) for s in state_list], colorscale="YlOrRd",
+                marker_line_color="white", marker_line_width=1,
+                colorbar=dict(title="Price growth<br>(%)", thickness=12, len=0.8),
+                hovertemplate="<b>%{text}</b><br>Overall prices: %{z:+.0f}%<extra></extra>",
+            )
+        )
+        sel = st.session_state["p3_state"]
+        if sel != ALL:  # dark outline around the chosen state
+            fig_map.add_trace(
                 go.Choropleth(
-                    geojson=gj, featureidkey="properties.state_key",
-                    locations=[calc.norm(s) for s in state_list], z=c[calc.OVERALL].values,
-                    text=[short_state(s) for s in state_list], colorscale="YlOrRd",
-                    marker_line_color="white", marker_line_width=1,
-                    colorbar=dict(title="Price growth<br>(%)", thickness=12, len=0.7),
-                    hovertemplate="<b>%{text}</b><br>Overall prices: %{z:+.0f}%<extra></extra>",
+                    geojson=gj, featureidkey="properties.state_key", locations=[calc.norm(sel)], z=[0],
+                    colorscale=[[0, "rgba(0,0,0,0)"], [1, "rgba(0,0,0,0)"]], showscale=False,
+                    marker_line_color=INK, marker_line_width=3, hoverinfo="skip",
                 )
             )
-            sel = st.session_state["p3_state"]
-            if sel != ALL:  # dark outline around the chosen state
-                fig_map.add_trace(
-                    go.Choropleth(
-                        geojson=gj, featureidkey="properties.state_key", locations=[calc.norm(sel)], z=[0],
-                        colorscale=[[0, "rgba(0,0,0,0)"], [1, "rgba(0,0,0,0)"]], showscale=False,
-                        marker_line_color=INK, marker_line_width=3, hoverinfo="skip",
-                    )
-                )
-            fig_map.update_geos(fitbounds="locations", visible=False, bgcolor="rgba(0,0,0,0)")
-            fig_map.update_layout(height=470, margin=dict(l=0, r=0, t=10, b=0), clickmode="event+select",
-                                  font=dict(family=FONT, size=13, color=INK))
-            show_clickable(fig_map, "map3", _on_map_click)
-            if no_shape:
-                st.caption("Too small to draw or missing from the map file: "
-                           + ", ".join(short_state(s) for s in no_shape) + ". Choose them from the menu.")
-        st.selectbox(
-            "Selected state (click the map, or choose here)", [ALL] + state_list, key="p3_state",
-            format_func=lambda s: s if s == ALL else f"{rank[s]}. {short_state(s)}  (overall {c.loc[s, calc.OVERALL]:+.0f}%)",
-            help="States are ranked 1 = highest cost-of-living pressure (overall price growth).",
-        )
+        fig_map.update_geos(fitbounds="locations", visible=False, bgcolor="rgba(0,0,0,0)")
+        fig_map.update_layout(height=480, margin=dict(l=0, r=0, t=0, b=0), clickmode="event+select",
+                              font=dict(family=FONT, size=13, color=INK))
+        st.caption("Click a state to see its spending categories below. Darker red = prices rose more.")
+        show_clickable(fig_map, "map3", _on_map_click)
+        if no_shape:
+            st.caption("Not on the map file: " + ", ".join(short_state(s) for s in no_shape)
+                       + ". Choose them from the menu.")
+    st.selectbox(
+        "Selected state (click the map, or choose here)", [ALL] + state_list, key="p3_state",
+        format_func=lambda s: s if s == ALL else f"{rank[s]}. {short_state(s)}  (overall {c.loc[s, calc.OVERALL]:+.0f}%)",
+        help="States are ranked 1 = highest cost-of-living pressure (overall price growth). "
+             "Small areas such as KL, Putrajaya and Labuan are easier to pick here.",
+    )
 
     choice = st.session_state["p3_state"]
     if choice == ALL:
@@ -356,27 +369,26 @@ else:
         vals = c.loc[choice].drop(calc.OVERALL).sort_values(ascending=False)
         overall, label = float(c.loc[choice, calc.OVERALL]), short_state(choice)
 
-    # ---------- right: which spending categories pushed prices up in the selected state
-    with right:
-        st.subheader(f"Spending categories: {label}")
-        fig = go.Figure(
-            go.Bar(
-                y=[calc.SHORT[k] for k in vals.index], x=vals.values, orientation="h",
-                marker_color=["#DC2626" if v >= 0 else "#2563EB" for v in vals.values],
-                text=[f"{v:+.0f}%" for v in vals.values], textposition="outside", cliponaxis=False,
-                hovertemplate="<b>%{y}</b><br>Price growth: %{x:+.1f}%<extra></extra>",
-            )
+    # ---------- bottom: which spending categories pushed prices up in the selected state
+    st.subheader(f"Spending categories: {label}")
+    fig = go.Figure(
+        go.Bar(
+            y=[calc.SHORT[k] for k in vals.index], x=vals.values, orientation="h",
+            marker_color=["#DC2626" if v >= 0 else "#2563EB" for v in vals.values],
+            text=[f"{v:+.0f}%" for v in vals.values], textposition="outside", cliponaxis=False,
+            hovertemplate="<b>%{y}</b><br>Price growth: %{x:+.1f}%<extra></extra>",
         )
-        fig.add_vline(x=overall, line_dash="dash", line_color=INK,
-                      annotation_text=f"Overall {overall:+.0f}%", annotation_position="top right")
-        fig.update_yaxes(autorange="reversed")
-        fig.update_xaxes(title=f"Price growth {y0}–{y1} (%)", range=[min(0, vals.min()) - 6, vals.max() * 1.15 + 4],
-                         zeroline=True, zerolinecolor=MUTED)
-        fig.update_layout(bargap=0.3, showlegend=False)
-        fig = style(fig, 540)
-        fig.update_layout(margin=dict(l=10, r=30, t=50, b=10))
-        show(fig)
-        st.caption("Red = prices rose, blue = prices fell. Bars past the dashed line rose faster than overall prices.")
+    )
+    fig.add_vline(x=overall, line_dash="dash", line_color=INK,
+                  annotation_text=f"Overall {overall:+.0f}%", annotation_position="top right")
+    fig.update_yaxes(autorange="reversed")
+    fig.update_xaxes(title=f"Price growth {y0}–{y1} (%)", range=[min(0, vals.min()) - 6, vals.max() * 1.15 + 4],
+                     zeroline=True, zerolinecolor=MUTED)
+    fig.update_layout(bargap=0.3, showlegend=False)
+    fig = style(fig, 520)
+    fig.update_layout(margin=dict(l=10, r=30, t=50, b=10))
+    show(fig)
+    st.caption("Red = prices rose, blue = prices fell. Bars past the dashed line rose faster than overall prices.")
 
     with st.container(border=True):
         st.markdown("**What the charts show**")
