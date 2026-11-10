@@ -97,15 +97,13 @@ with st.container(border=True):
                                   key="comparison_year")
     with fy_note:
         st.markdown(
-            f'<div style="padding:.5rem 0 .65rem;color:{MUTED};font-size:.86rem;">'
-            f'<b style="color:{INK}">{baseline} → {comparison}</b><br>'
-            f'<span>Only years present in the dataset</span></div>',
+            f'<div style="padding:.55rem 0 .7rem;color:{INK};font-size:.98rem;font-weight:650;">'
+            f'{baseline} → {comparison}</div>',
             unsafe_allow_html=True
         )
 
 if page.startswith("01"):
-    st.markdown('<div class="page-description">Compare household income growth with overall CPI growth across states.</div>', unsafe_allow_html=True)
-
+    
     f1, f2 = st.columns([1, 1])
     with f1:
         income_measure_label = st.selectbox("Household income measure", ["Mean income", "Median income"],
@@ -134,7 +132,6 @@ if page.startswith("01"):
               help="Average income growth adjusted for Overall CPI growth.")
 
     st.subheader(f"{income_measure_label} vs overall price growth")
-    st.caption(f"{baseline} → {comparison} · Growth rate (%)")
     fig = go.Figure()
     fig.add_trace(go.Bar(y=growth.state, x=growth.income_growth, name=income_measure_label,
                          orientation="h", marker_color=TEAL,
@@ -149,13 +146,11 @@ if page.startswith("01"):
     fig.update_xaxes(title="Growth rate (%)", ticksuffix="%", showgrid=True, gridcolor=GRID,
                      zeroline=True, zerolinecolor="#AAB5BF")
     st.plotly_chart(chart_layout(fig, 590), use_container_width=True, config=PLOT_CONFIG)
-    st.caption("Teal = household income growth · Coral = Overall CPI growth")
 
 elif page.startswith("02"):
     year = st.selectbox("Snapshot year", YEARS, index=len(YEARS)-1, key="snapshot_year")
     snap = calc.population_income_snapshot(df, year)
-    st.markdown('<div class="page-description">Explore how population size relates to household income and the overall price level.</div>', unsafe_allow_html=True)
-
+    
     selected_states_2 = st.multiselect("States", STATES, default=STATES, key="obj2_states")
     if selected_states_2:
         snap = snap[snap.state.isin(selected_states_2)]
@@ -165,7 +160,6 @@ elif page.startswith("02"):
 
     snap["state_label"] = snap.state.map(short_state)
     st.subheader(f"Population, household income and price level · {year}")
-    st.caption("Each point represents a state · Colour represents Overall CPI")
     fig = px.scatter(
         snap, x="population", y="income_mean", color="cpi",
         color_continuous_scale=["#BFE7E2", "#55AAA1", "#155E59"],
@@ -185,11 +179,9 @@ elif page.startswith("02"):
     fig.update_xaxes(showgrid=True, gridcolor=GRID, zeroline=False)
     fig.update_yaxes(showgrid=True, gridcolor=GRID, zeroline=False)
     st.plotly_chart(chart_layout(fig, 590), use_container_width=True, config=PLOT_CONFIG)
-    st.caption("X-axis: population · Y-axis: mean monthly household income · Colour: Overall CPI. Hover for state details.")
 
 else:
-    st.markdown('<div class="page-description">Rank spending categories by price growth, or compare states using Overall CPI.</div>', unsafe_allow_html=True)
-
+    
     view = st.radio("View", ["Spending categories", "States"],
                     horizontal=True,
                     help="Choose whether to rank CPI spending categories or states.")
@@ -197,7 +189,6 @@ else:
     if view == "Spending categories":
         rank = calc.category_growth_national(df, baseline, comparison).sort_values("price_growth", ascending=True)
         st.subheader("Which spending categories increased the most?")
-        st.caption(f"Average state-level CPI growth · {baseline} → {comparison}")
         labels = rank.category.tolist()
         values = rank.price_growth.tolist()
         colors = [CORAL if x >= 0 else TEAL for x in values]
@@ -211,12 +202,10 @@ else:
         fig.update_xaxes(showgrid=True, gridcolor=GRID, zeroline=True, zerolinecolor="#AAB5BF",
                          ticksuffix="%")
         st.plotly_chart(chart_layout(fig, 590), use_container_width=True, config=PLOT_CONFIG)
-        st.caption("13 categories · Unweighted average of available state-level CPI growth rates; not weighted contributions to inflation.")
     else:
         rank = calc.category_state_growth(df, baseline, comparison, "Overall")
         rank = rank.sort_values("price_growth", ascending=True)
         st.subheader("Overall price growth by state")
-        st.caption(f"{baseline} → {comparison} · Overall CPI growth (%)")
         colors = [CORAL if x >= 0 else TEAL for x in rank.price_growth]
         fig = go.Figure(go.Bar(
             x=rank.price_growth, y=rank.state, orientation="h", marker_color=colors,
@@ -228,7 +217,4 @@ else:
         fig.update_xaxes(showgrid=True, gridcolor=GRID, zeroline=True, zerolinecolor="#AAB5BF",
                          ticksuffix="%")
         st.plotly_chart(chart_layout(fig, 590), use_container_width=True, config=PLOT_CONFIG)
-        st.caption("16 states · Ranked by percentage change in Overall CPI.")
 
-st.divider()
-st.caption("Source: supplied dataset · Missing state-year/category combinations are not imputed.")
