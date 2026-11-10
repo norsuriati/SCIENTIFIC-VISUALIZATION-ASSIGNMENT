@@ -8,7 +8,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-import calc
+import analysis as calc
 
 # ---------------------------------------------------------------- setup
 st.set_page_config(page_title="Malaysia Cost of Living", page_icon="📊", layout="wide")
