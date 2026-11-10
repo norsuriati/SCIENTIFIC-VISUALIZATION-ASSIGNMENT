@@ -92,6 +92,13 @@ def norm(name) -> str:
     return ALIASES.get(s, s)
 
 
+def _round_coords(obj, nd=3):
+    """Round coordinates (about 100 m) so the map file is lighter to send to the browser."""
+    if isinstance(obj, (list, tuple)):
+        return [_round_coords(x, nd) for x in obj]
+    return round(obj, nd) if isinstance(obj, float) else obj
+
+
 def load_geojson(path: str, state_names):
     """Read a Malaysia states GeoJSON. Finds which property holds the state name, and adds a
     'state_key' property (normalised name) to every feature.
@@ -110,5 +117,7 @@ def load_geojson(path: str, state_names):
         raise ValueError("Could not match the GeoJSON property names to Malaysian state names.")
     for f in feats:
         f["properties"]["state_key"] = norm(f["properties"].get(best) or "")
+        if f.get("geometry"):
+            f["geometry"]["coordinates"] = _round_coords(f["geometry"]["coordinates"])
     drawn = {f["properties"]["state_key"] for f in feats}
     return gj, [s for s in state_names if norm(s) not in drawn]
