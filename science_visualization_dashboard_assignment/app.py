@@ -21,6 +21,10 @@ st.markdown(f"""
 [data-testid="stSidebar"] > div:first-child {{ padding:1.35rem 1.05rem 1rem; }}
 [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h2 {{font-size:1.18rem;letter-spacing:-.03em;}}
 [data-testid="stSidebar"] hr {{ margin:.8rem 0; border-color:{GRID}; }}
+[data-testid="stSidebar"] [data-testid="stRadio"] > label {{ font-size:.78rem; color:{MUTED}; font-weight:650; }}
+[data-testid="stSidebar"] [data-testid="stSelectbox"] label {{ font-size:.82rem; color:{MUTED}; }}
+[data-testid="stSidebar"] [data-testid="stSelectbox"] div[data-baseweb="select"] {{ min-height:2.55rem; }}
+[data-testid="stSidebar"] [data-testid="stCaptionContainer"] p {{ font-size:.72rem; line-height:1.35; }}
 h1,h2,h3 {{ color:{INK}; letter-spacing:-.035em; }}
 h1 {{ font-size:2rem !important; font-weight:730 !important; margin-bottom:.1rem !important; }}
 h2 {{ font-size:1.28rem !important; font-weight:680 !important; }}
@@ -77,6 +81,37 @@ page = st.sidebar.radio(
     label_visibility="visible"
 )
 st.sidebar.divider()
+st.sidebar.markdown("### TIME PERIOD")
+view_mode = st.sidebar.radio(
+    "Period",
+    ["Compare years", "Single year"],
+    key="global_view_mode",
+    label_visibility="collapsed"
+)
+
+if view_mode == "Compare years":
+    baseline = st.sidebar.selectbox(
+        "From year", YEARS, index=0, key="baseline_year"
+    )
+    comparison_options = [y for y in YEARS if y != baseline]
+    default_comparison = YEARS[-1] if YEARS[-1] != baseline else YEARS[-2]
+    comparison = st.sidebar.selectbox(
+        "To year", comparison_options,
+        index=comparison_options.index(default_comparison),
+        key="comparison_year"
+    )
+    selected_year = comparison
+else:
+    selected_year = st.sidebar.selectbox(
+        "Year", YEARS, index=len(YEARS)-1, key="single_year"
+    )
+    baseline = comparison = selected_year
+
+st.sidebar.caption(
+    "Population, income and prices uses the selected year. "
+    "When comparing years, it uses the To year."
+)
+st.sidebar.divider()
 with st.sidebar.expander("About this dashboard"):
     st.write("State-level comparison of household income, population and consumer price indices.")
     st.caption("Data years: " + " · ".join(map(str, YEARS)))
@@ -84,40 +119,8 @@ with st.sidebar.expander("About this dashboard"):
 st.markdown('<div class="page-kicker">MALAYSIA · COST OF LIVING</div>', unsafe_allow_html=True)
 st.title("Cost of Living Dashboard")
 
-# Choose whether to compare a period or inspect one year.
-if page.startswith("02"):
-    selected_year = st.selectbox("Year", YEARS, index=len(YEARS)-1, key="obj2_year")
-    baseline = comparison = selected_year
-    view_mode = "Single year"
-else:
-    view_mode = st.radio(
-        "Time period",
-        ["Compare years", "Single year"],
-        horizontal=True,
-        key="global_view_mode"
-    )
-    with st.container(border=True):
-        if view_mode == "Compare years":
-            st.markdown('<div class="filter-heading">YEAR COMPARISON</div>', unsafe_allow_html=True)
-            fy1, fy2 = st.columns(2)
-            with fy1:
-                baseline = st.selectbox("From year", YEARS, index=0, key="baseline_year")
-            comparison_options = [y for y in YEARS if y != baseline]
-            default_comparison = YEARS[-1] if YEARS[-1] != baseline else YEARS[-2]
-            with fy2:
-                comparison = st.selectbox(
-                    "To year", comparison_options,
-                    index=comparison_options.index(default_comparison),
-                    key="comparison_year"
-                )
-            selected_year = comparison
-        else:
-            selected_year = st.selectbox(
-                "Year", YEARS, index=len(YEARS)-1, key="single_year"
-            )
-            baseline = comparison = selected_year
-
 if page.startswith("01"):
+    st.markdown('<div class="filter-heading">ANALYSIS FILTERS</div>', unsafe_allow_html=True)
     f1, f2 = st.columns([1, 1])
     with f1:
         income_measure_label = st.selectbox("Income measure", ["Mean income", "Median income"])
@@ -234,6 +237,7 @@ elif page.startswith("02"):
     year = selected_year
     snap = calc.population_income_snapshot(df, year)
     
+    st.markdown('<div class="filter-heading">ANALYSIS FILTERS</div>', unsafe_allow_html=True)
     selected_states_2 = st.multiselect(
         "State", STATES, default=[], key="obj2_states",
         help="Leave empty to show all states."
@@ -268,6 +272,7 @@ elif page.startswith("02"):
 
 else:
     # Objective 3: two clear views — national overview or one selected state.
+    st.markdown('<div class="filter-heading">ANALYSIS FILTERS</div>', unsafe_allow_html=True)
     obj3_view = st.radio(
         "Area",
         ["Overall Malaysia", "By State"],
