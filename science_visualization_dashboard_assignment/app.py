@@ -100,11 +100,13 @@ if page.startswith("01"):
     
     f1, f2 = st.columns([1, 1])
     with f1:
-        income_measure_label = st.selectbox("Household income measure", ["Mean income", "Median income"],
+        income_measure_label = st.selectbox("Income measure", ["Mean income", "Median income"],
                                             help="Choose which income statistic to compare against Overall CPI.")
     with f2:
-        selected_states = st.multiselect("States to display", STATES, default=STATES,
-                                         help="Select the states you want to compare.")
+        selected_states = st.multiselect(
+            "State", STATES, default=[],
+            help="Leave empty to show all states."
+        )
     measure_col = "income_mean" if income_measure_label == "Mean income" else "income_median"
     growth = calc.growth_comparison(df, baseline, comparison, measure_col)
     if selected_states:
@@ -120,9 +122,9 @@ if page.startswith("01"):
     k1, k2, k3 = st.columns(3)
     k1.metric("Average income growth", f"{avg_income_growth:+.1f}%",
               help=f"Average {income_measure_label.lower()} growth across the selected states.")
-    k2.metric("Average price growth", f"{avg_price_growth:+.1f}%",
+    k2.metric("Average price increase", f"{avg_price_growth:+.1f}%",
               help="Average Overall CPI growth across the same selected states.")
-    k3.metric("Income growth advantage", f"{avg_gap:+.1f} pp",
+    k3.metric("Income advantage", f"{avg_gap:+.1f} pp",
               help="Average income growth minus average price growth, in percentage points.")
 
     # Identify states using the income-growth minus price-growth gap.
@@ -132,26 +134,26 @@ if page.startswith("01"):
     s1, s2 = st.columns(2)
     with s1:
         st.metric(
-            "Most improved state",
+            "Highest income advantage",
             short_state(most_improved["state"]),
             delta=f"{most_improved['gap']:+.1f} pp income advantage",
             help="State with the largest difference between income growth and Overall CPI growth."
         )
     with s2:
         st.metric(
-            "Least improved state",
+            "Lowest income advantage",
             short_state(least_improved["state"]),
             delta=f"{least_improved['gap']:+.1f} pp income advantage",
             delta_color="normal",
             help="State with the smallest difference between income growth and Overall CPI growth. A positive value still means income growth exceeded price growth."
         )
 
-    st.subheader(f"{income_measure_label} vs overall price growth")
+    st.subheader(f"{income_measure_label} and price growth by state")
     fig = go.Figure()
     fig.add_trace(go.Bar(y=growth.state, x=growth.income_growth, name=income_measure_label,
                          orientation="h", marker_color=TEAL,
                          hovertemplate="<b>%{y}</b><br>" + income_measure_label + " growth: %{x:.1f}%<extra></extra>"))
-    fig.add_trace(go.Bar(y=growth.state, x=growth.price_growth, name="Overall price growth",
+    fig.add_trace(go.Bar(y=growth.state, x=growth.price_growth, name="Price growth",
                          orientation="h", marker_color=CORAL,
                          hovertemplate="<b>%{y}</b><br>Overall price growth: %{x:.1f}%<extra></extra>"))
     fig.update_layout(barmode="group", xaxis_title="Growth rate (%)", yaxis_title="",
@@ -163,10 +165,13 @@ if page.startswith("01"):
     st.plotly_chart(chart_layout(fig, 590), use_container_width=True, config=PLOT_CONFIG)
 
 elif page.startswith("02"):
-    year = st.selectbox("Snapshot year", YEARS, index=len(YEARS)-1, key="snapshot_year")
+    year = st.selectbox("Year", YEARS, index=len(YEARS)-1, key="snapshot_year")
     snap = calc.population_income_snapshot(df, year)
     
-    selected_states_2 = st.multiselect("States", STATES, default=STATES, key="obj2_states")
+    selected_states_2 = st.multiselect(
+        "State", STATES, default=[], key="obj2_states",
+        help="Leave empty to show all states."
+    )
     if selected_states_2:
         snap = snap[snap.state.isin(selected_states_2)]
     if snap.empty:
@@ -174,7 +179,7 @@ elif page.startswith("02"):
         st.stop()
 
     snap["state_label"] = snap.state.map(short_state)
-    st.subheader(f"Population, household income and price level · {year}")
+    st.subheader(f"Population, income and prices · {year}")
     fig = px.scatter(
         snap, x="population", y="income_mean", color="cpi",
         color_continuous_scale=["#BFE7E2", "#55AAA1", "#155E59"],
@@ -197,13 +202,13 @@ elif page.startswith("02"):
 
 else:
     
-    view = st.radio("View", ["Spending categories", "States"],
+    view = st.radio("Rank by", ["Spending category", "State"],
                     horizontal=True,
                     help="Choose whether to rank CPI spending categories or states.")
 
-    if view == "Spending categories":
+    if view == "Spending category":
         rank = calc.category_growth_national(df, baseline, comparison).sort_values("price_growth", ascending=True)
-        st.subheader("Which spending categories increased the most?")
+        st.subheader("Price growth by spending category")
         labels = rank.category.tolist()
         values = rank.price_growth.tolist()
         colors = [CORAL if x >= 0 else TEAL for x in values]
@@ -220,13 +225,13 @@ else:
     else:
         rank = calc.category_state_growth(df, baseline, comparison, "Overall")
         rank = rank.sort_values("price_growth", ascending=True)
-        st.subheader("Overall price growth by state")
+        st.subheader("Price growth by state")
         colors = [CORAL if x >= 0 else TEAL for x in rank.price_growth]
         fig = go.Figure(go.Bar(
             x=rank.price_growth, y=rank.state, orientation="h", marker_color=colors,
             hovertemplate="<b>%{y}</b><br>Overall price growth: %{x:.1f}%<extra></extra>"
         ))
-        fig.update_layout(xaxis_title="Overall CPI growth (%)", yaxis_title="State",
+        fig.update_layout(xaxis_title="Price growth (%)", yaxis_title="State",
                           showlegend=False, bargap=.22, height=590)
         fig.update_yaxes(categoryorder="array", categoryarray=rank.state.tolist(), autorange="reversed")
         fig.update_xaxes(showgrid=True, gridcolor=GRID, zeroline=True, zerolinecolor="#AAB5BF",
