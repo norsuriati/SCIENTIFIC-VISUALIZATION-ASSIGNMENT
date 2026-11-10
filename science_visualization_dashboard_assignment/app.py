@@ -282,9 +282,8 @@ if page.startswith("01"):
             for state in chart_data.state
         ]
 
-        # Paired horizontal bars: income above CPI for each state.
-        # The measures have different units, so use clearly labelled,
-        # independent x-axes rather than implying they share one scale.
+        # Paired horizontal bars: two slim, separate rows for each state.
+        # Income (RM) and CPI (index) retain independent x-scales.
         chart_data = snap_all.copy()
         chart_data["state_label"] = chart_data.state.map(short_state)
         chart_data = chart_data.sort_values("state_label").reset_index(drop=True)
@@ -302,8 +301,8 @@ if page.startswith("01"):
         ]
 
         positions = list(range(len(chart_data)))
-        income_y = [p - 0.18 for p in positions]
-        cpi_y = [p + 0.18 for p in positions]
+        income_y = [p - 0.22 for p in positions]
+        cpi_y = [p + 0.22 for p in positions]
 
         fig = go.Figure()
         fig.add_trace(go.Bar(
@@ -311,6 +310,7 @@ if page.startswith("01"):
             y=income_y,
             xaxis="x",
             orientation="h",
+            width=0.30,
             marker_color=income_colors,
             name=f"{income_measure_label} household income",
             text=[f"RM {v:,.0f}" for v in chart_data[measure_col]],
@@ -325,6 +325,7 @@ if page.startswith("01"):
             y=cpi_y,
             xaxis="x2",
             orientation="h",
+            width=0.30,
             marker_color=cpi_colors,
             name="Overall CPI",
             text=[f"{v:.1f}" for v in chart_data["cpi"]],
@@ -340,32 +341,35 @@ if page.startswith("01"):
             plot_bgcolor=WHITE,
             font=dict(family=FONT, color=INK, size=12),
             height=max(590, 48 * len(chart_data) + 150),
-            margin=dict(l=100, r=75, t=90, b=65),
+            margin=dict(l=100, r=95, t=105, b=95),
             barmode="overlay",
-            bargap=.32,
             showlegend=True,
-            legend=dict(orientation="h", yanchor="bottom", y=1.12,
-                        xanchor="left", x=0),
+            legend=dict(
+                orientation="h", yanchor="top", y=-0.20,
+                xanchor="left", x=0
+            ),
             hoverlabel=dict(bgcolor="#17212B", font_color=WHITE, font_size=12),
             xaxis=dict(
                 title=f"{income_measure_label} household income (RM/month)",
-                range=[0, float(chart_data[measure_col].max()) * 1.18],
+                range=[0, float(chart_data[measure_col].max()) * 1.20],
                 showgrid=True, gridcolor=GRID, zeroline=False,
-                side="bottom"
+                side="bottom",
+                tickprefix="RM "
             ),
             xaxis2=dict(
                 title="Overall CPI index",
                 overlaying="x",
                 side="top",
-                range=[0, float(chart_data["cpi"].max()) * 1.18],
+                range=[0, float(chart_data["cpi"].max()) * 1.20],
                 showgrid=False,
-                zeroline=False
+                zeroline=False,
+                tickformat=".1f"
             ),
             yaxis=dict(
                 tickmode="array",
                 tickvals=positions,
                 ticktext=chart_data.state_label.tolist(),
-                range=[len(chart_data) - .5, -.5],
+                range=[len(chart_data) - 0.5, -0.5],
                 showgrid=False,
                 zeroline=False,
                 title=""
