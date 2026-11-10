@@ -1,18 +1,19 @@
 # Malaysia Cost of Living Dashboard
 
-Streamlit dashboard for JIE42403 Scientific Visualisation.
-
 ## Run
 ```bash
 pip install -r requirements.txt
 streamlit run app.py
 ```
 
-Keep `analysis.py` beside `app.py` and `merged_dataset.csv` inside `data/`.
+Keep `analysis.py` beside `app.py`, and `merged_dataset.csv` inside `data/`.
 
-## Dashboard structure
-1. Income growth vs overall CPI growth by state (grouped horizontal bar chart).
-2. Population vs mean household income, with Overall CPI shown by bubble size and colour (bubble scatter plot).
-3. State ranking by overall or selected spending-category CPI growth (ranked horizontal bar chart).
+## Views
+1. Income growth vs Overall CPI growth by state, with Mean/Median income selection.
+2. Population vs mean monthly household income, with Overall CPI shown by point colour.
+3. Ranked spending-category CPI growth or state Overall CPI growth.
 
-The dashboard contains no map, heatmap, line chart or dumbbell chart. All calculations use the supplied dataset; no synthetic values are generated.
+## Design
+Compact header, top comparison filter, navigation-only sidebar, and a consistent palette:
+teal = income; coral = price growth; navy/grey = text and neutral UI.
+Only years present in the dataset are selectable. No map, heatmap, line or dumbbell chart.

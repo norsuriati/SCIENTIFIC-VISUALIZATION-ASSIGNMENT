@@ -7,33 +7,35 @@ import analysis as calc
 
 st.set_page_config(page_title="Malaysia Cost of Living", page_icon="📊", layout="wide")
 
-# Calm editorial dashboard styling: neutral canvas, restrained teal/coral accents.
-BG, INK, MUTED = "#F6F8FA", "#17212B", "#667482"
-TEAL, CORAL, GOLD, GRID = "#168C83", "#E2765B", "#D7A441", "#E8EDF1"
+# Consistent dashboard design system: deep ink, teal for income, coral for prices.
+BG, INK, MUTED = "#F5F7FA", "#182230", "#667085"
+TEAL, CORAL, GRID, WHITE = "#147D73", "#E4775B", "#E5EAF0", "#FFFFFF"
 FONT = "Inter, Aptos, Segoe UI, sans-serif"
 PLOT_CONFIG = {"displayModeBar": False, "responsive": True}
 
 st.markdown(f"""
 <style>
 .stApp {{ background:{BG}; color:{INK}; }}
-.block-container {{ max-width:1480px; padding-top:2.0rem; padding-bottom:3rem; }}
+.block-container {{ max-width:1460px; padding-top:1.35rem; padding-bottom:2.5rem; }}
 [data-testid="stSidebar"] {{ background:#FFFFFF; border-right:1px solid {GRID}; }}
-[data-testid="stSidebar"] > div:first-child {{ padding-top:1.5rem; }}
+[data-testid="stSidebar"] > div:first-child {{ padding:1.35rem 1.05rem 1rem; }}
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h2 {{font-size:1.18rem;letter-spacing:-.03em;}}
+[data-testid="stSidebar"] hr {{ margin:.8rem 0; border-color:{GRID}; }}
 h1,h2,h3 {{ color:{INK}; letter-spacing:-.035em; }}
-h1 {{ font-size:2.15rem !important; font-weight:720 !important; }}
-h2 {{ font-size:1.32rem !important; font-weight:680 !important; }}
-p, label {{ color:{INK}; }}
-.kicker {{ color:{TEAL}; font-size:.76rem; font-weight:750; letter-spacing:.12em; text-transform:uppercase; }}
-.subhead {{ color:{MUTED}; font-size:1rem; margin-top:-.25rem; }}
-.objective {{ background:#FFFFFF; border:1px solid {GRID}; border-left:4px solid {TEAL};
-  padding:1rem 1.15rem; border-radius:12px; margin:.8rem 0 1rem 0; color:{INK}; }}
-.objective strong {{ color:{TEAL}; }}
-.chart-note {{ color:{MUTED}; font-size:.88rem; margin-top:-.35rem; }}
-[data-testid="stMetric"] {{ background:#FFFFFF; border:1px solid {GRID}; border-radius:13px; padding:13px 16px; }}
-[data-testid="stMetricLabel"] p {{ color:{MUTED}; font-size:.82rem; }}
-[data-testid="stMetricValue"] {{ color:{INK}; font-size:1.55rem; font-weight:700; }}
-div[data-testid="stPlotlyChart"] {{ background:#FFFFFF; border:1px solid {GRID}; border-radius:14px; padding:8px; }}
-.stSelectbox, .stMultiSelect {{ background:#FFFFFF; }}
+h1 {{ font-size:2rem !important; font-weight:730 !important; margin-bottom:.1rem !important; }}
+h2 {{ font-size:1.28rem !important; font-weight:680 !important; }}
+p,label {{ color:{INK}; }}
+.page-kicker {{ color:{TEAL}; font-size:.72rem; font-weight:750; letter-spacing:.11em; text-transform:uppercase; margin-bottom:.35rem; }}
+.page-description {{ color:{MUTED}; font-size:.94rem; margin:.15rem 0 1.05rem 0; }}
+.filter-panel {{ background:#FFFFFF; border:1px solid {GRID}; border-radius:13px; padding:.75rem 1rem .35rem; margin:.9rem 0 1.15rem; }}
+.filter-heading {{ color:{MUTED}; font-size:.7rem; font-weight:750; letter-spacing:.09em; text-transform:uppercase; margin:0 0 .2rem; }}
+[data-testid="stMetric"] {{ background:#FFFFFF; border:1px solid {GRID}; border-radius:12px; padding:12px 15px; min-height:96px; }}
+[data-testid="stMetricLabel"] p {{ color:{MUTED}; font-size:.78rem; line-height:1.25; }}
+[data-testid="stMetricValue"] {{ color:{INK}; font-size:1.42rem; font-weight:720; }}
+div[data-testid="stPlotlyChart"] {{ background:#FFFFFF; border:1px solid {GRID}; border-radius:13px; padding:5px 8px 2px; }}
+[data-testid="stRadio"] > div {{ gap:.55rem; }}
+[data-testid="stRadio"] label {{ font-size:.88rem; }}
+div[data-testid="stCaptionContainer"] p {{ color:{MUTED}; }}
 hr {{ border-color:{GRID}; }}
 </style>
 """, unsafe_allow_html=True)
@@ -65,46 +67,44 @@ def short_state(s):
             "Negeri Sembilan":"Negeri Sembilan"}.get(s, s)
 
 st.sidebar.markdown("## 📊 Cost of Living")
-st.sidebar.caption("MALAYSIA · STATE-LEVEL ANALYSIS")
+st.sidebar.caption("MALAYSIA")
 st.sidebar.divider()
-page = st.sidebar.radio("DASHBOARD", [
-    "01  Income vs Price Growth",
-    "02  Population, Income & Prices",
-    "03  Cost-of-Living Drivers",
-], label_visibility="collapsed")
-st.sidebar.divider()
-st.sidebar.markdown("**Year comparison**")
-st.sidebar.caption("Choose two years available in the dataset.")
-baseline = st.sidebar.selectbox("Baseline year (Year A)", YEARS, index=0, key="baseline_year")
-comparison_options = [y for y in YEARS if y != baseline]
-default_comparison = YEARS.index(YEARS[-1]) if YEARS[-1] != baseline else len(YEARS) - 2
-comparison = st.sidebar.selectbox(
-    "Comparison year (Year B)", comparison_options,
-    index=comparison_options.index(YEARS[default_comparison]),
-    key="comparison_year"
+page = st.sidebar.radio(
+    "PAGES",
+    ["01  Income vs Price Growth",
+     "02  Population, Income & Prices",
+     "03  Cost-of-Living Drivers"],
+    label_visibility="visible"
 )
-st.sidebar.caption(f"Selected comparison: {baseline} → {comparison}")
-with st.sidebar.expander("Available dataset years"):
-    st.write(", ".join(map(str, YEARS)))
-with st.sidebar.expander("Data & methodology"):
-    st.write("Source: supplied OpenDOSM-derived merged dataset.")
-    st.write("Population, mean/median household income and CPI are compared by state and year.")
-    st.write("CPI growth is calculated from the Overall CPI index. Category rankings use category CPI index growth.")
-    st.caption("Available years: " + ", ".join(map(str, YEARS)))
+st.sidebar.divider()
+with st.sidebar.expander("About this dashboard"):
+    st.write("State-level comparison of household income, population and consumer price indices.")
+    st.caption("Data years: " + " · ".join(map(str, YEARS)))
 
-st.markdown('<div class="kicker">Malaysia · Cost of Living Intelligence</div>', unsafe_allow_html=True)
-st.title("Understanding the cost of living")
-st.markdown('<div class="subhead">Three focused views. One analytical question per chart.</div>', unsafe_allow_html=True)
-st.markdown(
-    f'<div class="objective" style="display:flex;justify-content:space-between;align-items:center;gap:12px;'
-    f'padding:.7rem 1rem;margin:.8rem 0 1rem 0;">'
-    f'<span><strong>ACTIVE COMPARISON PERIOD</strong><br>{baseline} <span style="color:{MUTED}">compared with</span> {comparison}</span>'
-    f'<span style="color:{MUTED};font-size:.85rem;">Only years available in the dataset are selectable</span></div>',
-    unsafe_allow_html=True
-)
+st.markdown('<div class="page-kicker">MALAYSIA · COST OF LIVING</div>', unsafe_allow_html=True)
+st.title("Cost of Living Dashboard")
+
+with st.container(border=True):
+    st.markdown('<div class="filter-heading">COMPARISON PERIOD</div>', unsafe_allow_html=True)
+    fy1, fy2, fy_note = st.columns([1, 1, 1.35])
+    with fy1:
+        baseline = st.selectbox("Baseline year", YEARS, index=0, key="baseline_year")
+    comparison_options = [y for y in YEARS if y != baseline]
+    default_comparison = YEARS[-1] if YEARS[-1] != baseline else YEARS[-2]
+    with fy2:
+        comparison = st.selectbox("Compare with", comparison_options,
+                                  index=comparison_options.index(default_comparison),
+                                  key="comparison_year")
+    with fy_note:
+        st.markdown(
+            f'<div style="padding:.5rem 0 .65rem;color:{MUTED};font-size:.86rem;">'
+            f'<b style="color:{INK}">{baseline} → {comparison}</b><br>'
+            f'<span>Only years present in the dataset</span></div>',
+            unsafe_allow_html=True
+        )
 
 if page.startswith("01"):
-    st.markdown('<div class="objective"><strong>OBJECTIVE 01</strong><br>Compare household income growth with overall price growth in each state to see whether income is keeping pace with the cost of living.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="page-description">Compare household income growth with overall CPI growth across states.</div>', unsafe_allow_html=True)
 
     f1, f2 = st.columns([1, 1])
     with f1:
@@ -126,18 +126,15 @@ if page.startswith("01"):
     worse = int((growth.gap < 0).sum())
     avg_real = growth.real_growth.mean()
     k1, k2, k3 = st.columns(3)
-    with k1:
-        st.metric("Income outpaced prices", f"{better} of {len(growth)} states")
-        st.caption("Income growth % is higher than Overall CPI growth %.")
-    with k2:
-        st.metric("Prices outpaced income", f"{worse} of {len(growth)} states")
-        st.caption("Overall CPI growth % is higher than income growth %.")
-    with k3:
-        st.metric("Average real income growth", f"{avg_real:+.1f}%")
-        st.caption("Average income growth after adjusting for CPI growth.")
+    k1.metric("Income grew faster", f"{better} / {len(growth)}",
+              help="Selected states where income growth exceeded Overall CPI growth.")
+    k2.metric("Prices grew faster", f"{worse} / {len(growth)}",
+              help="Selected states where Overall CPI growth exceeded income growth.")
+    k3.metric("Average real income growth", f"{avg_real:+.1f}%",
+              help="Average income growth adjusted for Overall CPI growth.")
 
-    st.subheader(f"{income_measure_label} growth vs overall price growth")
-    st.caption(f"Year A: {baseline}  →  Year B: {comparison} · Percentage change (%)")
+    st.subheader(f"{income_measure_label} vs overall price growth")
+    st.caption(f"{baseline} → {comparison} · Growth rate (%)")
     fig = go.Figure()
     fig.add_trace(go.Bar(y=growth.state, x=growth.income_growth, name=income_measure_label,
                          orientation="h", marker_color=TEAL,
@@ -145,21 +142,21 @@ if page.startswith("01"):
     fig.add_trace(go.Bar(y=growth.state, x=growth.price_growth, name="Overall price growth",
                          orientation="h", marker_color=CORAL,
                          hovertemplate="<b>%{y}</b><br>Overall price growth: %{x:.1f}%<extra></extra>"))
-    fig.update_layout(barmode="group", xaxis_title="Growth rate (%)", yaxis_title="State",
-                      bargap=.22, bargroupgap=.08, legend_title="", height=650)
+    fig.update_layout(barmode="group", xaxis_title="Growth rate (%)", yaxis_title="",
+                      bargap=.22, bargroupgap=.08, legend_title="", height=590)
     fig.update_yaxes(categoryorder="array", categoryarray=growth.state.tolist(), autorange="reversed",
                      tickfont=dict(size=11), title_standoff=14)
     fig.update_xaxes(title="Growth rate (%)", ticksuffix="%", showgrid=True, gridcolor=GRID,
                      zeroline=True, zerolinecolor="#AAB5BF")
-    st.plotly_chart(chart_layout(fig, 650), use_container_width=True, config=PLOT_CONFIG)
-    st.markdown('<div class="chart-note">Teal = selected household income growth. Coral = overall CPI growth. If income growth is higher than price growth, purchasing power improved on average. Switch between Mean and Median to compare the two income measures separately.</div>', unsafe_allow_html=True)
+    st.plotly_chart(chart_layout(fig, 590), use_container_width=True, config=PLOT_CONFIG)
+    st.caption("Teal = household income growth · Coral = Overall CPI growth")
 
 elif page.startswith("02"):
     year = st.selectbox("Snapshot year", YEARS, index=len(YEARS)-1, key="snapshot_year")
     snap = calc.population_income_snapshot(df, year)
-    st.markdown('<div class="objective"><strong>OBJECTIVE 02</strong><br>Examine whether states with larger populations also have higher household incomes and price levels. Each point represents one state.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="page-description">Explore how population size relates to household income and the overall price level.</div>', unsafe_allow_html=True)
 
-    selected_states_2 = st.multiselect("States to display", STATES, default=STATES, key="obj2_states")
+    selected_states_2 = st.multiselect("States", STATES, default=STATES, key="obj2_states")
     if selected_states_2:
         snap = snap[snap.state.isin(selected_states_2)]
     if snap.empty:
@@ -168,8 +165,7 @@ elif page.startswith("02"):
 
     snap["state_label"] = snap.state.map(short_state)
     st.subheader(f"Population, household income and price level · {year}")
-    st.info(f"This page shows a single-year snapshot for **{year}**. Change the Snapshot year filter to view another available year; the comparison period above applies to Objectives 1 and 3.")
-    st.caption("Population is on the horizontal axis, mean monthly household income on the vertical axis, and Overall CPI is shown by point colour. Points are equal-sized for easier reading.")
+    st.caption("Each point represents a state · Colour represents Overall CPI")
     fig = px.scatter(
         snap, x="population", y="income_mean", color="cpi",
         color_continuous_scale=["#BFE7E2", "#55AAA1", "#155E59"],
@@ -188,23 +184,20 @@ elif page.startswith("02"):
     )
     fig.update_xaxes(showgrid=True, gridcolor=GRID, zeroline=False)
     fig.update_yaxes(showgrid=True, gridcolor=GRID, zeroline=False)
-    st.plotly_chart(chart_layout(fig, 650), use_container_width=True, config=PLOT_CONFIG)
-    st.markdown('<div class="chart-note">Look toward the upper-right for states with both larger populations and higher mean incomes. Darker points indicate a higher Overall CPI. Hover over a point to read the state and its values. Association does not imply causation.</div>', unsafe_allow_html=True)
+    st.plotly_chart(chart_layout(fig, 590), use_container_width=True, config=PLOT_CONFIG)
+    st.caption("X-axis: population · Y-axis: mean monthly household income · Colour: Overall CPI. Hover for state details.")
 
 else:
-    st.markdown('<div class="objective"><strong>OBJECTIVE 03</strong><br>Find which spending categories recorded the largest price increases, and identify which states experienced the highest overall price growth.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="page-description">Rank spending categories by price growth, or compare states using Overall CPI.</div>', unsafe_allow_html=True)
 
-    view = st.radio(
-        "Choose what to rank",
-        ["Spending categories", "States by overall price growth"],
-        horizontal=True,
-        help="Spending categories ranks the CPI categories. States ranks each state using Overall CPI only."
-    )
+    view = st.radio("View", ["Spending categories", "States"],
+                    horizontal=True,
+                    help="Choose whether to rank CPI spending categories or states.")
 
     if view == "Spending categories":
         rank = calc.category_growth_national(df, baseline, comparison).sort_values("price_growth", ascending=True)
         st.subheader("Which spending categories increased the most?")
-        st.caption(f"Average state-level CPI growth · Year A: {baseline} → Year B: {comparison}")
+        st.caption(f"Average state-level CPI growth · {baseline} → {comparison}")
         labels = rank.category.tolist()
         values = rank.price_growth.tolist()
         colors = [CORAL if x >= 0 else TEAL for x in values]
@@ -212,30 +205,30 @@ else:
             x=values, y=labels, orientation="h", marker_color=colors,
             hovertemplate="<b>%{y}</b><br>Average price growth: %{x:.1f}%<extra></extra>"
         ))
-        fig.update_layout(xaxis_title="Average price growth (%)", yaxis_title="Spending category",
-                          showlegend=False, bargap=.25, height=650)
+        fig.update_layout(xaxis_title="Average price growth (%)", yaxis_title="",
+                          showlegend=False, bargap=.25, height=590)
         fig.update_yaxes(categoryorder="array", categoryarray=labels, autorange="reversed")
         fig.update_xaxes(showgrid=True, gridcolor=GRID, zeroline=True, zerolinecolor="#AAB5BF",
                          ticksuffix="%")
-        st.plotly_chart(chart_layout(fig, 650), use_container_width=True, config=PLOT_CONFIG)
-        st.caption("This view compares the 13 spending categories. It does not rank states. Values are the unweighted average of available state-level CPI growth rates, not weighted contributions to inflation.")
+        st.plotly_chart(chart_layout(fig, 590), use_container_width=True, config=PLOT_CONFIG)
+        st.caption("13 categories · Unweighted average of available state-level CPI growth rates; not weighted contributions to inflation.")
     else:
         rank = calc.category_state_growth(df, baseline, comparison, "Overall")
         rank = rank.sort_values("price_growth", ascending=True)
-        st.subheader("Which states had the highest overall price growth?")
-        st.caption(f"Overall CPI growth by state · Year A: {baseline} → Year B: {comparison}")
+        st.subheader("Overall price growth by state")
+        st.caption(f"{baseline} → {comparison} · Overall CPI growth (%)")
         colors = [CORAL if x >= 0 else TEAL for x in rank.price_growth]
         fig = go.Figure(go.Bar(
             x=rank.price_growth, y=rank.state, orientation="h", marker_color=colors,
             hovertemplate="<b>%{y}</b><br>Overall price growth: %{x:.1f}%<extra></extra>"
         ))
         fig.update_layout(xaxis_title="Overall CPI growth (%)", yaxis_title="State",
-                          showlegend=False, bargap=.22, height=650)
+                          showlegend=False, bargap=.22, height=590)
         fig.update_yaxes(categoryorder="array", categoryarray=rank.state.tolist(), autorange="reversed")
         fig.update_xaxes(showgrid=True, gridcolor=GRID, zeroline=True, zerolinecolor="#AAB5BF",
                          ticksuffix="%")
-        st.plotly_chart(chart_layout(fig, 650), use_container_width=True, config=PLOT_CONFIG)
-        st.caption("This view ranks states using Overall CPI only. It is a broad measure of overall price growth, not a measure of household income or expenditure.")
+        st.plotly_chart(chart_layout(fig, 590), use_container_width=True, config=PLOT_CONFIG)
+        st.caption("16 states · Ranked by percentage change in Overall CPI.")
 
 st.divider()
-st.caption("Dashboard calculations use the supplied dataset only. Missing state-year/category combinations are not imputed.")
+st.caption("Source: supplied dataset · Missing state-year/category combinations are not imputed.")
