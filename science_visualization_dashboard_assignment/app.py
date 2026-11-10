@@ -130,14 +130,17 @@ if page.startswith("01"):
     measure_col = "income_mean" if income_measure_label == "Mean income" else "income_median"
 
     if view_mode == "Compare years":
-        growth = calc.growth_comparison(df, baseline, comparison, measure_col)
-        if selected_states:
-            growth = growth[growth.state.isin(selected_states)]
+        # Keep every state in the chart. The selected state(s) are highlighted;
+        # all other states remain visible in grey for context.
+        growth_all = calc.growth_comparison(df, baseline, comparison, measure_col)
+        growth_all = growth_all.sort_values("gap", ascending=False)
+
+        # Summary cards and best/worst state insights follow the selected state filter.
+        growth = growth_all[growth_all.state.isin(selected_states)] if selected_states else growth_all.copy()
         if growth.empty:
             st.warning("No data available for this selection.")
             st.stop()
 
-        growth = growth.sort_values("gap", ascending=False)
         avg_income_growth = growth["income_growth"].mean()
         avg_price_growth = growth["price_growth"].mean()
         avg_gap = growth["gap"].mean()
@@ -157,29 +160,39 @@ if page.startswith("01"):
                   delta=f"{least_improved['gap']:+.1f} pp")
 
         st.subheader(f"{income_measure_label} and price growth by state")
+        chart_growth = growth_all.copy()
+        selected_set = set(selected_states)
+        if selected_states:
+            income_colors = [TEAL if state in selected_set else "#D9DEE5"
+                             for state in chart_growth.state]
+            price_colors = [CORAL if state in selected_set else "#D9DEE5"
+                            for state in chart_growth.state]
+        else:
+            income_colors = [TEAL] * len(chart_growth)
+            price_colors = [CORAL] * len(chart_growth)
+
         fig = go.Figure()
         fig.add_trace(go.Bar(
-            y=growth.state, x=growth.income_growth, name="Income growth",
-            orientation="h", marker_color=TEAL,
+            y=chart_growth.state, x=chart_growth.income_growth, name="Income growth",
+            orientation="h", marker_color=income_colors,
             hovertemplate="<b>%{y}</b><br>Income growth: %{x:.1f}%<extra></extra>"
         ))
         fig.add_trace(go.Bar(
-            y=growth.state, x=growth.price_growth, name="Price growth",
-            orientation="h", marker_color=CORAL,
+            y=chart_growth.state, x=chart_growth.price_growth, name="Price growth",
+            orientation="h", marker_color=price_colors,
             hovertemplate="<b>%{y}</b><br>Price growth: %{x:.1f}%<extra></extra>"
         ))
         fig.update_layout(barmode="group", xaxis_title="Growth (%)", yaxis_title="",
                           bargap=.22, bargroupgap=.08, legend_title="", height=590)
-        fig.update_yaxes(categoryorder="array", categoryarray=growth.state.tolist(),
+        fig.update_yaxes(categoryorder="array", categoryarray=chart_growth.state.tolist(),
                          autorange="reversed", tickfont=dict(size=11))
         fig.update_xaxes(ticksuffix="%", showgrid=True, gridcolor=GRID,
                          zeroline=True, zerolinecolor="#AAB5BF")
         st.plotly_chart(chart_layout(fig, 590), use_container_width=True, config=PLOT_CONFIG)
 
     else:
-        snap = calc.population_income_snapshot(df, selected_year)
-        if selected_states:
-            snap = snap[snap.state.isin(selected_states)]
+        snap_all = calc.population_income_snapshot(df, selected_year)
+        snap = snap_all[snap_all.state.isin(selected_states)] if selected_states else snap_all.copy()
         if snap.empty:
             st.warning("No data available for this selection.")
             st.stop()
@@ -190,15 +203,22 @@ if page.startswith("01"):
         k1.metric(f"Average {income_measure_label.lower()}",
                   f"RM {income_avg:,.0f}")
         k2.metric("Average Overall CPI", f"{cpi_avg:.1f}")
-        k3.metric("States shown", f"{len(snap)}")
+        k3.metric("States selected", f"{len(snap)}")
 
         st.subheader(f"{income_measure_label} and Overall CPI by state · {selected_year}")
+        snap_all = snap_all.copy()
+        snap_all["state_label"] = snap_all.state.map(short_state)
+        selected_set = set(selected_states)
+        point_colors = [
+            TEAL if (not selected_states or state in selected_set) else "#D9DEE5"
+            for state in snap_all.state
+        ]
         fig = px.scatter(
-            snap, x="cpi", y=measure_col, hover_name=snap.state.map(short_state),
-            color_discrete_sequence=[TEAL], opacity=.88
+            snap_all, x="cpi", y=measure_col, hover_name="state_label",
+            color_discrete_sequence=[TEAL], opacity=.9
         )
         fig.update_traces(
-            marker=dict(size=13, line=dict(color="#FFFFFF", width=1.2)),
+            marker=dict(size=13, color=point_colors, line=dict(color="#FFFFFF", width=1.2)),
             hovertemplate="<b>%{hovertext}</b><br>Overall CPI: %{x:.1f}<br>"
                           + income_measure_label + ": RM %{y:,.0f}<extra></extra>"
         )
