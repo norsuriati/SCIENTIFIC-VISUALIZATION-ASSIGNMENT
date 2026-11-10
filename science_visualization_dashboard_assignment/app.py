@@ -268,9 +268,15 @@ elif page.startswith("02"):
     st.plotly_chart(chart_layout(fig, 590), use_container_width=True, config=PLOT_CONFIG)
 
 else:
-    view = st.radio("Rank by", ["Spending category", "State"], horizontal=True)
+    # Objective 3: two clear views — national overview or one selected state.
+    obj3_view = st.radio(
+        "View",
+        ["Overall Malaysia", "By State"],
+        horizontal=True,
+        key="obj3_view"
+    )
 
-    if view == "Spending category":
+    if obj3_view == "Overall Malaysia":
         if view_mode == "Compare years":
             rank = calc.category_growth_national(df, baseline, comparison)
             value_col = "price_growth"
@@ -282,53 +288,92 @@ else:
             rank = (selected.groupby("division", as_index=False)["index"]
                     .mean().rename(columns={"division": "category", "index": "cpi_index"}))
             value_col = "cpi_index"
-            chart_title = f"CPI by spending category · {selected_year}"
+            chart_title = f"Price index by spending category · {selected_year}"
             axis_title = "CPI index"
             hover_label = "CPI index"
 
-        rank = rank.sort_values(value_col, ascending=True)
+        rank = rank.sort_values(value_col, ascending=False).reset_index(drop=True)
         labels = rank.category.tolist()
         values = rank[value_col].tolist()
-        fig = go.Figure(go.Bar(
-            x=values, y=labels, orientation="h", marker_color=CORAL,
-            hovertemplate=f"<b>%{{y}}</b><br>{hover_label}: %{{x:.1f}}<extra></extra>"
+
+        # Lollipop chart: thin stems and clear dots make category ranking lighter.
+        fig = go.Figure()
+        for label, value in zip(labels, values):
+            fig.add_trace(go.Scatter(
+                x=[0, value], y=[label, label],
+                mode="lines", line=dict(color="#D8E0E7", width=2),
+                hoverinfo="skip", showlegend=False
+            ))
+        fig.add_trace(go.Scatter(
+            x=values, y=labels, mode="markers",
+            marker=dict(size=13, color=CORAL, line=dict(color=WHITE, width=1.5)),
+            name=hover_label,
+            customdata=labels,
+            hovertemplate="<b>%{customdata}</b><br>" + hover_label + ": %{x:.1f}"
+                           + ("%" if view_mode == "Compare years" else "") + "<extra></extra>"
         ))
-        fig.update_layout(xaxis_title=axis_title, yaxis_title="",
-                          showlegend=False, bargap=.25, height=590)
+        fig.update_layout(
+            xaxis_title=axis_title, yaxis_title="", showlegend=False,
+            height=590
+        )
         fig.update_yaxes(categoryorder="array", categoryarray=labels, autorange="reversed")
-        fig.update_xaxes(showgrid=True, gridcolor=GRID)
-        if view_mode == "Compare years":
-            fig.update_xaxes(ticksuffix="%")
+        fig.update_xaxes(showgrid=True, gridcolor=GRID, zeroline=False,
+                         ticksuffix="%" if view_mode == "Compare years" else "")
         st.subheader(chart_title)
         st.plotly_chart(chart_layout(fig, 590), use_container_width=True, config=PLOT_CONFIG)
 
     else:
+        selected_state = st.selectbox(
+            "State", STATES, index=STATES.index("Kelantan") if "Kelantan" in STATES else 0,
+            key="obj3_selected_state"
+        )
+
         if view_mode == "Compare years":
-            rank = calc.category_state_growth(df, baseline, comparison, "Overall")
+            rows = []
+            for category in CATEGORIES:
+                category_data = calc.category_state_growth(df, baseline, comparison, category)
+                match = category_data[category_data.state.eq(selected_state)]
+                if not match.empty:
+                    rows.append({
+                        "category": category,
+                        "price_growth": float(match.iloc[0]["price_growth"])
+                    })
+            rank = pd.DataFrame(rows)
             value_col = "price_growth"
-            chart_title = "Price growth by state"
+            chart_title = f"Price growth by category · {short_state(selected_state)}"
             axis_title = "Price growth (%)"
             hover_label = "Price growth"
         else:
-            rank = df[(df.year == selected_year) & (df.division == "Overall")][
-                ["state", "index"]
-            ].rename(columns={"index": "cpi_index"})
+            selected = df[
+                (df.year == selected_year) &
+                (df.state == selected_state) &
+                (df.division != "Overall")
+            ][["division", "index"]].copy()
+            rank = selected.rename(columns={"division": "category", "index": "cpi_index"})
             value_col = "cpi_index"
-            chart_title = f"Overall CPI by state · {selected_year}"
-            axis_title = "Overall CPI index"
-            hover_label = "Overall CPI"
+            chart_title = f"Price index by category · {short_state(selected_state)}"
+            axis_title = "CPI index"
+            hover_label = "CPI index"
 
-        rank = rank.sort_values(value_col, ascending=True)
+        if rank.empty:
+            st.warning("No category data is available for this state and period.")
+            st.stop()
+
+        rank = rank.sort_values(value_col, ascending=False).reset_index(drop=True)
+        labels = rank.category.tolist()
+        values = rank[value_col].tolist()
         fig = go.Figure(go.Bar(
-            x=rank[value_col], y=rank.state, orientation="h", marker_color=CORAL,
-            hovertemplate=f"<b>%{{y}}</b><br>{hover_label}: %{{x:.1f}}<extra></extra>"
+            x=values, y=labels, orientation="h",
+            marker=dict(color=TEAL, line=dict(width=0)),
+            hovertemplate="<b>%{y}</b><br>" + hover_label + ": %{x:.1f}"
+                           + ("%" if view_mode == "Compare years" else "") + "<extra></extra>"
         ))
-        fig.update_layout(xaxis_title=axis_title, yaxis_title="",
-                          showlegend=False, bargap=.22, height=590)
-        fig.update_yaxes(categoryorder="array", categoryarray=rank.state.tolist(), autorange="reversed")
-        fig.update_xaxes(showgrid=True, gridcolor=GRID)
-        if view_mode == "Compare years":
-            fig.update_xaxes(ticksuffix="%")
+        fig.update_layout(
+            xaxis_title=axis_title, yaxis_title="", showlegend=False,
+            bargap=.28, height=590
+        )
+        fig.update_yaxes(categoryorder="array", categoryarray=labels, autorange="reversed")
+        fig.update_xaxes(showgrid=True, gridcolor=GRID, zeroline=False,
+                         ticksuffix="%" if view_mode == "Compare years" else "")
         st.subheader(chart_title)
         st.plotly_chart(chart_layout(fig, 590), use_container_width=True, config=PLOT_CONFIG)
-
