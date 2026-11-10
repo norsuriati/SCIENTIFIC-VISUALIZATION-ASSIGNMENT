@@ -91,7 +91,7 @@ if page.startswith("02"):
     view_mode = "Single year"
 else:
     view_mode = st.radio(
-        "View",
+        "Time period",
         ["Compare years", "Single year"],
         horizontal=True,
         key="global_view_mode"
@@ -112,7 +112,6 @@ else:
                 )
             selected_year = comparison
         else:
-            st.markdown('<div class="filter-heading">SELECT YEAR</div>', unsafe_allow_html=True)
             selected_year = st.selectbox(
                 "Year", YEARS, index=len(YEARS)-1, key="single_year"
             )
@@ -270,7 +269,7 @@ elif page.startswith("02"):
 else:
     # Objective 3: two clear views — national overview or one selected state.
     obj3_view = st.radio(
-        "View",
+        "Area",
         ["Overall Malaysia", "By State"],
         horizontal=True,
         key="obj3_view"
@@ -304,9 +303,10 @@ else:
                 mode="lines", line=dict(color="#D8E0E7", width=2),
                 hoverinfo="skip", showlegend=False
             ))
+        marker_colors = [TEAL if value >= 0 else CORAL for value in values]
         fig.add_trace(go.Scatter(
             x=values, y=labels, mode="markers",
-            marker=dict(size=13, color=CORAL, line=dict(color=WHITE, width=1.5)),
+            marker=dict(size=13, color=marker_colors, line=dict(color=WHITE, width=1.5)),
             name=hover_label,
             customdata=labels,
             hovertemplate="<b>%{customdata}</b><br>" + hover_label + ": %{x:.1f}"
@@ -317,7 +317,8 @@ else:
             height=590
         )
         fig.update_yaxes(categoryorder="array", categoryarray=labels, autorange="reversed")
-        fig.update_xaxes(showgrid=True, gridcolor=GRID, zeroline=False,
+        fig.update_xaxes(showgrid=True, gridcolor=GRID, zeroline=True,
+                         zerolinecolor="#8793A1", zerolinewidth=1.4,
                          ticksuffix="%" if view_mode == "Compare years" else "")
         st.subheader(chart_title)
         st.plotly_chart(chart_layout(fig, 590), use_container_width=True, config=PLOT_CONFIG)
@@ -362,9 +363,10 @@ else:
         rank = rank.sort_values(value_col, ascending=False).reset_index(drop=True)
         labels = rank.category.tolist()
         values = rank[value_col].tolist()
+        state_bar_colors = [TEAL if value >= 0 else CORAL for value in values]
         fig = go.Figure(go.Bar(
             x=values, y=labels, orientation="h",
-            marker=dict(color=TEAL, line=dict(width=0)),
+            marker=dict(color=state_bar_colors, line=dict(width=0)),
             hovertemplate="<b>%{y}</b><br>" + hover_label + ": %{x:.1f}"
                            + ("%" if view_mode == "Compare years" else "") + "<extra></extra>"
         ))
@@ -373,7 +375,8 @@ else:
             bargap=.28, height=590
         )
         fig.update_yaxes(categoryorder="array", categoryarray=labels, autorange="reversed")
-        fig.update_xaxes(showgrid=True, gridcolor=GRID, zeroline=False,
+        fig.update_xaxes(showgrid=True, gridcolor=GRID, zeroline=True,
+                         zerolinecolor="#8793A1", zerolinewidth=1.4,
                          ticksuffix="%" if view_mode == "Compare years" else "")
         st.subheader(chart_title)
         st.plotly_chart(chart_layout(fig, 590), use_container_width=True, config=PLOT_CONFIG)
