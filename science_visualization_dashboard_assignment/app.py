@@ -36,14 +36,21 @@ def short_state(s: str) -> str:
 st.markdown(
     """
     <style>
-      .block-container {padding-top: 2rem; max-width: 1250px;}
-      h1 {font-size: 1.9rem !important; margin-bottom: 0.2rem;}
-      .objective {background: #E6F4F1; border-left: 5px solid #0F766E; padding: 0.9rem 1.1rem;
-                  border-radius: 8px; font-size: 1.05rem; color: #0F172A; margin: 0.6rem 0 1.2rem 0;}
+      .block-container {padding-top: 1.6rem; padding-bottom: 2.5rem; max-width: 1440px;}
+      h1 {font-size: 2rem !important; letter-spacing: -0.035em; margin-bottom: .2rem;}
+      h2, h3 {letter-spacing: -0.02em;}
+      .objective {background: linear-gradient(110deg,#ECFDF5,#F8FAFC); border: 1px solid #D1FAE5;
+                  border-left: 4px solid #0F766E; padding: .9rem 1.1rem;
+                  border-radius: 12px; font-size: 1rem; color: #0F172A; margin: .6rem 0 1.2rem 0;}
       .objective b {color: #0F766E;}
-      [data-testid="stMetricLabel"] p {font-size: 0.85rem; color: #64748B;}
-      [data-testid="stMetricValue"] {font-size: 1.6rem;}
-      .small {color: #64748B; font-size: 0.85rem;}
+      [data-testid="stMetric"] {background:#FFFFFF; border:1px solid #E2E8F0; padding:14px 16px;
+                  border-radius:14px; box-shadow:0 2px 8px rgba(15,23,42,.035);}
+      [data-testid="stMetricLabel"] p {font-size: .82rem; color: #64748B;}
+      [data-testid="stMetricValue"] {font-size: 1.55rem; font-weight:650;}
+      [data-testid="stSidebar"] {border-right:1px solid #E2E8F0;}
+      .small {color: #64748B; font-size: .85rem;}
+      div[data-testid="stPlotlyChart"] {border-radius: 14px; overflow:hidden;}
+      div[data-testid="stExpander"] {border-radius: 12px;}
     </style>
     """,
     unsafe_allow_html=True,
@@ -64,346 +71,25 @@ df = get_data()
 YEARS = sorted(df["year"].unique().tolist())
 
 
-@st.cache_data
+@st.cache_data(show_spinner=False)
 def get_geojson(path: str, state_names: tuple):
     return calc.load_geojson(path, list(state_names))
 
 
 def find_geojson():
+    """Find boundary files regardless of capitalization or a slightly different filename."""
     here = Path(__file__).parent
-    names = [here / "data" / "malaysia_states.geojson", here / "malaysia_states.geojson"]
-    names += sorted(here.glob("*.geojson")) + sorted((here / "data").glob("*.geojson"))
-    return next((p for p in names if p.exists()), None)
+    candidates = []
+    for folder in (here / "data", here):
+        if folder.exists():
+            candidates.extend(folder.glob("*.geojson"))
+            candidates.extend(folder.glob("*.json"))
+    # Prefer an explicitly named Malaysia states file, then geoBoundaries ADM1.
+    candidates = list(dict.fromkeys(candidates))
+    candidates.sort(key=lambda p: (
+        0 if "malaysia" in p.name.lower() and "state" in p.name.lower() else
+        1 if "mys" in p.name.lower() and "adm1" in p.name.lower() else 2,
+        p.name.lower()
+    ))
+    return next((p for p in candidates if p.is_file() and p.stat().st_size > 1000), None)
 
-
-def show(fig: go.Figure) -> None:
-    """Draw a Plotly chart full-width (works on old and new Streamlit versions)."""
-    try:
-        st.plotly_chart(fig, width="stretch", config=PLOT_CFG)
-    except Exception:
-        st.plotly_chart(fig, use_container_width=True, config=PLOT_CFG)
-
-
-def show_clickable(fig: go.Figure, key: str, on_click) -> None:
-    """Plotly chart where clicking a region calls on_click (falls back to a plain chart on old Streamlit)."""
-    try:
-        st.plotly_chart(fig, key=key, on_select=on_click, selection_mode="points", width="stretch", config=PLOT_CFG)
-    except Exception:
-        try:
-            st.plotly_chart(fig, key=key, on_select=on_click, selection_mode="points",
-                            use_container_width=True, config=PLOT_CFG)
-        except Exception:
-            show(fig)
-
-
-def style(fig: go.Figure, height: int) -> go.Figure:
-    fig.update_layout(
-        height=height,
-        template="plotly_white",
-        font=dict(family=FONT, size=13, color=INK),
-        margin=dict(l=10, r=10, t=40, b=10),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0),
-        hoverlabel=dict(font_size=13),
-    )
-    return fig
-
-
-def metric_row(items):
-    cols = st.columns(len(items))
-    for col, (label, value, help_text) in zip(cols, items):
-        with col.container(border=True):
-            st.metric(label, value, help=help_text)
-
-
-def period_picker(key: str):
-    y0, y1 = st.select_slider(
-        "Period to compare (survey years)",
-        options=YEARS,
-        value=(YEARS[0], YEARS[-1]),
-        key=key,
-    )
-    if y0 == y1:
-        st.info("Please choose two different years to compare.")
-        st.stop()
-    return y0, y1
-
-
-def strength(r: float) -> str:
-    a = abs(r)
-    return "almost no" if a < 0.2 else "a weak" if a < 0.4 else "a moderate" if a < 0.6 else "a strong"
-
-
-def names(series, n=3):
-    return ", ".join(short_state(s) for s in list(series)[:n])
-
-
-# ---------------------------------------------------------------- sidebar
-st.sidebar.title("📊 Cost of Living")
-st.sidebar.caption("Malaysia · by state · 2012–2024")
-page = st.sidebar.radio(
-    "Choose an objective",
-    ["1 · Income vs Prices", "2 · Population & Prices", "3 · What Drives Prices"],
-    label_visibility="collapsed",
-)
-st.sidebar.divider()
-with st.sidebar.expander("About the data"):
-    st.markdown(
-        """
-        **Source:** OpenDOSM (Department of Statistics Malaysia)
-        - Population by state
-        - Household income by state (mean, median)
-        - Consumer Price Index (CPI) by state and category
-
-        **How it was prepared**
-        - Joined by *state* and *year* (16 states, 7 survey years)
-        - Monthly CPI averaged into yearly values
-        - CPI base: 2010 = 100
-        - Population is in thousands
-        """
-    )
-
-st.title("Can Malaysians keep up with the cost of living?")
-
-# ---------------------------------------------------------------- page 1
-if page.startswith("1"):
-    st.markdown(
-        '<div class="objective"><b>Objective 1.</b> Compare income growth and price growth in each state, '
-        "to see which states became more affordable and which are falling behind.</div>",
-        unsafe_allow_html=True,
-    )
-    y0, y1 = period_picker("p1")
-    g = calc.growth_table(df, y0, y1).sort_values("real_growth", ascending=False)
-    best, worst = g.iloc[0], g.iloc[-1]
-
-    metric_row(
-        [
-            ("Average income growth", f"+{g.income_growth.mean():.0f}%", "Average of all 16 states, mean household income."),
-            ("Average price growth", f"+{g.price_growth.mean():.0f}%", "Average rise in overall CPI."),
-            ("Most affordable gain", short_state(best.state), f"Real income change of {best.real_growth:+.0f}% after prices."),
-            ("Falling behind", short_state(worst.state), f"Real income change of only {worst.real_growth:+.0f}% after prices."),
-        ]
-    )
-
-    states = [short_state(s) for s in g.state]
-    fig = go.Figure()
-    fig.add_bar(y=states, x=g.income_growth, name="Income growth", orientation="h",
-                marker_color=TEAL, text=[f"+{v:.0f}%" for v in g.income_growth], textposition="outside")
-    fig.add_bar(y=states, x=g.price_growth, name="Price growth", orientation="h",
-                marker_color=AMBER, text=[f"+{v:.0f}%" for v in g.price_growth], textposition="outside")
-    fig.update_layout(barmode="group", bargap=0.25)
-    fig.update_yaxes(autorange="reversed")
-    fig.update_xaxes(title=f"Growth from {y0} to {y1} (%)", range=[0, g.income_growth.max() * 1.15])
-    st.subheader(f"Income growth vs price growth, {y0}–{y1}")
-    st.caption("States are ranked by real income growth (income growth after removing price rises). Best at the top.")
-    show(style(fig, 640))
-
-    n_pos = int((g.real_growth > 0).sum())
-    outcome = (
-        "so households became better off in real terms."
-        if n_pos == len(g)
-        else f"so in {len(g) - n_pos} {'state' if len(g) - n_pos == 1 else 'states'} households lost purchasing power."
-    )
-    with st.container(border=True):
-        st.markdown("**What the chart shows**")
-        st.markdown(
-            f"- Between {y0} and {y1}, income changed by **{g.income_growth.mean():+.0f}%** on average while prices changed by "
-            f"**{g.price_growth.mean():+.0f}%**. Income grew faster than prices in **{n_pos} of {len(g)}** states, {outcome}\n"
-            f"- The strongest real income change is in **{names(g.state, 3)}** ({g.real_growth.iloc[:3].min():+.0f}% to "
-            f"{g.real_growth.iloc[0]:+.0f}%).\n"
-            f"- The weakest are **{names(g.state[::-1], 3)}**. **{short_state(worst.state)}** is furthest behind, with real income "
-            f"changing by only {worst.real_growth:+.0f}%."
-        )
-
-# ---------------------------------------------------------------- page 2
-elif page.startswith("2"):
-    st.markdown(
-        '<div class="objective"><b>Objective 2.</b> Examine whether states with more people also have higher '
-        "income and prices, to find where cost-of-living pressure is greatest.</div>",
-        unsafe_allow_html=True,
-    )
-    year = st.select_slider("Year", options=YEARS, value=YEARS[-1], key="p2")
-    t = calc.population_table(df, year)
-    r_inc = t["population"].corr(t["income_mean"], method="spearman")
-    r_cpi = t["population"].corr(t["cpi"], method="spearman")
-    r_ic = t["income_mean"].corr(t["cpi"], method="spearman")
-    top_inc = t.sort_values("income_mean", ascending=False)
-    top_pop = t.sort_values("population", ascending=False)
-
-    metric_row(
-        [
-            ("Most populous state", short_state(top_pop.iloc[0].state), f"{top_pop.iloc[0].population / 1000:.1f} million people."),
-            ("Highest income", short_state(top_inc.iloc[0].state), f"RM {top_inc.iloc[0].income_mean:,.0f} mean monthly household income."),
-            ("Population vs income", f"r = {r_inc:+.2f}", "Rank correlation. 0 = no link, 1 = perfect link."),
-            ("Income vs prices", f"r = {r_ic:+.2f}", "Rank correlation. Higher-income states tend to have higher prices."),
-        ]
-    )
-
-    fig = go.Figure(
-        go.Scatter(
-            x=t.population, y=t.income_mean, mode="markers+text",
-            text=[short_state(s) for s in t.state], textposition="top center", textfont=dict(size=11, color=INK),
-            marker=dict(size=17, color=t.cpi, colorscale="YlOrRd", line=dict(color="white", width=1.5),
-                        colorbar=dict(title="Price level<br>(CPI, 2010=100)", thickness=14)),
-            customdata=t[["cpi"]],
-            hovertemplate="<b>%{text}</b><br>Population: %{x:,.0f}k<br>Income: RM %{y:,.0f}<br>CPI: %{customdata[0]:.1f}<extra></extra>",
-        )
-    )
-    fig.update_xaxes(
-        type="log", title="Population (log scale)",
-        tickvals=[100, 250, 500, 1000, 2500, 5000], ticktext=["0.1M", "0.25M", "0.5M", "1M", "2.5M", "5M"],
-    )
-    fig.update_yaxes(title="Mean monthly household income (RM)", tickformat=",", rangemode="tozero")
-    st.subheader(f"Population, income and prices by state, {year}")
-    st.caption("Each dot is a state. Darker colour = higher prices.")
-    show(style(fig, 600))
-
-    with st.container(border=True):
-        st.markdown("**What the chart shows**")
-        st.markdown(
-            f"- Population size has **{strength(r_inc)} link** with income (r = {r_inc:+.2f}) and "
-            f"**{strength(r_cpi)} link** with prices (r = {r_cpi:+.2f}). "
-            + ("Having more people does not make a state richer or costlier.\n" if max(abs(r_inc), abs(r_cpi)) < 0.4
-               else "States with more people tend to differ in income and prices.\n")
-            + f"- Income and prices {'**move together**' if r_ic > 0.4 else 'are only loosely linked'} (r = {r_ic:+.2f}): the highest-income states "
-            f"(**{names(top_inc.state, 3)}**) have prices of {top_inc.cpi.iloc[:3].min():.0f}–{top_inc.cpi.iloc[:3].max():.0f} on the CPI scale, "
-            f"compared with {t.cpi.median():.0f} for the typical state.\n"
-            f"- Pressure is greatest where prices are high but income is not: look for dark dots that sit low on the chart. "
-            f"Compare the most populous states (**{names(top_pop.state, 3)}**) to see that size alone does not set income."
-        )
-
-# ---------------------------------------------------------------- page 3
-else:
-    st.markdown(
-        '<div class="objective"><b>Objective 3.</b> Identify which spending categories, such as food, housing '
-        "and transport, push prices up the most, to rank states by overall cost-of-living pressure.</div>",
-        unsafe_allow_html=True,
-    )
-    y0, y1 = period_picker("p3")
-    c = calc.category_growth(df, y0, y1)  # rows = states, already ranked by overall pressure
-    avg = c.drop(columns=calc.OVERALL).mean().sort_values(ascending=False)
-    top_cat, low_cat = avg.index[0], avg.index[-1]
-    food = avg.get("Food & Beverages", float("nan"))
-
-    metric_row(
-        [
-            ("Highest pressure state", short_state(c.index[0]), f"Overall prices up {c[calc.OVERALL].iloc[0]:.0f}%."),
-            ("Lowest pressure state", short_state(c.index[-1]), f"Overall prices up {c[calc.OVERALL].iloc[-1]:.0f}%."),
-            ("Fastest-rising category", calc.SHORT[top_cat], f"Up {avg.iloc[0]:.0f}% on average across states."),
-            ("Slowest category", calc.SHORT[low_cat], f"Changed {avg.iloc[-1]:+.0f}% on average across states."),
-        ]
-    )
-
-    ALL = "All states (average)"
-    state_list = list(c.index)
-    key_to_state = {calc.norm(s): s for s in state_list}
-    rank = {s: i for i, s in enumerate(state_list, 1)}
-
-    def _on_map_click():
-        """Clicking a state on the map selects it (the menu and the bar chart follow)."""
-        try:
-            pts = st.session_state["map3"]["selection"]["points"]
-        except Exception:
-            return
-        for p in pts:
-            name = key_to_state.get(p.get("location"))
-            if name is None and p.get("curve_number", 0) == 0 and p.get("point_index") is not None:
-                name = state_list[p["point_index"]]
-            if name:
-                st.session_state["p3_state"] = name
-                return
-
-    if st.session_state.get("p3_state") not in [ALL] + state_list:
-        st.session_state["p3_state"] = ALL
-
-    # ---------- top: map of overall pressure (click a state)
-    st.subheader("Overall price pressure by state")
-    geo_path = find_geojson()
-    gj, no_shape = None, []
-    if geo_path is not None:
-        try:
-            gj, no_shape = get_geojson(str(geo_path), tuple(state_list))
-        except Exception as err:
-            st.warning(f"Map file could not be read: {err}")
-    if gj is None:
-        st.info("Map file not found. Add a Malaysia states GeoJSON file (for example geoBoundaries-MYS-ADM1.geojson) "
-                "to the same folder as app.py. You can still choose a state with the menu below.")
-    else:
-        fig_map = go.Figure(
-            go.Choropleth(
-                geojson=gj, featureidkey="properties.state_key",
-                locations=[calc.norm(s) for s in state_list], z=c[calc.OVERALL].values,
-                text=[short_state(s) for s in state_list], colorscale="YlOrRd",
-                marker_line_color="white", marker_line_width=1,
-                colorbar=dict(title="Price growth<br>(%)", thickness=12, len=0.8),
-                hovertemplate="<b>%{text}</b><br>Overall prices: %{z:+.0f}%<extra></extra>",
-            )
-        )
-        sel = st.session_state["p3_state"]
-        if sel != ALL:  # dark outline around the chosen state
-            fig_map.add_trace(
-                go.Choropleth(
-                    geojson=gj, featureidkey="properties.state_key", locations=[calc.norm(sel)], z=[0],
-                    colorscale=[[0, "rgba(0,0,0,0)"], [1, "rgba(0,0,0,0)"]], showscale=False,
-                    marker_line_color=INK, marker_line_width=3, hoverinfo="skip",
-                )
-            )
-        fig_map.update_geos(fitbounds="locations", visible=False, bgcolor="rgba(0,0,0,0)")
-        fig_map.update_layout(height=480, margin=dict(l=0, r=0, t=0, b=0), clickmode="event+select",
-                              font=dict(family=FONT, size=13, color=INK))
-        st.caption("Click a state to see its spending categories below. Darker red = prices rose more.")
-        show_clickable(fig_map, "map3", _on_map_click)
-        if no_shape:
-            st.caption("Not on the map file: " + ", ".join(short_state(s) for s in no_shape)
-                       + ". Choose them from the menu.")
-    st.selectbox(
-        "Selected state (click the map, or choose here)", [ALL] + state_list, key="p3_state",
-        format_func=lambda s: s if s == ALL else f"{rank[s]}. {short_state(s)}  (overall {c.loc[s, calc.OVERALL]:+.0f}%)",
-        help="States are ranked 1 = highest cost-of-living pressure (overall price growth). "
-             "Small areas such as KL, Putrajaya and Labuan are easier to pick here.",
-    )
-
-    choice = st.session_state["p3_state"]
-    if choice == ALL:
-        vals, overall, label = avg, float(c[calc.OVERALL].mean()), "all states"
-    else:
-        vals = c.loc[choice].drop(calc.OVERALL).sort_values(ascending=False)
-        overall, label = float(c.loc[choice, calc.OVERALL]), short_state(choice)
-
-    # ---------- bottom: which spending categories pushed prices up in the selected state
-    st.subheader(f"Spending categories: {label}")
-    fig = go.Figure(
-        go.Bar(
-            y=[calc.SHORT[k] for k in vals.index], x=vals.values, orientation="h",
-            marker_color=["#DC2626" if v >= 0 else "#2563EB" for v in vals.values],
-            text=[f"{v:+.0f}%" for v in vals.values], textposition="outside", cliponaxis=False,
-            hovertemplate="<b>%{y}</b><br>Price growth: %{x:+.1f}%<extra></extra>",
-        )
-    )
-    fig.add_vline(x=overall, line_dash="dash", line_color=INK,
-                  annotation_text=f"Overall {overall:+.0f}%", annotation_position="top right")
-    fig.update_yaxes(autorange="reversed")
-    fig.update_xaxes(title=f"Price growth {y0}–{y1} (%)", range=[min(0, vals.min()) - 6, vals.max() * 1.15 + 4],
-                     zeroline=True, zerolinecolor=MUTED)
-    fig.update_layout(bargap=0.3, showlegend=False)
-    fig = style(fig, 520)
-    fig.update_layout(margin=dict(l=10, r=30, t=50, b=10))
-    show(fig)
-    st.caption("Red = prices rose, blue = prices fell. Bars past the dashed line rose faster than overall prices.")
-
-    with st.container(border=True):
-        st.markdown("**What the charts show**")
-        st.markdown(
-            f"- Ranking by overall pressure ({y0}–{y1}): highest in **{names(c.index, 3)}**, lowest in **{names(c.index[::-1], 3)}**.\n"
-            f"- Across states, the fastest-rising categories are **{calc.SHORT[avg.index[0]]}** ({avg.iloc[0]:+.0f}%), "
-            f"**{calc.SHORT[avg.index[1]]}** ({avg.iloc[1]:+.0f}%) and **{calc.SHORT[avg.index[2]]}** ({avg.iloc[2]:+.0f}%).\n"
-            + (f"- **Food & Drink**, an everyday essential, changed {food:+.0f}% on average.\n"
-               if "Food & Beverages" not in avg.index[:3] else "")
-            + (f"- **{calc.SHORT[low_cat]}** changed {avg.iloc[-1]:+.0f}%, so not every price is going up.\n"
-               if avg.iloc[-1] < -0.5 else f"- **{calc.SHORT[low_cat]}** changed the least ({avg.iloc[-1]:+.0f}%).\n")
-            + (f"- In **{label}**, **{calc.SHORT[vals.index[0]]}** rose the most ({vals.iloc[0]:+.0f}%) against overall prices of {overall:+.0f}%."
-               if choice != ALL else "- Click a state on the map to see which categories pushed its prices up.")
-        )
-        st.caption("These are price changes per category. The charts do not show how much of a household budget each category takes.")
-
-st.divider()
-st.caption("Source: OpenDOSM — Population, Household Income and Consumer Price Index by state. JIE42403 Scientific Visualisation.")
