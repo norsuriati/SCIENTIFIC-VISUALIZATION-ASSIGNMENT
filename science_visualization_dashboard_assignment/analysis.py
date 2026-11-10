@@ -1,4 +1,7 @@
 """Pure-pandas calculations for the dashboard (no Streamlit here, so they are easy to test)."""
+import json
+import re
+
 import pandas as pd
 
 OVERALL = "Overall"
@@ -67,3 +70,45 @@ def category_growth(df: pd.DataFrame, y0: int, y1: int) -> pd.DataFrame:
     g = g.sort_values(OVERALL, ascending=False)
     cols = [OVERALL] + [c for c in g.columns if c != OVERALL]
     return g[cols]
+
+
+# ------------------------------------------------------------------ map helpers
+ALIASES = {
+    "penang": "pulau pinang",
+    "malacca": "melaka",
+    "trengganu": "terengganu",
+    "johore": "johor",
+    "n sembilan": "negeri sembilan",
+}
+
+
+def norm(name) -> str:
+    """Normalise a state name so 'W.P. Kuala Lumpur', 'Wilayah Persekutuan Kuala Lumpur'
+    and 'Kuala Lumpur' all become 'kuala lumpur'."""
+    s = str(name).lower()
+    s = re.sub(r"federal territory of|wilayah persekutuan|w\.p\.|\bwp\b", " ", s)
+    s = re.sub(r"[^a-z ]", " ", s)
+    s = re.sub(r"\s+", " ", s).strip()
+    return ALIASES.get(s, s)
+
+
+def load_geojson(path: str, state_names):
+    """Read a Malaysia states GeoJSON. Finds which property holds the state name, and adds a
+    'state_key' property (normalised name) to every feature.
+    Returns (geojson, states_without_a_shape)."""
+    with open(path, encoding="utf-8") as fh:
+        gj = json.load(fh)
+    feats = gj["features"]
+    wanted = {norm(s) for s in state_names}
+    keys = {k for f in feats for k, v in (f.get("properties") or {}).items() if isinstance(v, str)}
+    best, best_n = None, 0
+    for k in keys:
+        n = len({norm((f.get("properties") or {}).get(k) or "") for f in feats} & wanted)
+        if n > best_n:
+            best, best_n = k, n
+    if best is None or best_n < 5:
+        raise ValueError("Could not match the GeoJSON property names to Malaysian state names.")
+    for f in feats:
+        f["properties"]["state_key"] = norm(f["properties"].get(best) or "")
+    drawn = {f["properties"]["state_key"] for f in feats}
+    return gj, [s for s in state_names if norm(s) not in drawn]
