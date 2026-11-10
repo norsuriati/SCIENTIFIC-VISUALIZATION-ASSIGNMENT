@@ -49,7 +49,7 @@ st.markdown(
 
 @st.cache_data
 def get_data() -> pd.DataFrame:
-    return calc.load_data(str(Path(__file__).parent / "merged_dataset.csv"))
+    return calc.load_data(str(Path(__file__).parent / "data" / "merged_dataset.csv"))
 
 
 df = get_data()
