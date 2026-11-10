@@ -2,6 +2,7 @@ from pathlib import Path
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import streamlit as st
 import analysis as calc
 
@@ -208,30 +209,73 @@ if page.startswith("01"):
         k3.metric("States selected", f"{len(snap)}")
 
         st.subheader(f"{income_measure_label} and Overall CPI by state · {selected_year}")
-        snap_all = snap_all.copy()
-        snap_all["state_label"] = snap_all.state.map(short_state)
+        chart_data = snap_all.copy()
+        chart_data["state_label"] = chart_data.state.map(short_state)
+        # Keep every state visible. Selected state(s) use the main colour;
+        # the remaining states stay muted for geographic context.
         selected_set = set(selected_states)
-        point_colors = [
+        bar_colors = [
             TEAL if (not selected_states or state in selected_set) else "#D9DEE5"
-            for state in snap_all.state
+            for state in chart_data.state
         ]
-        fig = px.scatter(
-            snap_all, x="cpi", y=measure_col, hover_name="state_label",
-            color_discrete_sequence=[TEAL], opacity=.9
+
+        # Separate panels are used because income (RM) and CPI (index points)
+        # have different units and should not share one misleading axis.
+        fig = make_subplots(
+            rows=1, cols=2,
+            subplot_titles=(
+                f"{income_measure_label} (RM per month)",
+                "Overall CPI index"
+            ),
+            horizontal_spacing=0.16
         )
-        fig.update_traces(
-            marker=dict(size=13, color=point_colors, line=dict(color="#FFFFFF", width=1.2)),
-            hovertemplate="<b>%{hovertext}</b><br>Overall CPI: %{x:.1f}<br>"
-                          + income_measure_label + ": RM %{y:,.0f}<extra></extra>"
+        fig.add_trace(
+            go.Bar(
+                x=chart_data[measure_col],
+                y=chart_data.state_label,
+                orientation="h",
+                marker_color=bar_colors,
+                name=income_measure_label,
+                customdata=chart_data.state,
+                hovertemplate="<b>%{y}</b><br>" + income_measure_label
+                              + ": RM %{x:,.0f}<extra></extra>"
+            ),
+            row=1, col=1
+        )
+        fig.add_trace(
+            go.Bar(
+                x=chart_data["cpi"],
+                y=chart_data.state_label,
+                orientation="h",
+                marker_color=bar_colors,
+                name="Overall CPI",
+                customdata=chart_data.state,
+                hovertemplate="<b>%{y}</b><br>Overall CPI: %{x:.1f}<extra></extra>"
+            ),
+            row=1, col=2
         )
         fig.update_layout(
-            xaxis_title="Overall CPI index",
-            yaxis_title=f"{income_measure_label} (RM per month)",
-            height=590
+            showlegend=False,
+            height=max(590, 34 * len(chart_data) + 150),
+            bargap=.28
         )
-        fig.update_xaxes(showgrid=True, gridcolor=GRID)
-        fig.update_yaxes(showgrid=True, gridcolor=GRID)
-        st.plotly_chart(chart_layout(fig, 590), use_container_width=True, config=PLOT_CONFIG)
+        fig.update_xaxes(title_text="RM per month", showgrid=True, gridcolor=GRID,
+                         tickprefix="RM ", row=1, col=1)
+        fig.update_xaxes(title_text="CPI index", showgrid=True, gridcolor=GRID,
+                         row=1, col=2)
+        fig.update_yaxes(
+            categoryorder="array", categoryarray=chart_data.state_label.tolist(),
+            autorange="reversed", showgrid=False, row=1, col=1
+        )
+        fig.update_yaxes(
+            categoryorder="array", categoryarray=chart_data.state_label.tolist(),
+            autorange="reversed", showgrid=False, row=1, col=2,
+            showticklabels=False
+        )
+        st.plotly_chart(
+            chart_layout(fig, max(590, 34 * len(chart_data) + 150)),
+            use_container_width=True, config=PLOT_CONFIG
+        )
 
 elif page.startswith("02"):
     year = selected_year
