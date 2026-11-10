@@ -282,15 +282,14 @@ if page.startswith("01"):
             for state in chart_data.state
         ]
 
-        # Paired horizontal bars: two slim, separate rows for each state.
-        # Income (RM) and CPI (index) retain independent x-scales.
+        # Paired horizontal bars. Income and CPI use independent scales
+        # because they are measured in different units.
         chart_data = snap_all.copy()
         chart_data["state_label"] = chart_data.state.map(short_state)
         chart_data = chart_data.sort_values("state_label").reset_index(drop=True)
 
         selected_set = set(selected_states)
-        income_blue = "#2864E8"
-        cpi_orange = "#F05A0A"
+        income_blue, cpi_orange = "#2864E8", "#F05A0A"
         income_colors = [
             income_blue if (not selected_states or state in selected_set) else "#D9DEE5"
             for state in chart_data.state
@@ -301,82 +300,70 @@ if page.startswith("01"):
         ]
 
         positions = list(range(len(chart_data)))
-        income_y = [p - 0.22 for p in positions]
-        cpi_y = [p + 0.22 for p in positions]
+        income_y = [p - 0.20 for p in positions]
+        cpi_y = [p + 0.20 for p in positions]
+        chart_height = max(610, 48 * len(chart_data) + 165)
 
         fig = go.Figure()
         fig.add_trace(go.Bar(
-            x=chart_data[measure_col],
-            y=income_y,
-            xaxis="x",
-            orientation="h",
-            width=0.30,
-            marker_color=income_colors,
+            x=chart_data[measure_col], y=income_y, xaxis="x",
+            orientation="h", width=0.30, marker_color=income_colors,
             name=f"{income_measure_label} household income",
             text=[f"RM {v:,.0f}" for v in chart_data[measure_col]],
-            textposition="outside",
-            cliponaxis=False,
+            textposition="outside", cliponaxis=False,
+            customdata=chart_data.state_label,
             hovertemplate="<b>%{customdata}</b><br>" + income_measure_label
-                          + ": RM %{x:,.0f} per month<extra></extra>",
-            customdata=chart_data.state_label
+                          + ": RM %{x:,.0f} per month<extra></extra>"
         ))
         fig.add_trace(go.Bar(
-            x=chart_data["cpi"],
-            y=cpi_y,
-            xaxis="x2",
-            orientation="h",
-            width=0.30,
-            marker_color=cpi_colors,
+            x=chart_data["cpi"], y=cpi_y, xaxis="x2",
+            orientation="h", width=0.30, marker_color=cpi_colors,
             name="Overall CPI",
             text=[f"{v:.1f}" for v in chart_data["cpi"]],
-            textposition="outside",
-            cliponaxis=False,
-            hovertemplate="<b>%{customdata}</b><br>Overall CPI: %{x:.1f}<extra></extra>",
-            customdata=chart_data.state_label
+            textposition="outside", cliponaxis=False,
+            customdata=chart_data.state_label,
+            hovertemplate="<b>%{customdata}</b><br>Overall CPI: %{x:.1f}<extra></extra>"
         ))
 
         fig.update_layout(
             template="plotly_white",
-            paper_bgcolor=WHITE,
-            plot_bgcolor=WHITE,
+            paper_bgcolor=WHITE, plot_bgcolor=WHITE,
             font=dict(family=FONT, color=INK, size=12),
-            height=max(590, 48 * len(chart_data) + 150),
-            margin=dict(l=100, r=95, t=105, b=95),
+            height=chart_height,
+            margin=dict(l=105, r=100, t=155, b=95),
             barmode="overlay",
             showlegend=True,
             legend=dict(
-                orientation="h", yanchor="top", y=-0.20,
-                xanchor="left", x=0
+                orientation="h", yanchor="bottom", y=1.22,
+                xanchor="left", x=0,
+                bgcolor="rgba(255,255,255,0)"
             ),
             hoverlabel=dict(bgcolor="#17212B", font_color=WHITE, font_size=12),
             xaxis=dict(
-                title=f"{income_measure_label} household income (RM/month)",
+                title=dict(text=f"{income_measure_label} household income (RM/month)", standoff=18),
+                domain=[0, 1],
                 range=[0, float(chart_data[measure_col].max()) * 1.20],
                 showgrid=True, gridcolor=GRID, zeroline=False,
-                side="bottom",
-                tickprefix="RM "
+                side="bottom", tickprefix="RM ", automargin=True
             ),
             xaxis2=dict(
-                title="Overall CPI index",
-                overlaying="x",
-                side="top",
+                title=dict(text="Overall CPI index", standoff=8),
+                overlaying="x", anchor="y", side="top", position=1,
                 range=[0, float(chart_data["cpi"].max()) * 1.20],
-                showgrid=False,
-                zeroline=False,
-                tickformat=".1f"
+                showgrid=False, zeroline=False, tickformat=".1f",
+                automargin=True
             ),
             yaxis=dict(
                 tickmode="array",
                 tickvals=positions,
                 ticktext=chart_data.state_label.tolist(),
                 range=[len(chart_data) - 0.5, -0.5],
-                showgrid=False,
-                zeroline=False,
-                title=""
+                showgrid=False, zeroline=False, title="",
+                automargin=True
             )
         )
         st.plotly_chart(
-            chart_layout(fig, max(590, 48 * len(chart_data) + 150)),
+            chart_layout(fig, chart_height),
             use_container_width=True,
             config=PLOT_CONFIG
         )
