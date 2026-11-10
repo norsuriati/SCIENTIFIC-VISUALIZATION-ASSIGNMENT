@@ -104,7 +104,18 @@ def strength(r):
     return "strong" if a >= 0.5 else ("moderate" if a >= 0.25 else "weak")
 
 
+CAT_LABEL = {"Alcoholic Beverages & Tobacco": "Alcohol & Tobacco", "Clothing & Footwear": "Clothing", "Education Services": "Education",
+             "Food & Beverages": "Food", "Furnishings & Household Maintenance": "Furnishings", "Health": "Health",
+             "Housing & Utilities": "Housing", "Information & Communication": "Info & Comms",
+             "Insurance & Financial Services": "Insurance", "Personal Care & Miscellaneous": "Personal Care",
+             "Recreation, Sport & Culture": "Recreation", "Restaurants & Accommodation": "Restaurants", "Transport": "Transport"}
+
+
 def cat_short(c):
+    return CAT_LABEL.get(c, c)
+
+
+def _old_cat_short(c):
     return c.split(" &")[0].split(",")[0]
 
 
@@ -128,17 +139,6 @@ if not sel:
 if y0 == y1:
     st.info("Start and end year are the same. Move the **Year range** slider so the two ends differ.")
     st.stop()
-
-cats, focus = ALLCATS, "None"
-if page.startswith("3"):
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("**Category filters**")
-    cats = st.sidebar.multiselect("Spending categories (13)", ALLCATS, default=ALLCATS, format_func=cat_short)
-    if not cats:
-        st.sidebar.info("No category selected, so all 13 are shown.")
-        cats = ALLCATS
-    focus = st.sidebar.selectbox("Highlight a state", ["None"] + list(sel),
-                                 format_func=lambda x: x if x == "None" else A.short(x))
 
 M = metrics(y0, y1).loc[sel]
 n = len(M)
@@ -233,53 +233,70 @@ else:
            "To identify which spending categories, such as food, housing and transport, push prices up "
            "the most, and rank states by overall cost-of-living pressure.", scope)
 
-    DG = A.division_growth(cpi, y0, y1).loc[sel][cats]          # state x selected categories (% rise)
-    nat = DG.mean().sort_values(ascending=False)                 # category average across states
-    pressure = DG.mean(axis=1)                                   # state overall pressure = average rise across categories
+    DG = A.division_growth(cpi, y0, y1).loc[sel]                 # state x 13 categories (% rise)
+    overall = M.cpi_growth                                        # headline (overall) price rise
+    ess = DG[A.ESSENTIALS].mean(axis=1)                           # food + housing + transport, simple average
+    nat_med = DG.median()                                         # typical (median) state, per category
+    kc = st.container()                                           # KPI row, filled after the state is chosen
+    left, right = st.columns([1, 1.15], gap="large")
+    lc, rc = left.container(border=True), right.container(border=True)
 
-    c = st.columns(4)
-    kpi(c[0], "Fastest-rising category", cat_short(nat.index[0]), f"{nat.iloc[0]:+.0f}% on average")
-    kpi(c[1], "Slowest category", cat_short(nat.index[-1]), f"{nat.iloc[-1]:+.0f}% on average")
-    kpi(c[2], "Highest pressure", A.short(pressure.idxmax()), f"{pressure.max():+.0f}% avg over {len(cats)} categories")
-    kpi(c[3], "Lowest pressure", A.short(pressure.idxmin()), f"{pressure.min():+.0f}% avg over {len(cats)} categories")
+    # ---------------- right card: one state, 13 categories
+    with rc:
+        focus = st.selectbox("State", list(M.index), index=list(M.index).index(overall.idxmax()), format_func=A.short)
+        v = DG.loc[focus].sort_values()                           # ascending, so the biggest rise is drawn on top
+        rank = int(overall.rank(ascending=False)[focus])
+        st.markdown(f'<div class="sec" style="margin-top:.2rem">{A.short(focus)}: price rise by spending category</div>'
+                    f'<div class="note">Overall +{overall[focus]:.1f}% · rank {rank} of {n} · {period}. '
+                    'Black tick = typical (median) state. Orange = prices fell.</div>', unsafe_allow_html=True)
+        lab = [cat_short(c_) for c_ in v.index]
+        f = go.Figure()
+        f.add_trace(go.Bar(y=lab, x=v.values, orientation="h", name=A.short(focus),
+                           marker_color=[BLUE if x >= 0 else ORANGE for x in v.values],
+                           text=[f"{x:+.0f}%" for x in v.values], textposition="outside", cliponaxis=False,
+                           customdata=list(v.index), hovertemplate="<b>%{customdata}</b><br>%{x:+.1f}%<extra></extra>"))
+        f.add_trace(go.Scatter(y=lab, x=nat_med[v.index].values, mode="markers", name="Typical state (median)",
+                               marker=dict(symbol="line-ns", size=20, line=dict(width=2.5, color=INK)),
+                               hovertemplate="Typical state: %{x:+.1f}%<extra></extra>"))
+        style(f, row_h(len(v), 36, 90), bargap=0.35, legend=dict(orientation="h", y=1.04, x=0))
+        f.update_xaxes(title=f"Price rise {period} (%)", ticksuffix="%",
+                       range=[min(0, float(v.min())) * 1.3 - 4, float(v.max()) * 1.18 + 4])
+        show(f)
+        st.caption("Shows how fast prices rose in each category. It is not each category's share of the overall rise.")
 
-    st.markdown(f'<div class="sec">Price rise by spending category, {period}</div>'
-                '<div class="note">Each row is a category, ranked by its average rise (top = fastest). Each dot is a state; '
-                'darker dot = that state has higher overall pressure (average rise across the selected categories). '
-                'Diamond = category average. Use the sidebar to pick categories or highlight a state.</div>',
-                unsafe_allow_html=True)
-    order = list(nat.index[::-1])                                # bottom -> top
-    ypos = {c_: i for i, c_ in enumerate(order)}
-    xs, ys, cols, cd = [], [], [], []
-    for i, s_ in enumerate(DG.index):
-        jit = ((i % 5) - 2) * 0.08                               # small vertical spread so dots do not hide each other
-        for c_ in order:
-            xs.append(float(DG.loc[s_, c_])); ys.append(ypos[c_] + jit)
-            cols.append(float(pressure[s_])); cd.append([A.short(s_), c_, float(pressure[s_])])
-    f = go.Figure()
-    f.add_trace(go.Scatter(
-        x=xs, y=ys, mode="markers", showlegend=False, customdata=cd,
-        marker=dict(size=10, color=cols, colorscale=ORSEQ, cmin=float(pressure.min()), cmax=float(pressure.max()),
-                    showscale=True, opacity=0.9, line=dict(width=0.5, color="white"),
-                    colorbar=dict(title="Overall<br>pressure %", thickness=14, len=0.8)),
-        hovertemplate="<b>%{customdata[0]}</b> · %{customdata[1]}<br>Price rise %{x:+.1f}%"
-                      "<br>State overall %{customdata[2]:+.1f}%<extra></extra>"))
-    f.add_trace(go.Scatter(
-        x=[float(nat[c_]) for c_ in order], y=list(range(len(order))), mode="markers", name="Category average",
-        marker=dict(symbol="diamond", size=14, color=INK, line=dict(width=1.5, color="white")),
-        hovertemplate="Average %{x:+.1f}%<extra></extra>"))
-    if focus != "None" and focus in DG.index:
+    # ---------------- left card: all states, overall vs essentials
+    with lc:
+        st.markdown(f'<div class="sec" style="margin-top:.2rem">Overall price rise vs everyday essentials, {period}</div>'
+                    '<div class="note">One bubble per state, size = population. Above the dashed line = food, housing and transport '
+                    'rose faster than prices overall. The state chosen on the right is highlighted.</div>', unsafe_allow_html=True)
+        lo = float(np.floor((min(overall.min(), ess.min()) - 1) / 5) * 5)
+        hi = float(np.ceil((max(overall.max(), ess.max()) + 1) / 5) * 5)
+        top = set(overall.nlargest(min(3, n)).index) | set(overall.nsmallest(min(3, n)).index) | {focus}
+        cols = ["#1e3a8a" if i == focus else "rgba(37,99,235,0.45)" for i in M.index]
+        f = go.Figure()
+        f.add_trace(go.Scatter(x=[lo, hi], y=[lo, hi], mode="lines", name="Essentials rose as fast as overall prices",
+                               line=dict(color="#94a3b8", dash="dash", width=1.5), hoverinfo="skip"))
         f.add_trace(go.Scatter(
-            x=[float(DG.loc[focus, c_]) for c_ in order], y=list(range(len(order))), mode="markers+text",
-            name=A.short(focus), text=[f"{DG.loc[focus, c_]:+.0f}%" for c_ in order], textposition="middle right",
-            textfont=dict(size=12, color=INK),
-            marker=dict(size=16, color="rgba(0,0,0,0)", line=dict(width=2.5, color=INK)),
-            hovertemplate=A.short(focus) + ": %{x:+.1f}%<extra></extra>"))
-    style(f, int(max(440, 42 * len(order) + 170)), legend=dict(orientation="h", y=1.06, x=0))
-    f.add_vline(x=0, line_dash="dot", line_color=MUTED, line_width=1)
-    f.update_xaxes(title=f"Price rise {period} (%)", ticksuffix="%")
-    f.update_yaxes(tickvals=list(range(len(order))), ticktext=order, range=[-0.7, len(order) - 0.3], automargin=True)
-    show(f)
+            x=overall.values, y=ess.values, mode="markers+text", name="State", showlegend=False,
+            text=[(f"<b>{A.short(i)}</b>" if i == focus else A.short(i)) if i in top else "" for i in M.index],
+            textposition="middle right", textfont=dict(size=12, color=INK),
+            marker=dict(size=M.pop_end.values, sizemode="area", sizeref=2.0 * float(M.pop_end.max()) / (46 ** 2), sizemin=9,
+                        color=cols, line=dict(width=[3 if i == focus else 1.5 for i in M.index],
+                                              color=[INK if i == focus else "white" for i in M.index])),
+            hovertext=[A.short(i) for i in M.index], customdata=np.stack([M.pop_end.values / 1000], axis=-1),
+            hovertemplate="<b>%{hovertext}</b><br>Overall +%{x:.1f}%<br>Essentials +%{y:.1f}%<br>Population %{customdata[0]:.1f} M<extra></extra>"))
+        style(f, 620, legend=dict(orientation="h", y=1.05, x=0))
+        f.update_xaxes(title=f"Overall price rise {period} (%)", ticksuffix="%", range=[lo, hi])
+        f.update_yaxes(title="Essentials price rise (%)", ticksuffix="%", range=[lo, hi], scaleanchor="x", scaleratio=1)
+        show(f)
+        st.caption("Essentials = simple average of Food & Beverages, Housing & Utilities and Transport.")
+
+    with kc:
+        c = st.columns(4)
+        kpi(c[0], "Highest pressure", A.short(overall.idxmax()), f"overall +{overall.max():.0f}%")
+        kpi(c[1], "Lowest pressure", A.short(overall.idxmin()), f"overall +{overall.min():.0f}%")
+        kpi(c[2], "Fastest-rising category", cat_short(nat_med.idxmax()), f"{nat_med.max():+.0f}% for the typical state")
+        kpi(c[3], f"Top category in {A.short(focus)}", cat_short(DG.loc[focus].idxmax()), f"{DG.loc[focus].max():+.0f}%")
 
 
 st.caption("Source: Department of Statistics Malaysia (DOSM) · JIE42403 Scientific Visualisation")
