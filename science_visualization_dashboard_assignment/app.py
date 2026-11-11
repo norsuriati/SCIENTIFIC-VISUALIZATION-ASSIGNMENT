@@ -235,8 +235,7 @@ else:
         f"Available years follow the dataset: {', '.join(map(str, YEARS))}. "
         f"Growth in Objectives 1 and 3 is measured from {baseline}."
     )
-st.markdown('<div class="page-kicker">MALAYSIA · COST OF LIVING</div>', unsafe_allow_html=True)
-st.title("Cost of Living Dashboard")
+st.title("Cost of Living")
 
 # =================================================================== PAGE 1
 if page.startswith("01"):
