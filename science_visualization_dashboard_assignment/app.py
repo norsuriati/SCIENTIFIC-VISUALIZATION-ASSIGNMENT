@@ -45,6 +45,12 @@ p,label {{ color:{INK}; }}
 .kpi-label {{ color:{MUTED}; font-size:.8rem; font-weight:650; line-height:1.25; }}
 .kpi-value {{ color:{INK}; font-size:1.4rem; font-weight:740; line-height:1.2; margin:.2rem 0 .15rem; overflow-wrap:anywhere; }}
 .kpi-sub {{ color:{MUTED}; font-size:.82rem; line-height:1.3; }}
+.kpi-row {{ display:flex; align-items:baseline; gap:.6rem; padding:.28rem 0; border-top:1px solid {GRID}; }}
+.kpi-tag {{ flex:0 0 3.9rem; color:{MUTED}; font-size:.72rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }}
+.kpi-name {{ flex:1; color:{INK}; font-size:1.02rem; font-weight:720; line-height:1.25; }}
+.kpi-name small {{ display:block; color:{MUTED}; font-size:.78rem; font-weight:500; }}
+.kpi-chg {{ flex:0 0 auto; font-size:.9rem; font-weight:700; white-space:nowrap; }}
+.kpi-foot {{ color:{MUTED}; font-size:.72rem; margin-top:.3rem; }}
 .kpi-delta {{ font-size:.86rem; font-weight:680; line-height:1.3; margin-top:.2rem; }}
 .legend-row {{ display:flex; gap:1.3rem; align-items:center; flex-wrap:wrap; font-size:.8rem; color:{MUTED}; margin:.1rem 0 .55rem; }}
 .lg-item {{ display:inline-flex; align-items:center; gap:.4rem; }}
@@ -142,21 +148,24 @@ def objective_banner(num, title, text):
 TONES = {"income": INCOME_BLUE, "price": PRICE_ORANGE, "down": TEAL, "neutral": MUTED}
 
 
-def delta(change, prev, tone):
-    """('▲ +4.2% vs 2022', colour tone). A fall always uses the teal tone."""
-    return f"{'▲' if change >= 0 else '▼'} {change:+.1f}% vs {prev}", ("down" if change < 0 else tone)
+def chg(change, tone="price"):
+    """('▲ +4.2%', tone). A fall always uses the teal tone."""
+    return f"{'▲' if change >= 0 else '▼'} {change:+.1f}%", ("down" if change < 0 else tone)
 
 
-def cards(items, heading):
-    """Summary boxes. Each item is (label, big value, detail line or None, change text, tone)."""
-    st.markdown(f'<div class="filter-heading">{html.escape(heading)}</div>', unsafe_allow_html=True)
-    for col, (label, value, detail, change, tone) in zip(st.columns(len(items)), items):
-        extra = f'<div class="kpi-sub">{html.escape(detail)}</div>' if detail else ""
+def cards(items):
+    """Summary cards. Each item is (title, highest row, lowest row, footnote).
+    A row is (name, detail or None, change text, tone)."""
+    def row(tag, r):
+        name, detail, change, tone = r
+        small = f"<small>{html.escape(detail)}</small>" if detail else ""
+        return (f'<div class="kpi-row"><span class="kpi-tag">{tag}</span>'
+                f'<span class="kpi-name">{html.escape(name)}{small}</span>'
+                f'<span class="kpi-chg" style="color:{TONES[tone]}">{html.escape(change)}</span></div>')
+    for col, (title, hi, lo, foot) in zip(st.columns(len(items)), items):
         col.markdown(
-            f'<div class="kpi" style="min-height:118px">'
-            f'<div class="kpi-label">{html.escape(label)}</div>'
-            f'<div class="kpi-value">{html.escape(str(value))}</div>{extra}'
-            f'<div class="kpi-delta" style="color:{TONES[tone]}">{html.escape(change)}</div></div>',
+            f'<div class="kpi"><div class="kpi-label" style="margin-bottom:.35rem">{html.escape(title)}</div>'
+            f'{row("Highest", hi)}{row("Lowest", lo)}<div class="kpi-foot">{html.escape(foot)}</div></div>',
             unsafe_allow_html=True,
         )
 
@@ -173,6 +182,10 @@ def scale_legend(low, mid, high):
         f'<div class="scale"><div class="scale-bar"></div>'
         f'<div class="scale-labels"><span>{html.escape(low)}</span><span>{html.escape(mid)}</span>'
         f'<span>{html.escape(high)}</span></div></div>', unsafe_allow_html=True)
+
+
+def source_note():
+    st.caption("Source: OpenDOSM")
 
 
 def swatch(color, text):
@@ -196,28 +209,7 @@ st.sidebar.divider()
 baseline = YEARS[0]
 st.sidebar.markdown("### YEAR")
 comparison = st.sidebar.selectbox("Select year", YEARS[1:], index=len(YEARS[1:]) - 1, key="year_select")
-if page.startswith("02"):
-    st.sidebar.caption(f"Shows every state in {comparison}.")
-else:
-    st.sidebar.caption(f"Shows change from {baseline} (first survey year) to {comparison}.")
 prev = max(y for y in YEARS if y < comparison)  # the survey year before the one selected
-st.sidebar.divider()
-with st.sidebar.expander("About the data"):
-    st.markdown(
-        """
-**Source:** OpenDOSM (Department of Statistics Malaysia): Population, Household Income and Consumer Price Index by state.
-
-**How it was prepared**
-- Joined by state and year (16 states, survey years only)
-- Monthly CPI averaged into yearly values (2010 = 100)
-- Population is in thousands persons
-
-**Limits**
-- Income is nominal, not adjusted for inflation
-- Category growth is an unweighted average, not budget-weighted
-        """
-    )
-
 st.markdown('<div class="page-kicker">MALAYSIA · COST OF LIVING</div>', unsafe_allow_html=True)
 st.title("Cost of Living Dashboard")
 
@@ -243,14 +235,14 @@ if page.startswith("01"):
         st.warning("No data available for this selection.")
         st.stop()
 
-    inc_up, inc_low = step.loc[step.income_growth.idxmax()], step.loc[step.income_growth.idxmin()]
-    pr_up = step.loc[step.price_growth.idxmax()]
-    low_label = "Income fell most" if inc_low.income_growth < 0 else "Income rose least"
+    def end_rows(col, tone):
+        hi, lo = step.loc[step[col].idxmax()], step.loc[step[col].idxmin()]
+        return ((short_state(hi.state), None, *chg(hi[col], tone)), (short_state(lo.state), None, *chg(lo[col], tone)))
+
     cards([
-        ("Income rose most" if inc_up.income_growth >= 0 else "Income fell least", short_state(inc_up.state), None, *delta(inc_up.income_growth, prev, "income")),
-        (low_label, short_state(inc_low.state), None, *delta(inc_low.income_growth, prev, "income")),
-        ("Prices rose most" if pr_up.price_growth >= 0 else "Prices fell least", short_state(pr_up.state), None, *delta(pr_up.price_growth, prev, "price")),
-    ], f"LATEST CHANGE · {prev} TO {comparison}")
+        ("Income", *end_rows("income_growth", "income"), f"Change vs {prev}"),
+        ("Prices", *end_rows("price_growth", "price"), f"Change vs {prev}"),
+    ])
 
     chart = growth_all.copy()
     chart["label"] = chart.state.map(short_state)
@@ -285,6 +277,7 @@ if page.startswith("01"):
                      range=[min(0, lo * 1.12), hi * 1.16 if hi > 0 else 1])
     st.subheader(f"Income and price growth by state · {baseline} to {comparison}")
     show(fig)
+    source_note()
 
 # =================================================================== PAGE 2
 elif page.startswith("02"):
@@ -312,14 +305,17 @@ elif page.startswith("02"):
     def change(row, col):
         return (row[col] / before.loc[row.state, col] - 1) * 100 if row.state in before.index else 0.0
 
+    def end_rows(col, tone, detail):
+        ordered = snap.sort_values(col, ascending=False)
+        hi, lo = ordered.iloc[0], ordered.iloc[-1]
+        return ((short_state(hi.state), detail(hi[col]), *chg(change(hi, col), tone)),
+                (short_state(lo.state), detail(lo[col]), *chg(change(lo, col), tone)))
+
     cards([
-        ("Highest income", short_state(top_inc.state), f"RM {top_inc[measure_col]:,.0f} per month",
-         *delta(change(top_inc, measure_col), prev, "income")),
-        ("Largest population", short_state(top_pop.state), f"{top_pop.population / 1000:.1f} million people",
-         *delta(change(top_pop, "population"), prev, "neutral")),
-        ("Highest prices", short_state(top_cpi.state), f"CPI {top_cpi.cpi:.1f} (2010 = 100)",
-         *delta(change(top_cpi, "cpi"), prev, "price")),
-    ], f"{comparison} · CHANGE SINCE {prev}")
+        ("Income", *end_rows(measure_col, "income", lambda v: f"RM {v:,.0f} per month"), f"Change vs {prev}"),
+        ("Population", *end_rows("population", "neutral", lambda v: f"{v / 1000:.2f} million people"), f"Change vs {prev}"),
+        ("Prices", *end_rows("cpi", "price", lambda v: f"CPI {v:.1f} (2010 = 100)"), f"Change vs {prev}"),
+    ])
 
     picked = set(selected_states)
     focus = [(not picked) or s in picked for s in snap.state]
@@ -339,15 +335,16 @@ elif page.startswith("02"):
     pmin, pmax = float(snap.population.min()), float(snap.population.max())
     ticks = [t for t in (100, 250, 500, 1000, 2500, 5000) if pmin * 0.7 <= t <= pmax * 1.4]
     ymin, ymax = float(snap[measure_col].min()), float(snap[measure_col].max())
-    fig.update_xaxes(type="log", title="Population (log scale): more people →", showgrid=True, gridcolor=GRID,
-                     tickvals=ticks, ticktext=[f"{t / 1000:g}M" for t in ticks],
+    fig.update_xaxes(type="log", title="Population (million)", showgrid=True, gridcolor=GRID,
+                     tickvals=ticks, ticktext=[f"{t / 1000:g}" for t in ticks],
                      range=[math.log10(pmin * 0.7), math.log10(pmax * 1.4)])
     fig.update_yaxes(title="Monthly household income (RM)", tickformat=",", showgrid=True,
                      gridcolor=GRID, range=[ymin * 0.8, ymax * 1.1])
     fig.update_layout(showlegend=False)
     st.subheader(f"Population, {income_label.lower()} and prices by state · {comparison}")
-    scale_legend("Smaller rise", "Moderate", "Bigger rise")
+    scale_legend("Small increase", "Medium", "Big increase")
     show(chart_layout(fig, 620))
+    source_note()
 
 # =================================================================== PAGE 3
 else:
@@ -365,16 +362,17 @@ else:
     ALL = "All states (average)"
     key_to_state = {calc.norm(s): s for s in state_list}
 
-    top_state = step[calc.OVERALL].idxmax()
-    low_cat, low_val = step_cat.index[-1], float(step_cat.iloc[-1])
+    st_sorted = step[calc.OVERALL].sort_values(ascending=False)
     cards([
-        ("State with the biggest price rise" if step.loc[top_state, calc.OVERALL] >= 0 else "State where prices fell least", short_state(top_state), None,
-         *delta(float(step.loc[top_state, calc.OVERALL]), prev, "price")),
-        ("Fastest-rising category" if step_cat.iloc[0] >= 0 else "Smallest fall in prices", step_cat.index[0], "Average of all states",
-         *delta(float(step_cat.iloc[0]), prev, "price")),
-        ("Prices fell most in" if low_val < 0 else "Slowest-rising category", low_cat, "Average of all states",
-         *delta(low_val, prev, "price")),
-    ], f"LATEST CHANGE · {prev} TO {comparison}")
+        ("State prices (overall)",
+         (short_state(st_sorted.index[0]), None, *chg(float(st_sorted.iloc[0]))),
+         (short_state(st_sorted.index[-1]), None, *chg(float(st_sorted.iloc[-1]))),
+         f"Change vs {prev}"),
+        ("Spending category prices",
+         (step_cat.index[0], None, *chg(float(step_cat.iloc[0]))),
+         (step_cat.index[-1], None, *chg(float(step_cat.iloc[-1]))),
+         f"Change vs {prev}, average of all states"),
+    ])
 
     def _on_map_click():
         """Clicking a state on the map selects it; the menu and the bar chart follow."""
@@ -395,7 +393,7 @@ else:
 
     # ---------- map of overall price pressure (click a state)
     st.subheader(f"Overall price growth by state · {baseline} to {comparison}")
-    scale_legend("Smaller rise", "Moderate", "Bigger rise")
+    scale_legend("Small increase", "Medium", "Big increase")
     geo_path = find_geojson()
     gj, no_shape = None, []
     if geo_path is not None:
@@ -433,6 +431,7 @@ else:
         fig_map.update_layout(height=460, margin=dict(l=0, r=0, t=0, b=0), clickmode="event+select",
                               paper_bgcolor="#FFFFFF", font=dict(family=FONT, size=12, color=INK))
         show_clickable(fig_map, "map3", _on_map_click)
+        source_note()
         if no_shape:
             st.caption("Not on the map file: " + ", ".join(short_state(s) for s in no_shape)
                        + ". Choose them from the menu below.")
@@ -440,7 +439,7 @@ else:
     st.selectbox(
         "Selected state (click the map, or choose here)", [ALL] + state_list, key="p3_state",
         format_func=lambda s: s if s == ALL else short_state(s),
-        help="Listed from the highest to the lowest overall price rise. "
+        help="Listed from the biggest to the smallest overall price increase. "
              "Small areas such as Kuala Lumpur, Putrajaya and Labuan are easier to pick here.",
     )
 
@@ -467,10 +466,7 @@ else:
     fig = chart_layout(fig, 560)
     fig.update_layout(showlegend=False, bargap=.28, margin=dict(l=28, r=40, t=20, b=50))
     st.subheader(f"Spending categories driving prices · {label}")
-    legend_row(swatch(PRICE_ORANGE, "Prices rose"), swatch(TEAL, "Prices fell"),
-               f'<span class="lg-dash"></span>Overall price rise ({overall:+.0f}%)')
+    legend_row(swatch(PRICE_ORANGE, "Prices increased"), swatch(TEAL, "Prices decreased"),
+               f'<span class="lg-dash"></span>Overall change ({overall:+.0f}%)')
     show(fig)
-
-st.divider()
-st.caption("Source: OpenDOSM — Population, Household Income and Consumer Price Index by state. "
-           "JIE42403 Scientific Visualisation.")
+    source_note()
