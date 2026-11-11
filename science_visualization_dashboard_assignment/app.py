@@ -50,8 +50,7 @@ p,label {{ color:{INK}; }}
 .lg-item {{ display:inline-flex; align-items:center; gap:.4rem; }}
 .lg-sw {{ width:12px; height:12px; border-radius:3px; display:inline-block; }}
 .lg-grad {{ width:96px; height:10px; border-radius:5px; background:linear-gradient(90deg,#FDE6D6,#F8A670,{PRICE_ORANGE},#B23A00); display:inline-block; }}
-.scale {{ width:340px; max-width:100%; margin:.1rem 0 .7rem; }}
-.scale-title {{ font-size:.78rem; font-weight:650; color:{MUTED}; margin-bottom:.3rem; }}
+.scale {{ width:340px; max-width:100%; margin:.1rem auto .7rem; }}
 .scale-bar {{ height:12px; border-radius:6px; background:linear-gradient(90deg,#FDE6D6,#F8A670,{PRICE_ORANGE},#B23A00); }}
 .scale-labels {{ display:flex; justify-content:space-between; font-size:.78rem; color:{MUTED}; margin-top:.3rem; }}
 .lg-dash {{ width:20px; border-top:2px dashed {INK}; display:inline-block; }}
@@ -168,10 +167,10 @@ def legend_row(*items):
                 unsafe_allow_html=True)
 
 
-def scale_legend(title, low, mid, high):
-    """Colour key: a gradient bar with three words underneath."""
+def scale_legend(low, mid, high):
+    """Colour key: a centred gradient bar with three words underneath."""
     st.markdown(
-        f'<div class="scale"><div class="scale-title">{html.escape(title)}</div><div class="scale-bar"></div>'
+        f'<div class="scale"><div class="scale-bar"></div>'
         f'<div class="scale-labels"><span>{html.escape(low)}</span><span>{html.escape(mid)}</span>'
         f'<span>{html.escape(high)}</span></div></div>', unsafe_allow_html=True)
 
@@ -347,7 +346,7 @@ elif page.startswith("02"):
                      gridcolor=GRID, range=[ymin * 0.8, ymax * 1.1])
     fig.update_layout(showlegend=False)
     st.subheader(f"Population, {income_label.lower()} and prices by state · {comparison}")
-    scale_legend("Dot colour = how much prices rose since 2010", "Smaller rise", "Moderate", "Bigger rise")
+    scale_legend("Smaller rise", "Moderate", "Bigger rise")
     show(chart_layout(fig, 620))
 
 # =================================================================== PAGE 3
@@ -396,7 +395,7 @@ else:
 
     # ---------- map of overall price pressure (click a state)
     st.subheader(f"Overall price growth by state · {baseline} to {comparison}")
-    scale_legend(f"Map colour = how much prices rose since {baseline}", "Smaller rise", "Moderate", "Bigger rise")
+    scale_legend("Smaller rise", "Moderate", "Bigger rise")
     geo_path = find_geojson()
     gj, no_shape = None, []
     if geo_path is not None:
