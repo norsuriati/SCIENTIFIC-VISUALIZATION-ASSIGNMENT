@@ -25,7 +25,7 @@ st.markdown(f"""
 .block-container {{ max-width:1460px; padding-top:1.35rem; padding-bottom:2.5rem; }}
 [data-testid="stSidebar"] {{ background:#FFFFFF; border-right:1px solid {GRID}; }}
 [data-testid="stSidebar"] > div:first-child {{ padding:1.35rem 1.05rem 1rem; }}
-[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h2 {{font-size:1.18rem;letter-spacing:-.03em;}}
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h2 {{font-size:1.22rem;letter-spacing:-.035em;font-weight:760;margin-bottom:.15rem;color:{INK};}}
 [data-testid="stSidebar"] hr {{ margin:.8rem 0; border-color:{GRID}; }}
 [data-testid="stSidebar"] [data-testid="stRadio"] > label {{ font-size:.78rem; color:{MUTED}; font-weight:650; }}
 [data-testid="stSidebar"] [data-testid="stSelectbox"] label {{ font-size:.82rem; color:{MUTED}; }}
@@ -235,7 +235,6 @@ else:
         f"Available years follow the dataset: {', '.join(map(str, YEARS))}. "
         f"Growth in Objectives 1 and 3 is measured from {baseline}."
     )
-st.title("Cost of Living")
 
 # =================================================================== PAGE 1
 if page.startswith("01"):
