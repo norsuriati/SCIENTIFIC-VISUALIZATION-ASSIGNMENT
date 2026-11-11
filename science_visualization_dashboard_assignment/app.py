@@ -317,7 +317,9 @@ elif page.startswith("02"):
     picked = set(selected_states)
     focus = [(not picked) or s in picked for s in snap.state]
     order = {s: i for i, s in enumerate(snap.sort_values("population").state)}  # alternate label sides to limit overlap
-    positions = ["top center" if order[s] % 2 == 0 else "bottom center" for s in snap.state]
+    pressured = set(q.state)
+    positions = ["middle right" if s in pressured else ("top center" if order[s] % 2 == 0 else "bottom center")
+                 for s in snap.state]
     fig = go.Figure()
     fig.add_trace(go.Scatter(  # red ring around the pressure states
         x=q.population, y=q[measure_col], mode="markers", hoverinfo="skip", showlegend=False,
@@ -344,8 +346,8 @@ elif page.startswith("02"):
     fig.update_layout(showlegend=False)
     st.subheader(f"Population, {income_label.lower()} and prices by state · {comparison}")
     legend_row(
-        '<span class="lg-grad"></span>Dot colour: lighter = smaller price rise, darker = bigger price rise since 2010',
-        '<span class="lg-ring"></span>High prices, income below median',
+        'Price rise since 2010: small <span class="lg-grad"></span> big',
+        '<span class="lg-ring"></span>Under pressure: high prices, low income',
     )
     show(chart_layout(fig, 620))
 
