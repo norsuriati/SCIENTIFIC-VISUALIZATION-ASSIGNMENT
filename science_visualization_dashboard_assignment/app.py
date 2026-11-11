@@ -504,22 +504,12 @@ else:
             st.caption("Not on the map file: " + ", ".join(short_state(s) for s in no_shape)
                        + ". Choose them from the menu below.")
 
-    sel_col, rank_col = st.columns([1.4, 1])
-    with sel_col:
-        st.selectbox(
-            "Selected state (click the map, or choose here)", [ALL] + state_list, key="p3_state",
-            format_func=lambda s: s if s == ALL else f"{rank[s]}. {short_state(s)}  (overall {tbl.loc[s, calc.OVERALL]:+.0f}%)",
-            help="States are ranked 1 = highest cost-of-living pressure (largest overall price growth). "
-                 "Small areas such as Kuala Lumpur, Putrajaya and Labuan are easier to pick here.",
-        )
-    with rank_col:
-        with st.expander("State ranking by overall price growth"):
-            st.dataframe(
-                pd.DataFrame({"Rank": range(1, len(state_list) + 1),
-                              "State": [short_state(s) for s in state_list],
-                              "Overall price growth": [f"{v:+.1f}%" for v in tbl[calc.OVERALL]]}),
-                hide_index=True,
-            )
+    st.selectbox(
+        "Selected state (click the map, or choose here)", [ALL] + state_list, key="p3_state",
+        format_func=lambda s: s if s == ALL else short_state(s),
+        help="Listed from the highest to the lowest overall price rise. "
+             "Small areas such as Kuala Lumpur, Putrajaya and Labuan are easier to pick here.",
+    )
 
     choice = st.session_state["p3_state"]
     if choice == ALL:
@@ -536,7 +526,7 @@ else:
         hovertemplate="<b>%{y}</b><br>Price growth: %{x:+.1f}%<extra></extra>",
     ))
     fig.add_vline(x=overall, line_dash="dash", line_color=INK,
-                  annotation_text=f"Overall {overall:+.0f}%", annotation_position="top right")
+                  annotation_text=f"Overall {overall:+.0f}%", annotation_position="top right", annotation_yshift=16)
     fig.update_yaxes(categoryorder="array", categoryarray=vals.index.tolist(), autorange="reversed",
                      automargin=True)
     fig.update_xaxes(title=f"Price growth {baseline} to {comparison} (%)", ticksuffix="%", showgrid=True,
