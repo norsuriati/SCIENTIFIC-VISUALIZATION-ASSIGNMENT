@@ -42,6 +42,10 @@ p,label {{ color:{INK}; }}
 .objective-text {{ color:{INK}; font-size:1.02rem; margin-top:.15rem; }}
 .filter-heading {{ color:{MUTED}; font-size:.7rem; font-weight:750; letter-spacing:.09em; text-transform:uppercase; margin:0 0 .2rem; }}
 .kpi {{ background:#FFFFFF; border:1px solid {GRID}; border-radius:12px; padding:13px 16px; box-sizing:border-box; }}
+.kpi.equal-height {{ height:258px; display:flex; flex-direction:column; }}
+.kpi.equal-height .kpi-row {{ flex:1 1 0; align-items:flex-start; }}
+.kpi.equal-height .kpi-name {{ min-width:0; overflow-wrap:anywhere; }}
+
 .kpi-header {{ display:flex; align-items:center; justify-content:space-between; gap:.5rem; margin-bottom:.35rem; }}
 .kpi-label {{ color:{MUTED}; font-size:.8rem; font-weight:650; line-height:1.25; }}
 .kpi-period {{ display:inline-flex; align-items:center; gap:.25rem; flex:0 0 auto; padding:.2rem .5rem; border-radius:999px; background:#F2F4F7; color:{MUTED}; font-size:.66rem; font-weight:750; letter-spacing:.035em; white-space:nowrap; }}
@@ -155,7 +159,7 @@ def chg(change, tone="price"):
     return f"{'▲' if change >= 0 else '▼'} {change:+.1f}%", ("down" if change < 0 else tone)
 
 
-def cards(items):
+def cards(items, equal_height=False):
     """Summary cards. The comparison period is shown as a compact header badge.
     A row is (name, detail or None, change text, tone)."""
     def row(tag, r):
@@ -168,7 +172,7 @@ def cards(items):
         period_text = str(foot).replace("Change ", "").replace("change ", "").split(",")[0]
         period = html.escape(period_text)
         col.markdown(
-            f'<div class="kpi"><div class="kpi-header">'
+            f'<div class="kpi{" equal-height" if equal_height else ""}"><div class="kpi-header">'
             f'<span class="kpi-label">{html.escape(title)}</span>'
             f'<span class="kpi-period">{period.upper()}</span></div>'
             f'{row("Highest", hi)}{row("Lowest", lo)}</div>',
@@ -320,8 +324,8 @@ elif page.startswith("02"):
     cards([
         ("Income", *end_rows(measure_col, "income", lambda v: f"RM {v:,.0f} per month"), f"Change vs {prev}"),
         ("Population", *end_rows("population", "neutral", lambda v: f"{v / 1000:.2f} million people"), f"Change vs {prev}"),
-        ("Prices", *end_rows("cpi", "price", lambda v: f"CPI {v:.1f} (2010 = 100)"), f"Change vs {prev}"),
-    ])
+        ("Prices", *end_rows("cpi", "price", lambda v: f"CPI Index {v:.1f}"), f"Change vs {prev}"),
+    ], equal_height=True)
 
     picked = set(selected_states)
     focus = [(not picked) or s in picked for s in snap.state]
