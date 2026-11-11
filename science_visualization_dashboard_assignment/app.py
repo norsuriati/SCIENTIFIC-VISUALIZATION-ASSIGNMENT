@@ -50,7 +50,10 @@ p,label {{ color:{INK}; }}
 .lg-item {{ display:inline-flex; align-items:center; gap:.4rem; }}
 .lg-sw {{ width:12px; height:12px; border-radius:3px; display:inline-block; }}
 .lg-grad {{ width:96px; height:10px; border-radius:5px; background:linear-gradient(90deg,#FDE6D6,#F8A670,{PRICE_ORANGE},#B23A00); display:inline-block; }}
-.lg-ring {{ width:14px; height:14px; border-radius:50%; border:2px solid #B42318; display:inline-block; box-sizing:border-box; }}
+.scale {{ width:340px; max-width:100%; margin:.1rem 0 .7rem; }}
+.scale-title {{ font-size:.78rem; font-weight:650; color:{MUTED}; margin-bottom:.3rem; }}
+.scale-bar {{ height:12px; border-radius:6px; background:linear-gradient(90deg,#FDE6D6,#F8A670,{PRICE_ORANGE},#B23A00); }}
+.scale-labels {{ display:flex; justify-content:space-between; font-size:.78rem; color:{MUTED}; margin-top:.3rem; }}
 .lg-dash {{ width:20px; border-top:2px dashed {INK}; display:inline-block; }}
 [data-testid="stMetric"] {{ background:#FFFFFF; border:1px solid {GRID}; border-radius:12px; padding:12px 15px; min-height:96px; }}
 [data-testid="stMetricLabel"] p {{ color:{MUTED}; font-size:.78rem; line-height:1.25; }}
@@ -163,6 +166,14 @@ def legend_row(*items):
     """A small key above a chart. Items are ready-made HTML snippets."""
     st.markdown('<div class="legend-row">' + "".join(f'<span class="lg-item">{i}</span>' for i in items) + "</div>",
                 unsafe_allow_html=True)
+
+
+def scale_legend(title, low, mid, high):
+    """Colour key: a gradient bar with three words underneath."""
+    st.markdown(
+        f'<div class="scale"><div class="scale-title">{html.escape(title)}</div><div class="scale-bar"></div>'
+        f'<div class="scale-labels"><span>{html.escape(low)}</span><span>{html.escape(mid)}</span>'
+        f'<span>{html.escape(high)}</span></div></div>', unsafe_allow_html=True)
 
 
 def swatch(color, text):
@@ -311,20 +322,11 @@ elif page.startswith("02"):
          *delta(change(top_cpi, "cpi"), prev, "price")),
     ], f"{comparison} · CHANGE SINCE {prev}")
 
-    # pressure = prices above the median AND income below the median
-    q = snap[(snap.cpi >= snap.cpi.median()) & (snap[measure_col] < snap[measure_col].median())]
-
     picked = set(selected_states)
     focus = [(not picked) or s in picked for s in snap.state]
     order = {s: i for i, s in enumerate(snap.sort_values("population").state)}  # alternate label sides to limit overlap
-    pressured = set(q.state)
-    positions = ["middle right" if s in pressured else ("top center" if order[s] % 2 == 0 else "bottom center")
-                 for s in snap.state]
+    positions = ["top center" if order[s] % 2 == 0 else "bottom center" for s in snap.state]
     fig = go.Figure()
-    fig.add_trace(go.Scatter(  # red ring around the pressure states
-        x=q.population, y=q[measure_col], mode="markers", hoverinfo="skip", showlegend=False,
-        marker=dict(size=29, color="rgba(0,0,0,0)", line=dict(color="#B42318", width=2.2)),
-    ))
     fig.add_trace(go.Scatter(
         x=snap.population, y=snap[measure_col], mode="markers+text", text=snap.label,
         textposition=positions, textfont=dict(size=10, color=INK),
@@ -345,10 +347,7 @@ elif page.startswith("02"):
                      gridcolor=GRID, range=[ymin * 0.8, ymax * 1.1])
     fig.update_layout(showlegend=False)
     st.subheader(f"Population, {income_label.lower()} and prices by state · {comparison}")
-    legend_row(
-        'Price rise since 2010: small <span class="lg-grad"></span> big',
-        '<span class="lg-ring"></span>Under pressure: high prices, low income',
-    )
+    scale_legend("Dot colour = how much prices rose since 2010", "Smaller rise", "Moderate", "Bigger rise")
     show(chart_layout(fig, 620))
 
 # =================================================================== PAGE 3
@@ -397,6 +396,7 @@ else:
 
     # ---------- map of overall price pressure (click a state)
     st.subheader(f"Overall price growth by state · {baseline} to {comparison}")
+    scale_legend(f"Map colour = how much prices rose since {baseline}", "Smaller rise", "Moderate", "Bigger rise")
     geo_path = find_geojson()
     gj, no_shape = None, []
     if geo_path is not None:
@@ -413,10 +413,10 @@ else:
         common = dict(geojson=gj, featureidkey="properties.state_key")
         fig_map = go.Figure(Choro(
             locations=[calc.norm(s) for s in state_list], z=tbl[calc.OVERALL].values,
-            text=[short_state(s) for s in state_list], colorscale="Oranges",
+            text=[short_state(s) for s in state_list],
+            colorscale=["#FDE6D6", "#F8A670", PRICE_ORANGE, "#B23A00"], showscale=False,
             marker_line_color="white", marker_line_width=1,
             selected=dict(marker=dict(opacity=1)), unselected=dict(marker=dict(opacity=1)),
-            colorbar=dict(title=f"Price rise<br>since {baseline} (%)", thickness=12, len=0.8),
             hovertemplate="<b>%{text}</b><br>Overall prices: %{z:+.0f}%<extra></extra>", **common,
         ))
         chosen = st.session_state["p3_state"]
