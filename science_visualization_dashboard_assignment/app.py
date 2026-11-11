@@ -215,11 +215,26 @@ page = st.sidebar.radio(
     ["01  Income vs Price Growth", "02  Population, Income & Prices", "03  Cost-of-Living Drivers"],
 )
 st.sidebar.divider()
-# One year choice for the whole dashboard. Growth (pages 01 and 03) is always measured from the first survey year.
+# One shared year filter for all objectives, populated directly from the dataset.
 baseline = YEARS[0]
 st.sidebar.markdown("### YEAR")
-comparison = st.sidebar.selectbox("Select year", YEARS[1:], index=len(YEARS[1:]) - 1, key="year_select")
-prev = max(y for y in YEARS if y < comparison)  # the survey year before the one selected
+comparison = st.sidebar.selectbox(
+    "Select year",
+    YEARS,
+    index=len(YEARS) - 1,
+    key="year_select",
+)
+prev = max((y for y in YEARS if y < comparison), default=None)
+if comparison == baseline:
+    st.sidebar.caption(
+        f"{baseline} is the baseline year. Objective 1 and 3 growth comparisons "
+        "start from the next available survey year."
+    )
+else:
+    st.sidebar.caption(
+        f"Available years follow the dataset: {', '.join(map(str, YEARS))}. "
+        f"Growth in Objectives 1 and 3 is measured from {baseline}."
+    )
 st.markdown('<div class="page-kicker">MALAYSIA · COST OF LIVING</div>', unsafe_allow_html=True)
 st.title("Cost of Living Dashboard")
 
@@ -236,6 +251,13 @@ if page.startswith("01"):
                                          help="Highlight one or more states. Leave empty to show all. "
                                               "The summary boxes follow your selection.")
     measure_col = "income_mean" if income_label == "Mean income" else "income_median"
+
+    if comparison == baseline:
+        st.info(
+            f"{baseline} is the baseline year. Select a later year to view income "
+            "and price growth compared with the baseline."
+        )
+        st.stop()
 
     growth_all = calc.growth_comparison(df, baseline, comparison, measure_col).sort_values("gap", ascending=False)
     step = calc.growth_comparison(df, prev, comparison, measure_col)  # latest step: previous survey year to selected year
@@ -303,7 +325,8 @@ elif page.startswith("02"):
     measure_col = "income_mean" if income_label == "Mean income" else "income_median"
 
     snap = calc.population_income_snapshot(df, comparison)
-    before = calc.population_income_snapshot(df, prev).set_index("state")
+    before = (calc.population_income_snapshot(df, prev).set_index("state")
+              if prev is not None else pd.DataFrame())
     if snap.empty:
         st.warning("No data available for this year.")
         st.stop()
@@ -313,18 +336,28 @@ elif page.startswith("02"):
     top_cpi = snap.sort_values("cpi", ascending=False).iloc[0]
 
     def change(row, col):
-        return (row[col] / before.loc[row.state, col] - 1) * 100 if row.state in before.index else 0.0
+        if prev is None or row.state not in before.index:
+            return None
+        return (row[col] / before.loc[row.state, col] - 1) * 100
 
     def end_rows(col, tone, detail):
         ordered = snap.sort_values(col, ascending=False)
         hi, lo = ordered.iloc[0], ordered.iloc[-1]
-        return ((short_state(hi.state), detail(hi[col]), *chg(change(hi, col), tone)),
-                (short_state(lo.state), detail(lo[col]), *chg(change(lo, col), tone)))
 
+        def change_display(row):
+            value = change(row, col)
+            return ("—", "neutral") if value is None else chg(value, tone)
+
+        hi_change, hi_tone = change_display(hi)
+        lo_change, lo_tone = change_display(lo)
+        return ((short_state(hi.state), detail(hi[col]), hi_change, hi_tone),
+                (short_state(lo.state), detail(lo[col]), lo_change, lo_tone))
+
+    period_label = "Baseline year" if prev is None else f"Change vs {prev}"
     cards([
-        ("Income", *end_rows(measure_col, "income", lambda v: f"RM {v:,.0f} per month"), f"Change vs {prev}"),
-        ("Population", *end_rows("population", "neutral", lambda v: f"{v / 1000:.2f} million people"), f"Change vs {prev}"),
-        ("Prices", *end_rows("cpi", "price", lambda v: f"CPI Index {v:.1f}"), f"Change vs {prev}"),
+        ("Income", *end_rows(measure_col, "income", lambda v: f"RM {v:,.0f} per month"), period_label),
+        ("Population", *end_rows("population", "neutral", lambda v: f"{v / 1000:.2f} million people"), period_label),
+        ("Prices", *end_rows("cpi", "price", lambda v: f"CPI Index {v:.1f}"), period_label),
     ], equal_height=True)
 
     picked = set(selected_states)
@@ -361,6 +394,13 @@ else:
     objective_banner(3, "Cost-of-Living Drivers",
                      "Identify which spending categories, such as food, housing and transport, push prices up the most, "
                      "and rank states by overall cost-of-living pressure.")
+    if comparison == baseline:
+        st.info(
+            f"{baseline} is the baseline year. Select a later year to view "
+            "overall price growth and spending-category changes."
+        )
+        st.stop()
+
     tbl = calc.category_growth_table(df, baseline, comparison)
     step = calc.category_growth_table(df, prev, comparison)  # latest step: previous survey year to selected year
     if tbl.empty or step.empty:
