@@ -22,10 +22,10 @@ MAP_VERSION = "4"  # change this number to force the map file to be read again
 st.markdown(f"""
 <style>
 .stApp {{ background:{BG}; color:{INK}; }}
-.block-container {{ max-width:1460px; padding-top:1.35rem; padding-bottom:2.5rem; }}
+.block-container {{ max-width:1460px; padding-top:.35rem; padding-bottom:2.5rem; }}
 [data-testid="stSidebar"] {{ background:#FFFFFF; border-right:1px solid {GRID}; }}
 [data-testid="stSidebar"] > div:first-child {{ padding:1.35rem 1.05rem 1rem; }}
-[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h2 {{font-size:1.22rem;letter-spacing:-.035em;font-weight:760;margin-bottom:.15rem;color:{INK};}}
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h2 {{font-size:1.32rem;letter-spacing:-.035em;font-weight:760;margin-bottom:.15rem;color:{INK};}}
 [data-testid="stSidebar"] hr {{ margin:.8rem 0; border-color:{GRID}; }}
 [data-testid="stSidebar"] [data-testid="stRadio"] > label {{ font-size:.78rem; color:{MUTED}; font-weight:650; }}
 [data-testid="stSidebar"] [data-testid="stSelectbox"] label {{ font-size:.82rem; color:{MUTED}; }}
@@ -37,7 +37,7 @@ h2 {{ font-size:1.28rem !important; font-weight:680 !important; }}
 p,label {{ color:{INK}; }}
 .page-kicker {{ color:{TEAL}; font-size:.72rem; font-weight:750; letter-spacing:.11em; text-transform:uppercase; margin-bottom:.35rem; }}
 .objective-card {{ background:#FFFFFF; border:1px solid {GRID}; border-left:5px solid {TEAL}; border-radius:12px;
-                   padding:.8rem 1.1rem; margin:.5rem 0 1.1rem; }}
+                   padding:.8rem 1.1rem; margin:.15rem 0 1.1rem; }}
 .objective-label {{ color:{TEAL}; font-size:.7rem; font-weight:750; letter-spacing:.09em; text-transform:uppercase; }}
 .objective-text {{ color:{INK}; font-size:1.02rem; margin-top:.15rem; }}
 .filter-heading {{ color:{MUTED}; font-size:.7rem; font-weight:750; letter-spacing:.09em; text-transform:uppercase; margin:0 0 .2rem; }}
