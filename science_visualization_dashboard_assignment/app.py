@@ -41,9 +41,9 @@ p,label {{ color:{INK}; }}
 .objective-label {{ color:{TEAL}; font-size:.7rem; font-weight:750; letter-spacing:.09em; text-transform:uppercase; }}
 .objective-text {{ color:{INK}; font-size:1.02rem; margin-top:.15rem; }}
 .filter-heading {{ color:{MUTED}; font-size:.7rem; font-weight:750; letter-spacing:.09em; text-transform:uppercase; margin:0 0 .2rem; }}
-.kpi {{ background:#FFFFFF; border:1px solid {GRID}; border-radius:12px; padding:13px 16px; min-height:118px; }}
+.kpi {{ background:#FFFFFF; border:1px solid {GRID}; border-radius:12px; padding:13px 16px; min-height:152px; box-sizing:border-box; }}
 .kpi-label {{ color:{MUTED}; font-size:.8rem; font-weight:650; line-height:1.25; }}
-.kpi-value {{ color:{INK}; font-size:1.55rem; font-weight:740; line-height:1.2; margin:.2rem 0 .15rem; overflow-wrap:anywhere; }}
+.kpi-value {{ color:{INK}; font-size:1.4rem; font-weight:740; line-height:1.2; margin:.2rem 0 .15rem; overflow-wrap:anywhere; }}
 .kpi-sub {{ color:{MUTED}; font-size:.8rem; line-height:1.3; }}
 [data-testid="stMetric"] {{ background:#FFFFFF; border:1px solid {GRID}; border-radius:12px; padding:12px 15px; min-height:96px; }}
 [data-testid="stMetricLabel"] p {{ color:{MUTED}; font-size:.78rem; line-height:1.25; }}
