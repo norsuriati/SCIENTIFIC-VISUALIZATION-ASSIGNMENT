@@ -1,4 +1,5 @@
 from pathlib import Path
+import html
 import math
 
 import pandas as pd
@@ -40,6 +41,10 @@ p,label {{ color:{INK}; }}
 .objective-label {{ color:{TEAL}; font-size:.7rem; font-weight:750; letter-spacing:.09em; text-transform:uppercase; }}
 .objective-text {{ color:{INK}; font-size:1.02rem; margin-top:.15rem; }}
 .filter-heading {{ color:{MUTED}; font-size:.7rem; font-weight:750; letter-spacing:.09em; text-transform:uppercase; margin:0 0 .2rem; }}
+.kpi {{ background:#FFFFFF; border:1px solid {GRID}; border-radius:12px; padding:13px 16px; min-height:118px; }}
+.kpi-label {{ color:{MUTED}; font-size:.8rem; font-weight:650; line-height:1.25; }}
+.kpi-value {{ color:{INK}; font-size:1.55rem; font-weight:740; line-height:1.2; margin:.2rem 0 .15rem; overflow-wrap:anywhere; }}
+.kpi-sub {{ color:{MUTED}; font-size:.8rem; line-height:1.3; }}
 [data-testid="stMetric"] {{ background:#FFFFFF; border:1px solid {GRID}; border-radius:12px; padding:12px 15px; min-height:96px; }}
 [data-testid="stMetricLabel"] p {{ color:{MUTED}; font-size:.78rem; line-height:1.25; }}
 [data-testid="stMetricValue"] {{ color:{INK}; font-size:1.42rem; font-weight:720; }}
@@ -135,9 +140,29 @@ def objective_banner(num, title, text):
 
 
 def cards(items):
-    """Summary boxes: items are (label, value, help text)."""
-    for col, (label, value, hint) in zip(st.columns(len(items)), items):
-        col.metric(label, value, help=hint)
+    """Summary boxes. Each item is (label, big value, one plain-language line, tooltip)."""
+    for col, (label, value, sub, hint) in zip(st.columns(len(items)), items):
+        col.markdown(
+            f'<div class="kpi" title="{html.escape(hint, quote=True)}">'
+            f'<div class="kpi-label">{html.escape(label)}</div>'
+            f'<div class="kpi-value">{html.escape(str(value))}</div>'
+            f'<div class="kpi-sub">{html.escape(sub)}</div></div>',
+            unsafe_allow_html=True,
+        )
+
+
+def link_text(r):
+    """Plain words for a correlation value."""
+    a = abs(r)
+    if a < 0.2:
+        return "No clear link"
+    word = "Weak" if a < 0.4 else "Moderate" if a < 0.6 else "Strong"
+    return f"{word} {'positive' if r > 0 else 'negative'} link"
+
+
+def gap_phrase(gap):
+    return (f"Income grew {gap:.0f} points more than prices" if gap >= 0
+            else f"Income fell {abs(gap):.0f} points behind prices")
 
 
 def interpretation(bullets, note=None):
@@ -221,14 +246,22 @@ if page.startswith("01"):
     best, worst = growth.iloc[0], growth.iloc[-1]
 
     cards([
-        ("Average income growth", f"{avg_inc:+.1f}%", f"{income_label} household income, {baseline} to {comparison}."),
-        ("Average price growth", f"{avg_price:+.1f}%", "Growth in the overall Consumer Price Index (CPI)."),
-        ("Income–price gap", f"{avg_gap:+.1f} pp", "Income growth minus price growth, in percentage points."),
+        ("Average income growth", f"{avg_inc:+.1f}%", f"{income_label} of households, {baseline} to {comparison}",
+         "How much household income grew on average across the states."),
+        ("Average price growth", f"{avg_price:+.1f}%", "Change in prices (Consumer Price Index)",
+         "Growth in the overall Consumer Price Index (CPI)."),
+        ("Income growth minus price growth", f"{avg_gap:+.1f} points",
+         "Above zero = income grew faster than prices",
+         "Income growth minus price growth, in percentage points."),
     ])
     cards([
-        ("Most affordable (largest gap)", short_state(best.state), f"Income grew {best.gap:+.1f} pp more than prices."),
-        ("Falling behind (smallest gap)", short_state(worst.state), f"Income grew {worst.gap:+.1f} pp more than prices."),
-        ("Income beat prices in", f"{n_beat} of {len(growth)} states", "A positive gap means purchasing power improved."),
+        ("Highest gap (best off)", short_state(best.state), gap_phrase(best.gap),
+         "The state where income grew furthest ahead of prices."),
+        ("Lowest gap (most behind)", short_state(worst.state), gap_phrase(worst.gap),
+         "The state where income grew least compared with prices."),
+        ("States where income beat prices", f"{n_beat} of {len(growth)}",
+         "Households there gained purchasing power" if n_beat else "No state gained purchasing power",
+         "A positive gap means purchasing power improved."),
     ])
 
     chart = growth_all.copy()
@@ -311,10 +344,14 @@ elif page.startswith("02"):
     top_inc = snap.sort_values(measure_col, ascending=False)
 
     cards([
-        ("Most populous state", short_state(top_pop.iloc[0].state), f"{top_pop.iloc[0].population / 1000:.1f} million people in {comparison}."),
-        ("Highest income", short_state(top_inc.iloc[0].state), f"{income_label}: RM {top_inc.iloc[0][measure_col]:,.0f} per month."),
-        ("Population vs income", f"r = {r_inc:+.2f}", "Rank correlation across states: 0 = no link, +1 = perfect link."),
-        ("Income vs prices", f"r = {r_ic:+.2f}", "Rank correlation: do higher-income states also have higher prices?"),
+        ("Highest income", short_state(top_inc.iloc[0].state), f"RM {top_inc.iloc[0][measure_col]:,.0f} per month in {comparison}",
+         f"{income_label} household income."),
+        ("Largest population", short_state(top_pop.iloc[0].state), f"{top_pop.iloc[0].population / 1000:.1f} million people in {comparison}",
+         "The state with the most people."),
+        ("More people, higher income?", link_text(r_inc), f"Correlation r = {r_inc:+.2f} (from -1 to +1)",
+         "Rank correlation across states: 0 = no link, +1 = perfect link."),
+        ("Higher income, higher prices?", link_text(r_ic), f"Correlation r = {r_ic:+.2f} (from -1 to +1)",
+         "Rank correlation across states: do richer states also have higher prices?"),
     ])
 
     picked = set(selected_states)
@@ -373,10 +410,16 @@ else:
     key_to_state = {calc.norm(s): s for s in state_list}
 
     cards([
-        ("Highest pressure state", short_state(state_list[0]), f"Overall prices up {tbl[calc.OVERALL].iloc[0]:.0f}%."),
-        ("Lowest pressure state", short_state(state_list[-1]), f"Overall prices up {tbl[calc.OVERALL].iloc[-1]:.0f}%."),
-        ("Fastest-rising category", cat_avg.index[0], f"Up {cat_avg.iloc[0]:.0f}% on average across states."),
-        ("Slowest category", cat_avg.index[-1], f"Changed {cat_avg.iloc[-1]:+.0f}% on average across states."),
+        ("Highest price rise (state)", short_state(state_list[0]), f"Overall prices up {tbl[calc.OVERALL].iloc[0]:.0f}%",
+         "The state with the largest overall price growth."),
+        ("Lowest price rise (state)", short_state(state_list[-1]), f"Overall prices up {tbl[calc.OVERALL].iloc[-1]:.0f}%",
+         "The state with the smallest overall price growth."),
+        ("Fastest-rising category", cat_avg.index[0], f"Prices up {cat_avg.iloc[0]:.0f}% on average",
+         "Average of the 16 states, not weighted by spending."),
+        ("Slowest-rising category", cat_avg.index[-1],
+         (f"Prices fell {abs(cat_avg.iloc[-1]):.0f}% on average" if cat_avg.iloc[-1] < -0.5
+          else f"Prices up only {cat_avg.iloc[-1]:.0f}% on average"),
+         "Average of the 16 states, not weighted by spending."),
     ])
 
     def _on_map_click():
