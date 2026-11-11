@@ -190,21 +190,14 @@ page = st.sidebar.radio(
     ["01  Income vs Price Growth", "02  Population, Income & Prices", "03  Cost-of-Living Drivers"],
 )
 st.sidebar.divider()
+# One year choice for the whole dashboard. Growth (pages 01 and 03) is always measured from the first survey year.
+baseline = YEARS[0]
+st.sidebar.markdown("### YEAR")
+comparison = st.sidebar.selectbox("Select year", YEARS[1:], index=len(YEARS[1:]) - 1, key="year_select")
 if page.startswith("02"):
-    # Page 02 compares states at one moment, so it only needs one year.
-    st.sidebar.markdown("### YEAR")
-    comparison = st.sidebar.selectbox("Year", YEARS, index=len(YEARS) - 1, key="snapshot_year")
-    baseline = None
-    st.sidebar.caption(f"Shows every state in {comparison}. Pages 01 and 03 compare two years instead.")
+    st.sidebar.caption(f"Shows every state in {comparison}.")
 else:
-    # Pages 01 and 03 measure change, which needs a start year and an end year.
-    st.sidebar.markdown("### TIME PERIOD")
-    baseline = st.sidebar.selectbox("From year", YEARS[:-1], index=0, key="baseline_year")
-    to_options = [y for y in YEARS if y > baseline]  # the To year is always after the From year
-    if st.session_state.get("comparison_year") not in to_options:
-        st.session_state.pop("comparison_year", None)
-    comparison = st.sidebar.selectbox("To year", to_options, index=len(to_options) - 1, key="comparison_year")
-    st.sidebar.caption(f"Change is measured from {baseline} to {comparison}. Page 02 shows one year at a time.")
+    st.sidebar.caption(f"Shows change from {baseline} (first survey year) to {comparison}.")
 st.sidebar.divider()
 with st.sidebar.expander("About the data"):
     st.markdown(
@@ -346,6 +339,8 @@ elif page.startswith("02"):
     r_inc = calc.rank_corr(snap.population, snap[measure_col])
     r_cpi = calc.rank_corr(snap.population, snap.cpi)
     r_ic = calc.rank_corr(snap[measure_col], snap.cpi)
+    first = calc.population_income_snapshot(df, baseline)
+    r_first = calc.rank_corr(first[measure_col], first.cpi)
     top_pop = snap.sort_values("population", ascending=False)
     top_inc = snap.sort_values(measure_col, ascending=False)
 
@@ -403,7 +398,10 @@ elif page.startswith("02"):
         + ("Having more people does not make a state richer or more expensive." if max(abs(r_inc), abs(r_cpi)) < 0.4
            else "States with more people tend to differ in income and prices."),
         f"Income and prices are {'**closely linked**' if r_ic >= 0.6 else '**moderately linked**' if r_ic >= 0.4 else 'only loosely linked'} "
-        f"(r = {r_ic:+.2f}): the highest-income states ({names(top_inc.state, 3)}) are also among the most expensive.",
+        f"(r = {r_ic:+.2f}): the highest-income states ({names(top_inc.state, 3)}) also had some of the biggest price rises since 2010.",
+        (f"The link between income and prices was much weaker in {baseline} (r = {r_first:+.2f}), so households in high-income states now face larger price rises than before."
+         if comparison != baseline and r_first < r_ic - 0.2 else
+         f"In {baseline} the same link was r = {r_first:+.2f}."),
         f"Those three states have very different populations, from {pop_range.min() / 1000:.1f} to {pop_range.max() / 1000:.1f} million. "
         "Their income is explained by their economy, not by their headcount.",
         "Pressure is greatest where prices are high but income is below the median: "
@@ -538,12 +536,18 @@ else:
     st.caption("Orange = prices rose, teal = prices fell. Bars past the dashed line rose faster than overall prices.")
     show(fig)
 
+    above = tbl.drop(columns=calc.OVERALL).gt(tbl[calc.OVERALL], axis=0).sum()
+    n_all = len(tbl)
+    lead = [c for c in cat_avg.head(3).index if above[c] == n_all]
     top3 = ", ".join(f"**{k}** ({v:+.0f}%)" for k, v in cat_avg.head(3).items())
     low = cat_avg.index[-1]
     bullets = [
         f"Across states, the fastest-rising categories from {baseline} to {comparison} are {top3}.",
         (f"**{low}** changed {cat_avg.iloc[-1]:+.0f}%, so not every price is going up."
          if cat_avg.iloc[-1] < -0.5 else f"**{low}** changed the least ({cat_avg.iloc[-1]:+.0f}%)."),
+        (f"{', '.join(lead)} rose faster than overall prices in every one of the {n_all} states, so they push the cost of living up everywhere."
+         if len(lead) >= 2 else
+         f"The fastest-rising category is above the overall price rise in {int(above[cat_avg.index[0]])} of {n_all} states."),
         f"Ranking by overall price growth: highest pressure in {', '.join(f'**{short_state(s)}** ({tbl.loc[s, calc.OVERALL]:+.0f}%)' for s in state_list[:3])}; "
         f"lowest in {', '.join(f'**{short_state(s)}** ({tbl.loc[s, calc.OVERALL]:+.0f}%)' for s in state_list[::-1][:3])}.",
     ]
