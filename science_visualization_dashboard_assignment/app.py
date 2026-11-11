@@ -350,7 +350,9 @@ elif page.startswith("02"):
     top_inc = snap.sort_values(measure_col, ascending=False)
 
     top_cpi = snap.sort_values("cpi", ascending=False)
-    q = snap[(snap.cpi >= snap.cpi.median()) & (snap[measure_col] < snap[measure_col].median())].sort_values("cpi", ascending=False)
+    # Pressure = prices high AND income low. Rank by how far price rank sits above income rank (ties broken fairly).
+    snap["pressure"] = snap.cpi.rank(pct=True) - snap[measure_col].rank(pct=True)
+    q = snap[(snap.cpi >= snap.cpi.median()) & (snap[measure_col] < snap[measure_col].median())].sort_values("pressure", ascending=False)
     if q.empty:
         pressure = ("None", "No state has high prices with below-average income")
     else:
