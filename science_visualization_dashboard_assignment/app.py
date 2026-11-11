@@ -190,16 +190,21 @@ page = st.sidebar.radio(
     ["01  Income vs Price Growth", "02  Population, Income & Prices", "03  Cost-of-Living Drivers"],
 )
 st.sidebar.divider()
-st.sidebar.markdown("### TIME PERIOD")
-baseline = st.sidebar.selectbox("From year", YEARS[:-1], index=0, key="baseline_year")
-to_options = [y for y in YEARS if y > baseline]  # the To year is always after the From year
-if st.session_state.get("comparison_year") not in to_options:
-    st.session_state.pop("comparison_year", None)
-comparison = st.sidebar.selectbox("To year", to_options, index=len(to_options) - 1, key="comparison_year")
-st.sidebar.caption(
-    f"Growth is measured from {baseline} to {comparison}. "
-    f"Page 02 shows the snapshot for {comparison}."
-)
+if page.startswith("02"):
+    # Page 02 compares states at one moment, so it only needs one year.
+    st.sidebar.markdown("### YEAR")
+    comparison = st.sidebar.selectbox("Year", YEARS, index=len(YEARS) - 1, key="snapshot_year")
+    baseline = None
+    st.sidebar.caption(f"Shows every state in {comparison}. Pages 01 and 03 compare two years instead.")
+else:
+    # Pages 01 and 03 measure change, which needs a start year and an end year.
+    st.sidebar.markdown("### TIME PERIOD")
+    baseline = st.sidebar.selectbox("From year", YEARS[:-1], index=0, key="baseline_year")
+    to_options = [y for y in YEARS if y > baseline]  # the To year is always after the From year
+    if st.session_state.get("comparison_year") not in to_options:
+        st.session_state.pop("comparison_year", None)
+    comparison = st.sidebar.selectbox("To year", to_options, index=len(to_options) - 1, key="comparison_year")
+    st.sidebar.caption(f"Change is measured from {baseline} to {comparison}. Page 02 shows one year at a time.")
 st.sidebar.divider()
 with st.sidebar.expander("About the data"):
     st.markdown(
