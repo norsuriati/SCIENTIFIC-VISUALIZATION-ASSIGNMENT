@@ -343,15 +343,24 @@ elif page.startswith("02"):
     top_pop = snap.sort_values("population", ascending=False)
     top_inc = snap.sort_values(measure_col, ascending=False)
 
+    top_cpi = snap.sort_values("cpi", ascending=False)
+    q = snap[(snap.cpi >= snap.cpi.median()) & (snap[measure_col] < snap[measure_col].median())].sort_values("cpi", ascending=False)
+    if q.empty:
+        pressure = ("None", "No state has high prices with below-average income")
+    else:
+        others = [short_state(s) for s in q.state.iloc[1:3]]
+        pressure = (short_state(q.state.iloc[0]),
+                    "High prices, lower income" + (f" (also {', '.join(others)})" if others else ""))
+
     cards([
-        ("Highest income", short_state(top_inc.iloc[0].state), f"RM {top_inc.iloc[0][measure_col]:,.0f} per month in {comparison}",
-         f"{income_label} household income."),
-        ("Largest population", short_state(top_pop.iloc[0].state), f"{top_pop.iloc[0].population / 1000:.1f} million people in {comparison}",
-         "The state with the most people."),
-        ("More people, higher income?", link_text(r_inc), f"Correlation r = {r_inc:+.2f} (from -1 to +1)",
-         "Rank correlation across states: 0 = no link, +1 = perfect link."),
-        ("Higher income, higher prices?", link_text(r_ic), f"Correlation r = {r_ic:+.2f} (from -1 to +1)",
-         "Rank correlation across states: do richer states also have higher prices?"),
+        ("Highest income", short_state(top_inc.iloc[0].state), f"RM {top_inc.iloc[0][measure_col]:,.0f} per month",
+         f"{income_label} household income in {comparison}."),
+        ("Largest population", short_state(top_pop.iloc[0].state), f"{top_pop.iloc[0].population / 1000:.1f} million people",
+         f"The state with the most people in {comparison}."),
+        ("Highest prices", short_state(top_cpi.iloc[0].state), f"Prices {top_cpi.iloc[0].cpi - 100:.0f}% higher than in 2010",
+         "Based on the Overall Consumer Price Index (2010 = 100)."),
+        ("Most pressure on households", pressure[0], pressure[1],
+         "States where prices are above the median but income is below the median."),
     ])
 
     picked = set(selected_states)
@@ -379,7 +388,6 @@ elif page.startswith("02"):
     st.caption("Each dot is a state. Darker orange = higher prices. Hover for exact values.")
     show(chart_layout(fig, 620))
 
-    q = snap[(snap.cpi >= snap.cpi.median()) & (snap[measure_col] < snap[measure_col].median())].sort_values("cpi", ascending=False)
     pop_range = top_inc.head(3).population
     interpretation([
         f"Population size has **{strength(r_inc)} link** with income (r = {r_inc:+.2f}) and **{strength(r_cpi)} link** "
