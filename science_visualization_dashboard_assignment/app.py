@@ -41,7 +41,7 @@ p,label {{ color:{INK}; }}
 .objective-label {{ color:{TEAL}; font-size:.7rem; font-weight:750; letter-spacing:.09em; text-transform:uppercase; }}
 .objective-text {{ color:{INK}; font-size:1.02rem; margin-top:.15rem; }}
 .filter-heading {{ color:{MUTED}; font-size:.7rem; font-weight:750; letter-spacing:.09em; text-transform:uppercase; margin:0 0 .2rem; }}
-.kpi {{ background:#FFFFFF; border:1px solid {GRID}; border-radius:12px; padding:13px 16px; min-height:152px; box-sizing:border-box; }}
+.kpi {{ background:#FFFFFF; border:1px solid {GRID}; border-radius:12px; padding:13px 16px; box-sizing:border-box; }}
 .kpi-label {{ color:{MUTED}; font-size:.8rem; font-weight:650; line-height:1.25; }}
 .kpi-value {{ color:{INK}; font-size:1.4rem; font-weight:740; line-height:1.2; margin:.2rem 0 .15rem; overflow-wrap:anywhere; }}
 .kpi-sub {{ color:{MUTED}; font-size:.8rem; line-height:1.3; }}
@@ -143,7 +143,7 @@ def cards(items):
     """Summary boxes. Each item is (label, big value, one plain-language line, tooltip)."""
     for col, (label, value, sub, hint) in zip(st.columns(len(items)), items):
         col.markdown(
-            f'<div class="kpi" title="{html.escape(hint, quote=True)}">'
+            f'<div class="kpi" style="min-height:{120 if len(items) <= 3 else 150}px" title="{html.escape(hint, quote=True)}">'
             f'<div class="kpi-label">{html.escape(label)}</div>'
             f'<div class="kpi-value">{html.escape(str(value))}</div>'
             f'<div class="kpi-sub">{html.escape(sub)}</div></div>',
