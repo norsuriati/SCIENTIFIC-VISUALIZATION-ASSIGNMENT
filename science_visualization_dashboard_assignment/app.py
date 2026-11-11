@@ -273,30 +273,31 @@ if page.startswith("01"):
 
     fig = go.Figure()
     fig.add_trace(go.Bar(
-        y=chart.label, x=chart.income_growth, orientation="h", name=f"{income_label} growth",
+        y=chart.label, x=chart.income_growth, orientation="h", name=f"{income_label} growth ({baseline}–{comparison})",
         marker_color=inc_colors, text=[f"{v:.0f}%" for v in chart.income_growth],
         textposition="outside", cliponaxis=False, customdata=hover_extra,
-        hovertemplate="<b>%{y}</b><br>Income growth: %{x:.1f}%<br>Real income growth: %{customdata[0]:+.1f}%"
+        hovertemplate="<b>%{y}</b><br>Change " + f"{baseline} to {comparison}" + "<br>Income growth: %{x:.1f}%<br>Real income growth: %{customdata[0]:+.1f}%"
                       "<br>Income–price gap: %{customdata[1]:+.1f} pp<extra></extra>",
     ))
     fig.add_trace(go.Bar(
-        y=chart.label, x=chart.price_growth, orientation="h", name="Price (CPI) growth",
+        y=chart.label, x=chart.price_growth, orientation="h", name=f"Price (CPI) growth ({baseline}–{comparison})",
         marker_color=price_colors, text=[f"{v:.0f}%" for v in chart.price_growth],
         textposition="outside", cliponaxis=False,
-        hovertemplate="<b>%{y}</b><br>Price growth: %{x:.1f}%<extra></extra>",
+        hovertemplate="<b>%{y}</b><br>Change " + f"{baseline} to {comparison}" + "<br>Price growth: %{x:.1f}%<extra></extra>",
     ))
     hi = max(float(chart.income_growth.max()), float(chart.price_growth.max()), 0)
     lo = min(float(chart.income_growth.min()), float(chart.price_growth.min()), 0)
     height = max(590, 34 * len(chart) + 120)
     fig = chart_layout(fig, height)
     fig.update_layout(barmode="group", bargap=.25, bargroupgap=.08, legend_title="",
-                      yaxis_title="", xaxis_title="Growth (%)", margin=dict(l=28, r=65, t=55, b=45))
+                      yaxis_title="", xaxis_title=f"Change from {baseline} to {comparison} (%)", margin=dict(l=28, r=65, t=55, b=45))
     fig.update_yaxes(categoryorder="array", categoryarray=chart.label.tolist(), autorange="reversed",
                      tickfont=dict(size=11))
     fig.update_xaxes(ticksuffix="%", showgrid=True, gridcolor=GRID, zeroline=True, zerolinecolor="#AAB5BF",
                      range=[min(0, lo * 1.12), hi * 1.16 if hi > 0 else 1])
     st.subheader(f"Income and price growth by state · {baseline} to {comparison}")
-    st.caption("States are ranked by the income–price gap, the most affordable at the top.")
+    st.caption(f"Each bar shows how much it grew between {baseline} and {comparison}. "
+               "States are ranked by the income–price gap, the most affordable at the top.")
     show(fig)
 
     ratio = (f" Income grew about {avg_inc / avg_price:.1f} times as fast as prices."
@@ -371,17 +372,17 @@ elif page.startswith("02"):
         marker=dict(size=15, color=snap.cpi, colorscale=["#FDE6D6", "#F8A670", PRICE_ORANGE, "#B23A00"],
                     opacity=[0.95 if f else 0.3 for f in focus],
                     line=dict(color=[INK if (picked and f) else WHITE for f in focus], width=1.6),
-                    colorbar=dict(title="Overall CPI<br>(2010 = 100)", thickness=13, len=.72)),
+                    colorbar=dict(title=f"Overall CPI<br>{comparison}<br>(2010 = 100)", thickness=13, len=.72)),
         customdata=snap[["cpi"]],
         hovertemplate="<b>%{text}</b><br>Population: %{x:,.0f} thousand persons<br>"
                       + income_label + ": RM %{y:,.0f} per month<br>Overall CPI: %{customdata[0]:.1f}<extra></extra>",
     ))
     pmin, pmax = float(snap.population.min()), float(snap.population.max())
     ticks = [t for t in (100, 250, 500, 1000, 2500, 5000) if pmin * 0.7 <= t <= pmax * 1.4]
-    fig.update_xaxes(type="log", title="Population (log scale)", showgrid=True, gridcolor=GRID,
+    fig.update_xaxes(type="log", title=f"Population in {comparison} (log scale)", showgrid=True, gridcolor=GRID,
                      tickvals=ticks, ticktext=[f"{t / 1000:g}M" for t in ticks],
                      range=[math.log10(pmin * 0.7), math.log10(pmax * 1.4)])
-    fig.update_yaxes(title=f"{income_label} monthly household income (RM)", tickformat=",", showgrid=True,
+    fig.update_yaxes(title=f"{income_label} monthly income in {comparison} (RM)", tickformat=",", showgrid=True,
                      gridcolor=GRID, rangemode="tozero")
     fig.update_layout(showlegend=False)
     st.subheader(f"Population, {income_label.lower()} and prices by state · {comparison}")
@@ -468,7 +469,7 @@ else:
             text=[short_state(s) for s in state_list], colorscale="Oranges",
             marker_line_color="white", marker_line_width=1,
             selected=dict(marker=dict(opacity=1)), unselected=dict(marker=dict(opacity=1)),
-            colorbar=dict(title="Price growth<br>(%)", thickness=12, len=0.8),
+            colorbar=dict(title=f"Price growth<br>{baseline}–{comparison}<br>(%)", thickness=12, len=0.8),
             hovertemplate="<b>%{text}</b><br>Overall prices: %{z:+.0f}%<extra></extra>", **common,
         ))
         chosen = st.session_state["p3_state"]
