@@ -22,10 +22,10 @@ MAP_VERSION = "4"  # change this number to force the map file to be read again
 st.markdown(f"""
 <style>
 .stApp {{ background:{BG}; color:{INK}; }}
-.block-container {{ max-width:1460px; padding-top:.35rem; padding-bottom:2.5rem; }}
+.block-container {{ max-width:1460px; padding-top:1.35rem; padding-bottom:2.5rem; }}
 [data-testid="stSidebar"] {{ background:#FFFFFF; border-right:1px solid {GRID}; }}
 [data-testid="stSidebar"] > div:first-child {{ padding:1.35rem 1.05rem 1rem; }}
-[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h2 {{font-size:1.32rem;letter-spacing:-.035em;font-weight:760;margin-bottom:.15rem;color:{INK};}}
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h2 {{font-size:1.18rem;letter-spacing:-.03em;}}
 [data-testid="stSidebar"] hr {{ margin:.8rem 0; border-color:{GRID}; }}
 [data-testid="stSidebar"] [data-testid="stRadio"] > label {{ font-size:.78rem; color:{MUTED}; font-weight:650; }}
 [data-testid="stSidebar"] [data-testid="stSelectbox"] label {{ font-size:.82rem; color:{MUTED}; }}
@@ -37,26 +37,24 @@ h2 {{ font-size:1.28rem !important; font-weight:680 !important; }}
 p,label {{ color:{INK}; }}
 .page-kicker {{ color:{TEAL}; font-size:.72rem; font-weight:750; letter-spacing:.11em; text-transform:uppercase; margin-bottom:.35rem; }}
 .objective-card {{ background:#FFFFFF; border:1px solid {GRID}; border-left:5px solid {TEAL}; border-radius:12px;
-                   padding:.8rem 1.1rem; margin:.15rem 0 1.1rem; }}
+                   padding:.8rem 1.1rem; margin:.5rem 0 1.1rem; }}
 .objective-label {{ color:{TEAL}; font-size:.7rem; font-weight:750; letter-spacing:.09em; text-transform:uppercase; }}
 .objective-text {{ color:{INK}; font-size:1.02rem; margin-top:.15rem; }}
 .filter-heading {{ color:{MUTED}; font-size:.7rem; font-weight:750; letter-spacing:.09em; text-transform:uppercase; margin:0 0 .2rem; }}
 .kpi {{ background:#FFFFFF; border:1px solid {GRID}; border-radius:12px; padding:13px 16px; box-sizing:border-box; }}
-.kpi.equal-height {{ height:258px; display:flex; flex-direction:column; }}
-.kpi.equal-height .kpi-row {{ flex:1 1 0; align-items:flex-start; }}
-.kpi.equal-height .kpi-name {{ min-width:0; overflow-wrap:anywhere; }}
-
-.kpi-header {{ display:flex; align-items:center; justify-content:space-between; gap:.5rem; margin-bottom:.35rem; }}
 .kpi-label {{ color:{MUTED}; font-size:.8rem; font-weight:650; line-height:1.25; }}
-.kpi-period {{ display:inline-flex; align-items:center; gap:.25rem; flex:0 0 auto; padding:.2rem .5rem; border-radius:999px; background:#F2F4F7; color:{MUTED}; font-size:.66rem; font-weight:750; letter-spacing:.035em; white-space:nowrap; }}
 .kpi-value {{ color:{INK}; font-size:1.4rem; font-weight:740; line-height:1.2; margin:.2rem 0 .15rem; overflow-wrap:anywhere; }}
 .kpi-sub {{ color:{MUTED}; font-size:.82rem; line-height:1.3; }}
 .kpi-row {{ display:flex; align-items:baseline; gap:.6rem; padding:.28rem 0; border-top:1px solid {GRID}; }}
-.kpi-tag {{ flex:0 0 3.9rem; color:{MUTED}; font-size:.72rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }}
-.kpi-name {{ flex:1; color:{INK}; font-size:1.02rem; font-weight:720; line-height:1.25; }}
-.kpi-name small {{ display:block; color:{MUTED}; font-size:.78rem; font-weight:500; }}
+.kpi-tag {{ flex:0 0 3.5rem; color:{MUTED}; font-size:.72rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }}
+.kpi-name {{ flex:1; color:{INK}; font-size:1rem; font-weight:720; line-height:1.25; white-space:nowrap; }}
+.kpi-name small {{ display:block; color:{MUTED}; font-size:.78rem; font-weight:500; white-space:normal; }}
 .kpi-chg {{ flex:0 0 auto; font-size:.9rem; font-weight:700; white-space:nowrap; }}
-.kpi-foot {{ color:{MUTED}; font-size:.72rem; margin-top:.3rem; }}
+.kpi-head {{ display:flex; justify-content:space-between; align-items:center; margin-bottom:.4rem; }}
+.kpi-pill {{ font-size:.72rem; font-weight:720; border-radius:999px; padding:.12rem .55rem; white-space:nowrap; }}
+.pill-income {{ background:#EAF0FD; color:{INCOME_BLUE}; }}
+.pill-price {{ background:#FDEDE3; color:#C84A06; }}
+.pill-neutral {{ background:#EEF1F5; color:{MUTED}; }}
 .kpi-delta {{ font-size:.86rem; font-weight:680; line-height:1.3; margin-top:.2rem; }}
 .legend-row {{ display:flex; gap:1.3rem; align-items:center; flex-wrap:wrap; font-size:.8rem; color:{MUTED}; margin:.1rem 0 .55rem; }}
 .lg-item {{ display:inline-flex; align-items:center; gap:.4rem; }}
@@ -159,8 +157,8 @@ def chg(change, tone="price"):
     return f"{'▲' if change >= 0 else '▼'} {change:+.1f}%", ("down" if change < 0 else tone)
 
 
-def cards(items, equal_height=False):
-    """Summary cards. The comparison period is shown as a compact header badge.
+def cards(items):
+    """Summary cards. Each item is (title, highest row, lowest row, pill text, tone).
     A row is (name, detail or None, change text, tone)."""
     def row(tag, r):
         name, detail, change, tone = r
@@ -168,13 +166,10 @@ def cards(items, equal_height=False):
         return (f'<div class="kpi-row"><span class="kpi-tag">{tag}</span>'
                 f'<span class="kpi-name">{html.escape(name)}{small}</span>'
                 f'<span class="kpi-chg" style="color:{TONES[tone]}">{html.escape(change)}</span></div>')
-    for col, (title, hi, lo, foot) in zip(st.columns(len(items)), items):
-        period_text = str(foot).replace("Change ", "").replace("change ", "").split(",")[0]
-        period = html.escape(period_text)
+    for col, (title, hi, lo, pill, tone) in zip(st.columns(len(items)), items):
         col.markdown(
-            f'<div class="kpi{" equal-height" if equal_height else ""}"><div class="kpi-header">'
-            f'<span class="kpi-label">{html.escape(title)}</span>'
-            f'<span class="kpi-period">{period.upper()}</span></div>'
+            f'<div class="kpi"><div class="kpi-head"><span class="kpi-label">{html.escape(title)}</span>'
+            f'<span class="kpi-pill pill-{tone}">{html.escape(pill)}</span></div>'
             f'{row("Highest", hi)}{row("Lowest", lo)}</div>',
             unsafe_allow_html=True,
         )
@@ -215,26 +210,13 @@ page = st.sidebar.radio(
     ["01  Income vs Price Growth", "02  Population, Income & Prices", "03  Cost-of-Living Drivers"],
 )
 st.sidebar.divider()
-# One shared year filter for all objectives, populated directly from the dataset.
+# One year choice for the whole dashboard. Growth (pages 01 and 03) is always measured from the first survey year.
 baseline = YEARS[0]
 st.sidebar.markdown("### YEAR")
-comparison = st.sidebar.selectbox(
-    "Select year",
-    YEARS,
-    index=len(YEARS) - 1,
-    key="year_select",
-)
-prev = max((y for y in YEARS if y < comparison), default=None)
-if comparison == baseline:
-    st.sidebar.caption(
-        f"{baseline} is the baseline year. Objective 1 and 3 growth comparisons "
-        "start from the next available survey year."
-    )
-else:
-    st.sidebar.caption(
-        f"Available years follow the dataset: {', '.join(map(str, YEARS))}. "
-        f"Growth in Objectives 1 and 3 is measured from {baseline}."
-    )
+comparison = st.sidebar.selectbox("Select year", YEARS[1:], index=len(YEARS[1:]) - 1, key="year_select")
+prev = max(y for y in YEARS if y < comparison)  # the survey year before the one selected
+st.markdown('<div class="page-kicker">MALAYSIA · COST OF LIVING</div>', unsafe_allow_html=True)
+st.title("Cost of Living Dashboard")
 
 # =================================================================== PAGE 1
 if page.startswith("01"):
@@ -250,13 +232,6 @@ if page.startswith("01"):
                                               "The summary boxes follow your selection.")
     measure_col = "income_mean" if income_label == "Mean income" else "income_median"
 
-    if comparison == baseline:
-        st.info(
-            f"{baseline} is the baseline year. Select a later year to view income "
-            "and price growth compared with the baseline."
-        )
-        st.stop()
-
     growth_all = calc.growth_comparison(df, baseline, comparison, measure_col).sort_values("gap", ascending=False)
     step = calc.growth_comparison(df, prev, comparison, measure_col)  # latest step: previous survey year to selected year
     if selected_states:
@@ -270,8 +245,8 @@ if page.startswith("01"):
         return ((short_state(hi.state), None, *chg(hi[col], tone)), (short_state(lo.state), None, *chg(lo[col], tone)))
 
     cards([
-        ("Income", *end_rows("income_growth", "income"), f"Change vs {prev}"),
-        ("Prices", *end_rows("price_growth", "price"), f"Change vs {prev}"),
+        ("Income", *end_rows("income_growth", "income"), f"vs {prev}", "income"),
+        ("Prices", *end_rows("price_growth", "price"), f"vs {prev}", "price"),
     ])
 
     chart = growth_all.copy()
@@ -323,8 +298,7 @@ elif page.startswith("02"):
     measure_col = "income_mean" if income_label == "Mean income" else "income_median"
 
     snap = calc.population_income_snapshot(df, comparison)
-    before = (calc.population_income_snapshot(df, prev).set_index("state")
-              if prev is not None else pd.DataFrame())
+    before = calc.population_income_snapshot(df, prev).set_index("state")
     if snap.empty:
         st.warning("No data available for this year.")
         st.stop()
@@ -334,29 +308,19 @@ elif page.startswith("02"):
     top_cpi = snap.sort_values("cpi", ascending=False).iloc[0]
 
     def change(row, col):
-        if prev is None or row.state not in before.index:
-            return None
-        return (row[col] / before.loc[row.state, col] - 1) * 100
+        return (row[col] / before.loc[row.state, col] - 1) * 100 if row.state in before.index else 0.0
 
     def end_rows(col, tone, detail):
         ordered = snap.sort_values(col, ascending=False)
         hi, lo = ordered.iloc[0], ordered.iloc[-1]
+        return ((short_state(hi.state), detail(hi[col]), *chg(change(hi, col), tone)),
+                (short_state(lo.state), detail(lo[col]), *chg(change(lo, col), tone)))
 
-        def change_display(row):
-            value = change(row, col)
-            return ("—", "neutral") if value is None else chg(value, tone)
-
-        hi_change, hi_tone = change_display(hi)
-        lo_change, lo_tone = change_display(lo)
-        return ((short_state(hi.state), detail(hi[col]), hi_change, hi_tone),
-                (short_state(lo.state), detail(lo[col]), lo_change, lo_tone))
-
-    period_label = "Baseline year" if prev is None else f"Change vs {prev}"
     cards([
-        ("Income", *end_rows(measure_col, "income", lambda v: f"RM {v:,.0f} per month"), period_label),
-        ("Population", *end_rows("population", "neutral", lambda v: f"{v / 1000:.2f} million people"), period_label),
-        ("Prices", *end_rows("cpi", "price", lambda v: f"CPI Index {v:.1f}"), period_label),
-    ], equal_height=True)
+        ("Income", *end_rows(measure_col, "income", lambda v: f"RM {v:,.0f} / month"), f"vs {prev}", "income"),
+        ("Population", *end_rows("population", "neutral", lambda v: f"{v / 1000:.2f} million"), f"vs {prev}", "neutral"),
+        ("Prices", *end_rows("cpi", "price", lambda v: f"CPI {v:.1f}"), f"vs {prev}", "price"),
+    ])
 
     picked = set(selected_states)
     focus = [(not picked) or s in picked for s in snap.state]
@@ -392,13 +356,6 @@ else:
     objective_banner(3, "Cost-of-Living Drivers",
                      "Identify which spending categories, such as food, housing and transport, push prices up the most, "
                      "and rank states by overall cost-of-living pressure.")
-    if comparison == baseline:
-        st.info(
-            f"{baseline} is the baseline year. Select a later year to view "
-            "overall price growth and spending-category changes."
-        )
-        st.stop()
-
     tbl = calc.category_growth_table(df, baseline, comparison)
     step = calc.category_growth_table(df, prev, comparison)  # latest step: previous survey year to selected year
     if tbl.empty or step.empty:
@@ -415,11 +372,11 @@ else:
         ("State prices (overall)",
          (short_state(st_sorted.index[0]), None, *chg(float(st_sorted.iloc[0]))),
          (short_state(st_sorted.index[-1]), None, *chg(float(st_sorted.iloc[-1]))),
-         f"Change vs {prev}"),
-        ("Spending category prices",
+         f"vs {prev}", "price"),
+        ("Spending category prices (average)",
          (step_cat.index[0], None, *chg(float(step_cat.iloc[0]))),
          (step_cat.index[-1], None, *chg(float(step_cat.iloc[-1]))),
-         f"Change vs {prev}, average of all states"),
+         f"vs {prev}", "price"),
     ])
 
     def _on_map_click():
